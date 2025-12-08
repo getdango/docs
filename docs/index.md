@@ -1,38 +1,8 @@
-# Welcome to Dango Documentation
+# Dango Documentation
 
-**Open source data platform built with production-grade tools**
+Dango is an open-source data platform that integrates **dlt + dbt + DuckDB + Metabase** into a single, pre-configured stack.
 
 Works on your laptop today. Designed to scale to production tomorrow.
-
----
-
-## What is Dango?
-
-Dango deploys a complete data stack (dlt + dbt + DuckDB + Metabase) to your laptop with one command.
-
-<div class="feature-grid" markdown>
-
-<div class="feature-item" markdown>
-### Fast Setup
-Get a complete data platform running on your laptop in minutes, not weeks.
-</div>
-
-<div class="feature-item" markdown>
-### Production-Grade Tools
-Built with dlt, dbt, DuckDB, and Metabase - the same tools used in production.
-</div>
-
-<div class="feature-item" markdown>
-### Simple to Start
-Wizard-driven setup for common use cases. No complex configuration required.
-</div>
-
-<div class="feature-item" markdown>
-### Fully Customizable
-Direct access to dlt and dbt. Build custom sources, write SQL transformations.
-</div>
-
-</div>
 
 ---
 
@@ -91,37 +61,6 @@ dango start
     Common issues and solutions
 
 </div>
-
----
-
-## Who is Dango For?
-
-- Solo data professionals
-- Fractional consultants
-- SMEs needing analytics fast
-- Anyone who wants a "real" data stack without the complexity
-
----
-
-## Why Dango?
-
-**Most tools force you to choose:**
-
-- ❌ Simple setup (limited features) OR Enterprise platforms (expensive, complex)
-- ❌ No-code (inflexible) OR Full-code (steep learning curve)
-- ❌ Fast setup (toy project) OR Production-grade (weeks of work)
-
-**Dango gives you both:**
-
-- ✅ Starts on your laptop, designed to scale to your infrastructure
-- ✅ Wizard-driven AND fully customizable
-- ✅ Fast setup AND best practices built-in
-
----
-
-## Current Version: v0.0.5
-
-Dango is in active MVP development. See the [changelog](https://github.com/getdango/dango/blob/main/CHANGELOG.md) for the latest updates.
 
 ---
 

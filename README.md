@@ -9,6 +9,7 @@ Official documentation for Dango - Open Source Data Platform
 - **Live URL**: https://docs.getdango.dev (coming soon)
 - **Framework**: MkDocs Material
 - **Deployment**: Cloudflare Pages
+- **Design**: Teal (#14B8A6) and Indigo (#6366F1) matching getdango.dev
 
 ## Development
 
