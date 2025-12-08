@@ -1,0 +1,184 @@
+site_name: Dango Documentation
+site_url: https://docs.getdango.dev
+site_description: Open source data platform built with production-grade tools
+site_author: Dango Team
+repo_url: https://github.com/getdango/dango
+repo_name: getdango/dango
+edit_uri: ""
+
+# Copyright
+copyright: Copyright &copy; 2025 Dango
+
+# Theme Configuration
+theme:
+  name: material
+  favicon: assets/favicon.svg
+  logo: assets/logo.svg
+
+  # Color scheme - Teal matching main website (getdango.dev)
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  # Features
+  features:
+    # Navigation
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    - navigation.tracking
+
+    # Table of contents
+    - toc.follow
+    - toc.integrate
+
+    # Search
+    - search.suggest
+    - search.highlight
+    - search.share
+
+    # Content
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+
+    # Header
+    - announce.dismiss
+
+  # Font
+  font:
+    text: Inter
+    code: JetBrains Mono
+
+  # Icon
+  icon:
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+
+# Additional CSS
+extra_css:
+  - stylesheets/extra.css
+
+# Additional JavaScript
+extra_javascript:
+  - javascripts/extra.js
+
+# Extensions
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - tables
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Plugins
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"/]+|(?!\b)(?=[A-Z][a-z])|\.(?!\d)|&[lg]t;'
+  - minify:
+      minify_html: true
+  - git-revision-date-localized:
+      enable_creation_date: true
+      type: timeago
+
+# Extra configuration
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/getdango/dango
+      name: GitHub Repository
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/getdango/
+      name: PyPI Package
+
+  version:
+    provider: mike
+    default: stable
+
+# Navigation Structure
+nav:
+  - Home: index.md
+
+  - Getting Started:
+    - getting-started/index.md
+    - What is Dango?: getting-started/what-is-dango.md
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+    - Troubleshooting: getting-started/troubleshooting.md
+
+  # Placeholder sections - will be populated in later phases
+  - Core Concepts:
+    - core-concepts/index.md
+
+  - Data Sources:
+    - data-sources/index.md
+
+  - Transformations:
+    - transformations/index.md
+
+  - Dashboards:
+    - dashboards/index.md
+
+  - Reference:
+    - reference/index.md
+
+  - Community:
+    - community/index.md
