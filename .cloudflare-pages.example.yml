@@ -1,6 +1,9 @@
 # Cloudflare Pages Build Configuration
-# This file documents the build settings for Cloudflare Pages deployment
-# Configure these settings in the Cloudflare Pages dashboard
+#
+# IMPORTANT: This file is for DOCUMENTATION ONLY and is NOT used by Cloudflare Pages.
+# Cloudflare Pages configuration must be set in the Cloudflare Dashboard.
+#
+# This file documents the recommended build settings for reference.
 
 build:
   command: pip install -r requirements.txt && mkdocs build

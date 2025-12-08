@@ -104,7 +104,7 @@ Format: `YYYY-MM-DD/<type>/<short-description>`
 
 ## Project Plan
 
-See `/Users/aaronteoh/Desktop/code/getdango/DOCS_WEBSITE_PLAN.md` for the complete implementation plan.
+See `../DOCS_WEBSITE_PLAN.md` for the complete implementation plan.
 
 ## Related Repositories
 
