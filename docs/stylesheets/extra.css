@@ -1,0 +1,120 @@
+/**
+ * Dango Documentation - Custom Styles
+ * Matching main website branding: Red #ef4444, Teal #14B8A6
+ */
+
+:root {
+  /* Primary red from main website */
+  --md-primary-fg-color: #ef4444;
+  --md-primary-fg-color--light: #f87171;
+  --md-primary-fg-color--dark: #dc2626;
+
+  /* Teal accent from main website */
+  --md-accent-fg-color: #14B8A6;
+  --md-accent-fg-color--transparent: rgba(20, 184, 166, 0.1);
+
+  /* Additional brand colors */
+  --dango-red: #ef4444;
+  --dango-teal: #14B8A6;
+}
+
+/* Override default red palette with exact brand color */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #ef4444;
+  --md-accent-fg-color: #14B8A6;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #ef4444;
+  --md-accent-fg-color: #14B8A6;
+}
+
+/* Custom button styling */
+.md-button {
+  border-radius: 0.5rem;
+}
+
+.md-button--primary {
+  background-color: var(--dango-red);
+  border-color: var(--dango-red);
+}
+
+.md-button--primary:hover,
+.md-button--primary:focus {
+  background-color: var(--md-primary-fg-color--dark);
+  border-color: var(--md-primary-fg-color--dark);
+}
+
+/* Code block styling */
+.highlight code {
+  border-radius: 0.375rem;
+}
+
+/* Admonition styling */
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 0.5rem;
+}
+
+/* Link hover effects */
+.md-typeset a:hover {
+  color: var(--dango-teal);
+}
+
+/* Custom hero section for homepage */
+.hero {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  font-size: 1.25rem;
+  color: var(--md-default-fg-color--light);
+  margin-bottom: 2rem;
+}
+
+/* Feature grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.feature-item {
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+}
+
+.feature-item h3 {
+  margin-top: 0;
+  color: var(--dango-red);
+}
+
+/* Command line examples */
+.md-typeset code {
+  background-color: var(--md-code-bg-color);
+  border-radius: 0.25rem;
+}
+
+/* Improve table styling */
+.md-typeset table:not([class]) {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Navigation improvements */
+.md-nav__link--active {
+  color: var(--dango-red);
+}
+
+.md-nav__link:hover {
+  color: var(--dango-teal);
+}
