@@ -202,17 +202,27 @@ The Web UI provides:
 
 ### Query Your Data with SQL
 
-You can also query DuckDB directly:
+You can also query DuckDB directly using the DuckDB CLI:
 
 ```bash
-dango query "SELECT * FROM marts.dim_customers LIMIT 10"
+# Install DuckDB CLI if not already installed
+# brew install duckdb  # macOS
+# apt-get install duckdb  # Linux
+
+# Query your data
+duckdb data/warehouse.duckdb "SELECT * FROM marts.dim_customers LIMIT 10"
 ```
 
 Or open an interactive SQL session:
 
 ```bash
-dango query --interactive
+duckdb data/warehouse.duckdb
+
+D SELECT * FROM marts.dim_customers LIMIT 10;
+D .exit
 ```
+
+**Recommended**: Use Metabase's SQL editor at `http://localhost:3000` for a better query experience with autocomplete and visualization.
 
 ---
 
@@ -251,19 +261,44 @@ Your new model is now available in DuckDB and Metabase!
 
 ## Step 7: Automate with File Watcher
 
-Enable automatic syncing when data files change:
+Enable automatic syncing when CSV files change by configuring auto-sync:
+
+**1. Enable in configuration:**
+
+Edit `.dango/project.yml`:
+
+```yaml
+platform:
+  auto_sync: true
+  debounce_seconds: 600  # Wait 10 minutes after last change
+```
+
+**2. Start platform with auto-sync:**
 
 ```bash
-dango watch
+dango start
 ```
 
 **What it does:**
 
-- Monitors CSV files for changes
+- Monitors CSV files configured with `watch: true` in sources.yml
 - Automatically runs `dango sync` when changes detected
-- Keeps your data up-to-date in real-time
+- Debounces changes to avoid excessive syncing
+- Keeps your data up-to-date automatically
 
-Press `Ctrl+C` to stop watching.
+**Configure which sources to watch:**
+
+```yaml
+# .dango/sources.yml
+sources:
+  - name: sales_data
+    type: csv
+    csv:
+      file_path: data/sales.csv
+      watch: true  # Enable auto-sync for this file
+```
+
+Auto-sync runs in the background while `dango start` is running.
 
 ---
 
