@@ -205,7 +205,7 @@ For large datasets:
 
 ### Where are my credentials stored?
 
-- **OAuth tokens**: System keyring (encrypted)
+- **OAuth tokens**: `.dlt/secrets.toml` (optionally encrypted)
 - **API keys**: `.dlt/secrets.toml` (file)
 
 Always add `.dlt/secrets.toml` to `.gitignore`.

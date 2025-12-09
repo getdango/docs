@@ -28,7 +28,7 @@ Dango uses OAuth for sources that require user authorization:
 
 4. Google returns tokens to Dango
 
-5. Tokens stored securely in keyring
+5. Tokens stored securely in secrets.toml
 ```
 
 ### Token Types
@@ -46,27 +46,26 @@ Dango uses OAuth for sources that require user authorization:
 
 ### Location
 
-OAuth tokens are stored in the system keyring:
+OAuth tokens are stored in `.dlt/secrets.toml` under the source credentials section:
 
-| Platform | Storage |
-|----------|---------|
-| macOS | Keychain |
-| Linux | Secret Service |
-| Windows | Credential Manager |
+```toml
+# .dlt/secrets.toml
+[sources.google_sheets.credentials]
+client_id = "xxx.apps.googleusercontent.com"
+client_secret = "xxx"
+refresh_token = "1//xxx"
+```
+
+!!! note "Encryption Key Storage"
+    The system keyring (Keychain on macOS, Secret Service on Linux, Credential Manager on Windows) stores only an **encryption key** used to protect sensitive tokens - not the tokens themselves.
 
 ### What's Stored
 
-```
-Service: dango_oauth
-Account: google_sheets
-Data: {
-  "access_token": "ya29.xxx",
-  "refresh_token": "1//xxx",
-  "expires_at": "2024-01-15T10:30:00Z",
-  "token_type": "Bearer",
-  "scope": "https://www.googleapis.com/auth/spreadsheets.readonly"
-}
-```
+The `secrets.toml` file contains:
+
+- **OAuth credentials**: client_id, client_secret, refresh_token
+- **Access tokens**: Short-lived tokens refreshed automatically
+- **Metadata**: Token expiry timestamps, scopes granted
 
 ---
 
@@ -81,7 +80,7 @@ dango auth google_sheets
 
 1. Opens browser to Google consent screen
 2. You approve access
-3. Tokens saved to keyring
+3. Tokens saved to `.dlt/secrets.toml`
 
 ### Token Refresh
 
@@ -256,7 +255,7 @@ dango auth google_sheets --source my_source
 - Don't share tokens
 
 **Dango protections**:
-- Tokens stored in system keyring (encrypted)
+- Tokens stored in `secrets.toml` (optionally encrypted)
 - Tokens never logged
 - Tokens never displayed in UI
 

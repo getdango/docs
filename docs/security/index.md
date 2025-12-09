@@ -22,8 +22,8 @@ Dango implements several security measures automatically:
 
 | Feature | Description |
 |---------|-------------|
-| **Credential Storage** | API keys stored via system keyring |
-| **OAuth Tokens** | Tokens encrypted at rest |
+| **Credential Storage** | API keys stored in `.dlt/secrets.toml` |
+| **OAuth Tokens** | Tokens stored in `secrets.toml` (optionally encrypted) |
 | **Credential Masking** | Secrets masked in logs |
 | **Local Storage** | Data stays on your machine |
 

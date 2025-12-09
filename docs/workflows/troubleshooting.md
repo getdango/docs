@@ -50,10 +50,10 @@ dango validate
 # Check if source API is responsive
 curl -I https://api.stripe.com/v1/charges
 
-# Try with verbose output
-dango sync --source my_source --verbose
+# Enable debug logging
+RUNTIME__LOG_LEVEL=DEBUG dango sync --source my_source
 
-# Reduce scope
+# Reduce scope with date range
 dango sync --source my_source --start-date 2024-01-01
 ```
 

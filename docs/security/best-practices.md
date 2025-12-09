@@ -339,7 +339,7 @@ Know your data:
 
 - ✅ Use environment variables
 - ✅ Use `.gitignore` for secrets
-- ✅ Use system keyring for OAuth
+- ✅ Use `dango auth` for OAuth (auto-saves to secrets.toml)
 - ✅ Rotate credentials regularly
 - ✅ Use test credentials for development
 - ✅ Encrypt backups
