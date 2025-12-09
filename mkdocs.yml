@@ -164,9 +164,12 @@ nav:
     - Quick Start: getting-started/quick-start.md
     - Troubleshooting: getting-started/troubleshooting.md
 
-  # Placeholder sections - will be populated in later phases
   - Core Concepts:
     - core-concepts/index.md
+    - Architecture: core-concepts/architecture.md
+    - Data Layers: core-concepts/data-layers.md
+    - CLI Overview: core-concepts/cli-overview.md
+    - Project Structure: core-concepts/project-structure.md
 
   - Data Sources:
     - data-sources/index.md
