@@ -1390,10 +1390,21 @@ dango dashboard provision [OPTIONS]
 | `--username` | `admin@example.com` | Metabase admin username |
 | `--password` | (prompted) | Metabase admin password |
 
+!!! warning "Port Mismatch"
+    The CLI defaults to port 3001, but Metabase runs on port 3000 by default.
+    Always specify `--url http://localhost:3000` when using this command.
+
+!!! note "Use Auto-Created Credentials"
+    If Metabase was auto-configured by `dango start`, use the auto-created credentials:
+
+    - **Email**: `admin@dango.local`
+    - **Password**: `dangolocal123`
+
 **Example**:
 
 ```bash
-dango dashboard provision
+# With auto-created Metabase credentials (correct port and username)
+dango dashboard provision --url http://localhost:3000 --username admin@dango.local
 ```
 
 **What it creates**:
