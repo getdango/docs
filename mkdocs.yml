@@ -173,12 +173,38 @@ nav:
 
   - Data Sources:
     - data-sources/index.md
+    - CSV Files: data-sources/csv-files.md
+    - OAuth Sources: data-sources/oauth-sources.md
+    - Custom Sources: data-sources/custom-sources.md
+    - Database Sources: data-sources/database-sources.md
+    - Built-in Sources: data-sources/built-in-sources.md
 
   - Transformations:
     - transformations/index.md
+    - dbt Basics: transformations/dbt-basics.md
+    - Staging Models: transformations/staging-models.md
+    - Custom Models: transformations/custom-models.md
+    - Testing: transformations/testing.md
 
   - Dashboards:
     - dashboards/index.md
+    - Metabase Overview: dashboards/metabase-overview.md
+    - Creating Dashboards: dashboards/creating-dashboards.md
+    - SQL Queries: dashboards/sql-queries.md
+
+  - Web UI:
+    - web-ui/index.md
+    - Overview: web-ui/web-ui-overview.md
+    - Managing Sources: web-ui/managing-sources.md
+    - Monitoring: web-ui/monitoring.md
+
+  - CLI:
+    - cli/index.md
+    - Command Reference: cli/cli-reference.md
+    - Init & Start: cli/init-start.md
+    - Sync & Run: cli/sync-run.md
+    - Source Management: cli/source-management.md
+    - Validation: cli/validation.md
 
   - Reference:
     - reference/index.md

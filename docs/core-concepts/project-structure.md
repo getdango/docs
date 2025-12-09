@@ -676,7 +676,7 @@ dashboards/
 3. Commit to Git
 4. Teammates import into their Metabase
 
-**Learn more**: [Metabase Workflows](../workflows/metabase-workflows.md)
+**Learn more**: [Metabase Overview](../dashboards/metabase-overview.md)
 
 ---
 
@@ -743,8 +743,6 @@ Typical file sizes for a small project:
 - `dbt/target/` (regenerated)
 - Docker images (re-downloadable)
 - `metabase-plugins/` (re-downloadable)
-
-**Learn more**: [Backup & Restore guide](../workflows/backup-restore.md)
 
 ---
 
