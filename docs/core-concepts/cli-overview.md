@@ -803,11 +803,8 @@ dango sync --help
 # Show version
 dango --version
 
-# Verbose output
-dango sync --verbose
-
-# Quiet mode (errors only)
-dango sync --quiet
+# Debug output (via environment variable)
+RUNTIME__LOG_LEVEL=DEBUG dango sync
 ```
 
 ---

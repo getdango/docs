@@ -857,11 +857,11 @@ AuthenticationError: Invalid API key
 
 1. **Check API key**:
    ```bash
-   # View current config (keys are masked)
-   dango source list --verbose
+   # View current config
+   dango source list
 
-   # Verify in .env
-   cat .env | grep STRIPE_API_KEY
+   # Verify in secrets.toml
+   cat .dlt/secrets.toml | grep stripe
 
    # Test key manually
    curl https://api.stripe.com/v1/charges \

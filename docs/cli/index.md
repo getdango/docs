@@ -562,7 +562,7 @@ alias dv='dango validate'
 alias dsr='dango sync && dango run'
 
 # Common options
-alias dsv='dango sync --verbose'
+alias dsf='dango sync --full-refresh'
 alias drf='dango run --full-refresh'
 ```
 

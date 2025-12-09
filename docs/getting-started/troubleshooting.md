@@ -326,10 +326,10 @@ Different sources have different requirements. See:
 - [Data Sources Documentation](../data-sources/index.md)
 - [dlt Source Documentation](https://dlthub.com/docs/dlt-ecosystem/verified-sources/)
 
-**5. Run with verbose logging:**
+**5. Run with debug logging:**
 
 ```bash
-dango sync --verbose
+RUNTIME__LOG_LEVEL=DEBUG dango sync
 ```
 
 ---
@@ -625,13 +625,12 @@ Check if someone else has had the same problem:
 
 [github.com/getdango/dango/issues](https://github.com/getdango/dango/issues)
 
-### 2. Check Verbose Logs
+### 2. Enable Debug Logging
 
-Run commands with `--verbose` flag for detailed output:
+Run commands with debug logging for detailed output:
 
 ```bash
-dango sync --verbose
-dango start --verbose
+RUNTIME__LOG_LEVEL=DEBUG dango sync
 ```
 
 ### 3. Validate Installation
