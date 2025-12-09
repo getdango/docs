@@ -408,19 +408,18 @@ dango validate --fix-yaml
 
 ### Verbose Output
 
-Get detailed diagnostics:
+Get detailed diagnostics with debug logging:
 
 ```bash
-dango validate --verbose
+RUNTIME__LOG_LEVEL=DEBUG dango validate
 ```
 
-**Additional information**:
+**Additional information with debug mode**:
 
 - Full stack traces for errors
 - Detailed configuration values
 - Network diagnostics
 - File system details
-- Timing information
 
 **Example**:
 
@@ -921,17 +920,14 @@ Schedule periodic validation:
 
 ### 5. Use Auto-Fix Safely
 
-Review before applying fixes:
+Review validation results:
 
 ```bash
-# Preview fixes
-dango validate --verbose
-
-# Apply fixes
-dango validate --fix
-
-# Verify
+# Run validation
 dango validate
+
+# With debug output
+RUNTIME__LOG_LEVEL=DEBUG dango validate
 ```
 
 ---
@@ -979,7 +975,7 @@ Use this checklist for manual validation:
 **Run validation**:
 
 ```bash
-dango validate --verbose
+dango validate
 ```
 
 ---

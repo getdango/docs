@@ -36,11 +36,7 @@ dango [COMMAND] [OPTIONS]
 | Flag | Description |
 |------|-------------|
 | `--help`, `-h` | Show help message and exit |
-| `--version`, `-v` | Show Dango version |
-| `--verbose` | Enable verbose output |
-| `--quiet`, `-q` | Suppress non-error output |
-| `--no-color` | Disable colored output |
-| `--project-dir PATH` | Run command in specific project directory |
+| `--version` | Show Dango version |
 
 **Examples**:
 
@@ -52,14 +48,8 @@ dango sync --help
 dango --version
 # Output: dango version 0.0.5
 
-# Verbose output
-dango sync --verbose
-
-# Quiet mode (errors only)
-dango sync --quiet
-
-# Run in different project
-dango --project-dir ~/other-project status
+# Enable debug logging (via environment variable)
+RUNTIME__LOG_LEVEL=DEBUG dango sync
 ```
 
 ---
@@ -644,10 +634,7 @@ dango source list [OPTIONS]
 
 | Option | Description |
 |--------|-------------|
-| `--enabled` | Show only enabled sources |
-| `--disabled` | Show only disabled sources |
-| `--json` | Output in JSON format |
-| `--verbose`, `-v` | Show detailed configuration |
+| `--enabled-only` | Show only enabled sources |
 
 **Examples**:
 
@@ -656,16 +643,7 @@ dango source list [OPTIONS]
 dango source list
 
 # Enabled sources only
-dango source list --enabled
-
-# Disabled sources only
-dango source list --disabled
-
-# JSON output
-dango source list --json
-
-# Detailed info
-dango source list --verbose
+dango source list --enabled-only
 ```
 
 **Output**:

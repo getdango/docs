@@ -219,26 +219,12 @@ Configured Sources:
 **Enabled sources only**:
 
 ```bash
-dango source list --enabled
+dango source list --enabled-only
 ```
 
-**Disabled sources only**:
+### Source Details
 
-```bash
-dango source list --disabled
-```
-
-**Failed sources**:
-
-```bash
-dango source list --failed
-```
-
-### Detailed Information
-
-```bash
-dango source list --verbose
-```
+The `source list` command shows comprehensive information:
 
 **Output**:
 

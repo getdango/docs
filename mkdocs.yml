@@ -206,10 +206,37 @@ nav:
     - Source Management: cli/source-management.md
     - Validation: cli/validation.md
 
+  - Workflows:
+    - workflows/index.md
+    - Local Development: workflows/local-development.md
+    - dlt Workflows: workflows/dlt-workflows.md
+    - dbt Workflows: workflows/dbt-workflows.md
+    - Metabase Workflows: workflows/metabase-workflows.md
+    - Backup & Restore: workflows/backup-restore.md
+    - Git Best Practices: workflows/git-workflows.md
+    - Performance: workflows/performance.md
+    - Troubleshooting: workflows/troubleshooting.md
+
+  - Guides:
+    - guides/index.md
+    - E-commerce Analytics: guides/ecommerce-tutorial.md
+    - Financial Reporting: guides/financial-reporting.md
+    - Multi-Source Integration: guides/multi-source.md
+    - Custom API Integration: guides/custom-api.md
+
+  - Security:
+    - security/index.md
+    - Credential Management: security/credentials.md
+    - OAuth Tokens: security/oauth.md
+    - Best Practices: security/best-practices.md
+
   - Reference:
     - reference/index.md
     - Configuration: reference/configuration.md
     - API Reference: reference/api.md
 
+  - FAQ: faq.md
+
   - Community:
     - community/index.md
+    - Changelog: community/changelog.md
