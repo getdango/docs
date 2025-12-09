@@ -36,24 +36,18 @@ Welcome to Dango Source Wizard
 
 Select source type:
   1. CSV files
-  2. Stripe
-  3. Google Sheets
-  4. Google Analytics 4 (GA4)
+  2. dlt Native (advanced - for manual source configuration)
+  3. REST API
+  4. Google Sheets
   5. Facebook Ads
-  6. HubSpot
-  7. Salesforce
-  8. Shopify
-  9. PostgreSQL
- 10. MySQL
- 11. SQL Server
- 12. Snowflake
- 13. BigQuery
- 14. MongoDB
- 15. REST API
- 16. Custom (dlt_native)
- ... (30+ total)
+  6. Google Analytics 4 (GA4)
+  7. Stripe
+  8. Google Ads
 
-Choice: 2
+For other sources (HubSpot, Notion, Asana, etc.), select "dlt Native"
+and configure manually. See: https://docs.getdango.dev/data-sources/custom-sources/
+
+Choice: 7
 
 ──────────────────────────────────────
 Stripe Source Configuration
@@ -310,17 +304,12 @@ dango source list --json
 
 ## Editing Sources
 
+!!! note "No Edit Command"
+    Dango does not have a `source edit` command. Edit sources manually:
+
 ### Edit Configuration
 
-Edit source in default editor:
-
-```bash
-dango source edit stripe_payments
-```
-
-**Opens** `.dango/sources.yml` in editor at source location.
-
-**Or edit directly**:
+**Edit sources.yml directly**:
 
 ```bash
 vim .dango/sources.yml
@@ -350,13 +339,10 @@ dango validate
 
 ### Enable/Disable Source
 
-**Disable source**:
+!!! note "No Enable/Disable Commands"
+    Dango does not have `source enable` or `source disable` commands. Edit sources.yml manually:
 
-```bash
-dango source disable stripe_payments
-```
-
-**Or edit manually**:
+**Disable source** (edit `.dango/sources.yml`):
 
 ```yaml
 sources:
@@ -364,10 +350,12 @@ sources:
     enabled: false  # Change from true to false
 ```
 
-**Enable source**:
+**Enable source** (edit `.dango/sources.yml`):
 
-```bash
-dango source enable stripe_payments
+```yaml
+sources:
+  - name: stripe_payments
+    enabled: true  # Change from false to true
 ```
 
 **Effect**:
@@ -426,24 +414,27 @@ Start date [2024-06-01]: 2024-06-01
 
 ### Clone Source
 
-Duplicate source with new name:
+!!! note "No Clone Command"
+    Dango does not have a `source clone` command. To duplicate a source:
 
-```bash
-dango source clone stripe_payments stripe_staging
+    1. Manually copy the source configuration in `.dango/sources.yml`
+    2. Change the `name` field to a new name
+    3. Update credentials in `.dlt/secrets.toml` if needed
+
+**Example** (manually copying in `.dango/sources.yml`):
+
+```yaml
+sources:
+  # Original source
+  - name: stripe_payments
+    type: stripe
+    enabled: true
+
+  # Manually cloned source with new name
+  - name: stripe_staging
+    type: stripe
+    enabled: true
 ```
-
-**What happens**:
-
-1. Copies `stripe_payments` configuration
-2. Renames to `stripe_staging`
-3. Adds to `.dango/sources.yml`
-4. Prompts to update credentials (likely different for staging)
-
-**Use when**:
-
-- Separate prod and staging environments
-- Multiple instances of same source type
-- Testing configuration changes
 
 ---
 
@@ -849,88 +840,26 @@ sources:
           initial_value: "2024-01-01"
 ```
 
----
+!!! note "No Import/Export Commands"
+    Dango does not have `source export` or `source import` commands. To share or backup source configurations:
 
-## Import/Export Sources
+    **Manual Export/Import**:
 
-### Export Source Configuration
+    1. Copy `.dango/sources.yml` to share source configurations
+    2. Copy `.dlt/secrets.toml` separately (contains credentials - **never commit to Git**)
+    3. On destination machine, place files in the same locations
 
-**Single source**:
+    **Example**:
+    ```bash
+    # Backup source configurations
+    cp .dango/sources.yml ~/backups/sources.yml
 
-```bash
-dango source export stripe_payments > stripe-config.yml
-```
+    # Restore source configurations
+    cp ~/backups/sources.yml .dango/sources.yml
 
-**All sources**:
-
-```bash
-dango source export --all > all-sources.yml
-```
-
-**Output file** (`stripe-config.yml`):
-
-```yaml
-name: stripe_payments
-type: stripe
-enabled: true
-stripe:
-  stripe_secret_key_env: STRIPE_API_KEY
-  start_date: 2024-06-01
-  resources:
-    - charges
-    - customers
-    - subscriptions
-```
-
-### Import Source Configuration
-
-```bash
-dango source import stripe-config.yml
-```
-
-**Output**:
-
-```
-Importing source from stripe-config.yml...
-✓ Configuration valid
-✓ Source 'stripe_payments' added
-
-Credentials required:
-  Set STRIPE_API_KEY in .env or .dlt/secrets.toml
-```
-
-### Bulk Import
-
-```bash
-dango source import all-sources.yml
-```
-
-**Handles conflicts**:
-
-```
-Importing sources from all-sources.yml...
-
-Found 5 sources to import:
-  1. stripe_payments - New
-  2. google_sheets - Already exists
-  3. orders_csv - New
-  4. production_db - Already exists
-  5. facebook_ads - New
-
-Resolve conflicts:
-  1. Skip existing (keep current config)
-  2. Merge (update existing config)
-  3. Replace (overwrite existing config)
-Choice [1]: 2
-
-✓ Imported stripe_payments
-⊕ Merged google_sheets
-✓ Imported orders_csv
-⊕ Merged production_db
-✓ Imported facebook_ads
-
-5 sources imported (2 new, 3 merged)
-```
+    # Validate after restore
+    dango validate
+    ```
 
 ---
 

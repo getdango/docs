@@ -28,6 +28,8 @@ mkdocs build
 
 ### Git Workflow
 
+**For complete contributor guidelines, see [CONTRIBUTING.md](CONTRIBUTING.md)**
+
 **Branch Protection**:
 - `main` branch is protected
 - All changes must go through Pull Requests
@@ -35,7 +37,7 @@ mkdocs build
 
 **Branch Naming Convention**:
 
-Format: `YYYY-MM-DD/<type>/<short-description>`
+Format: `<type>/<date>-<description>`
 
 **Types**:
 - `feature/` - New features or major additions (e.g., new documentation sections)
@@ -45,11 +47,11 @@ Format: `YYYY-MM-DD/<type>/<short-description>`
 - `refactor/` - Restructuring without changing functionality
 
 **Examples**:
-- `2025-12-08/feature/getting-started-section`
-- `2025-12-08/feature/data-sources-docs`
-- `2025-12-09/fix/broken-links-homepage`
-- `2025-12-09/docs/update-installation-guide`
-- `2025-12-10/chore/update-mkdocs-version`
+- `feature/2025-12-08-getting-started-section`
+- `feature/2025-12-08-data-sources-docs`
+- `fix/2025-12-09-broken-links-homepage`
+- `docs/2025-12-09-update-installation-guide`
+- `chore/2025-12-10-update-mkdocs-version`
 
 **Workflow Steps**:
 
@@ -61,7 +63,7 @@ Format: `YYYY-MM-DD/<type>/<short-description>`
 
 2. **Create feature branch**:
    ```bash
-   git checkout -b $(date +%Y-%m-%d)/feature/your-feature-name
+   git checkout -b feature/$(date +%Y-%m-%d)-your-feature-name
    ```
 
 3. **Make changes and commit**:

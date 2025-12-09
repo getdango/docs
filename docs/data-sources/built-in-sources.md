@@ -195,7 +195,7 @@ The following sources are available through dlt and can be configured in Dango. 
 
 | Source | Type | Authentication | Status |
 |--------|------|---------------|--------|
-| Shopify | `shopify` | OAuth | 🔄 Available (untested) |
+| Shopify | `shopify` | OAuth | ⛔ Blocked (legacy auth deprecated Jan 2026) |
 | WooCommerce | `woocommerce` | API key | 🔄 Available (untested) |
 
 ### Other
@@ -470,10 +470,9 @@ Missing a source you need? We prioritize based on community demand.
 3. If no: Consider creating a [custom source](custom-sources.md)
 
 **Most requested**:
-- Google Ads (planned for v0.1.0)
-- Shopify
-- Salesforce
-- HubSpot
+- Google Ads (wizard-supported in v0.1.0)
+- Salesforce (requires manual dlt_native config)
+- HubSpot (requires manual dlt_native config)
 
 ---
 

@@ -86,9 +86,6 @@ dango init [PROJECT_NAME] [OPTIONS]
 |--------|-------------|
 | `--skip-wizard` | Skip interactive setup wizard |
 | `--force`, `-f` | Overwrite existing project |
-| `--template TEMPLATE` | Use project template (default, analytics, etl) |
-| `--no-docker` | Skip Docker setup (no Metabase) |
-| `--python-version VERSION` | Python version for venv (default: current) |
 
 **Examples**:
 
@@ -101,12 +98,6 @@ dango init . --skip-wizard
 
 # Force reinitialize
 dango init my-project --force
-
-# Use template
-dango init my-project --template analytics
-
-# No Docker setup
-dango init my-project --no-docker
 ```
 
 **What it creates**:
@@ -759,33 +750,26 @@ Start the Dango platform and all services.
 **Syntax**:
 
 ```bash
-dango start [OPTIONS]
+dango start
 ```
 
-**Options**:
+!!! note "No Options Available"
+    The `start` command has no command-line options. All configuration is done via `.dango/project.yml`.
 
-| Option | Description |
-|--------|-------------|
-| `--port PORT` | Override default Web UI port |
-| `--no-metabase` | Skip starting Metabase |
-| `--no-docs` | Skip starting dbt-docs |
-| `--no-watcher` | Skip file watcher |
-| `--background`, `-d` | Run in background (daemon mode) |
-
-**Examples**:
+**Example**:
 
 ```bash
-# Start all services
+# Start all services (Web UI, Metabase, dbt docs)
 dango start
+```
 
-# Custom port
-dango start --port 8888
+**Configuration** (via `.dango/project.yml`):
 
-# Skip Metabase
-dango start --no-metabase
-
-# Background mode
-dango start --background
+```yaml
+platform:
+  web_ui:
+    port: 8800  # Configure Web UI port here
+  auto_sync: true  # Enable file watcher
 ```
 
 **Output**:
@@ -846,31 +830,12 @@ Stopping Dango platform...
 Platform stopped.
 ```
 
----
+!!! note "Restarting the Platform"
+    There is no `dango restart` command. To restart the platform:
 
-### dango restart
-
-Restart the platform (stop + start).
-
-**Syntax**:
-
-```bash
-dango restart [OPTIONS]
-```
-
-**Options**:
-
-Same as `dango start`.
-
-**Examples**:
-
-```bash
-# Restart all services
-dango restart
-
-# Restart without Metabase
-dango restart --no-metabase
-```
+    ```bash
+    dango stop && dango start
+    ```
 
 ---
 
