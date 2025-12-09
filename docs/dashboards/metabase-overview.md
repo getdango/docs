@@ -39,21 +39,25 @@ dango start
 
 Metabase is available at: **http://localhost:3000**
 
-!!! tip "First-Time Setup"
-    On first launch, Metabase will prompt you to create an admin account. This is a one-time setup.
+!!! info "Auto-Created Admin User"
+    Dango automatically creates an admin user on first start:
 
-### Initial Admin Setup
+    - **Email**: `admin@dango.local`
+    - **Password**: `dangolocal123`
+
+    The DuckDB connection is also auto-configured. You can start querying data immediately.
+
+### First Login
 
 1. **Open Metabase**: Navigate to http://localhost:3000
 
-2. **Create Admin Account**:
-   - Email: your@email.com
-   - Password: (choose a secure password)
-   - First name / Last name
+2. **Login** with auto-created credentials:
+   - Email: `admin@dango.local`
+   - Password: `dangolocal123`
 
-3. **Skip "Add your data"** - Dango has already configured the DuckDB connection
+3. **DuckDB already connected** - All schemas (raw, staging, marts) are immediately available
 
-4. **Complete setup** - Click "Take me to Metabase"
+4. **Optional**: Change admin password in Account Settings
 
 You're now ready to query your data!
 
