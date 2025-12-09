@@ -13,9 +13,10 @@ The Dango CLI provides a comprehensive set of commands for managing your data pl
 - [Project Management](#project-management) - init, info, status, validate, rename
 - [Data Operations](#data-operations) - sync, generate, run
 - [Source Management](#source-management) - source add/list/remove
-- [Platform Control](#platform-control) - start, stop, restart
+- [Platform Control](#platform-control) - start, stop
 - [Database](#database-operations) - db status, db clean
-- [Authentication](#authentication) - auth list/refresh/status
+- [Authentication](#authentication) - auth list/refresh/status/check/setup
+- [Metabase](#metabase-operations) - metabase save/load/refresh
 - [Documentation](#documentation) - docs
 - [Configuration](#configuration) - config validate/show
 
@@ -1088,6 +1089,283 @@ Healthy:
 
 Run 'dango auth refresh <source>' to re-authenticate.
 ```
+
+---
+
+### dango auth check
+
+Validate OAuth configuration and credential status.
+
+**Syntax**:
+
+```bash
+dango auth check
+```
+
+**What it validates**:
+
+1. **OAuth Client Credentials** (.env file):
+   - Google: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
+   - Facebook: `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`
+
+2. **Saved OAuth Tokens** (.dlt/secrets.toml):
+   - Token presence and validity
+   - Expiration status (expired, expiring soon, active)
+
+3. **Summary**:
+   - Overall configuration state
+   - Recommended next steps
+
+**Example**:
+
+```bash
+dango auth check
+```
+
+**Output**:
+
+```
+OAuth Configuration Check
+
+1. OAuth Client Credentials (.env)
+  ✓ Google
+    ✓ GOOGLE_CLIENT_ID: 1234...5678.apps.googleusercontent.com
+    ✓ GOOGLE_CLIENT_SECRET: ********
+    → Ready to authenticate
+
+  ✗ Facebook
+    ✗ FACEBOOK_APP_ID: Missing
+    ✗ FACEBOOK_APP_SECRET: Missing
+    → Run: dango auth setup facebook
+
+2. Saved OAuth Tokens (.dlt/secrets.toml)
+  ✓ my_sheets (user@example.com)
+    Provider: google_sheets | Source: my_sheets
+    Active
+
+  ⚠ my_analytics (user@example.com)
+    Provider: google_analytics | Source: my_analytics
+    Expires in 5d
+    → Run: dango auth refresh my_analytics
+
+3. Summary
+  Google credentials configured and authenticated.
+  Facebook credentials missing.
+  → Run: dango auth setup facebook
+```
+
+**Status indicators**:
+
+| Symbol | Meaning |
+|--------|---------|
+| `✓` (green) | Configured/Active |
+| `✗` (red) | Missing/Expired |
+| `⚠` (yellow) | Warning (expiring soon) |
+
+---
+
+### dango auth setup
+
+Interactive OAuth setup wizard for creating provider credentials.
+
+**Syntax**:
+
+```bash
+dango auth setup PROVIDER
+```
+
+**Arguments**:
+
+| Argument | Required | Description |
+|----------|----------|-------------|
+| `PROVIDER` | Yes | OAuth provider: `google` or `facebook` |
+
+**Supported Providers**:
+
+| Provider | Services | Required Credentials |
+|----------|----------|---------------------|
+| `google` | Google Sheets, GA4, Google Ads | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` |
+| `facebook` | Facebook Ads | `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` |
+
+**Examples**:
+
+```bash
+# Setup Google OAuth
+dango auth setup google
+
+# Setup Facebook OAuth
+dango auth setup facebook
+```
+
+**Interactive flow**:
+
+```
+OAuth Setup: Google
+
+Why create your own OAuth app?
+────────────────────────────────
+Your data flows directly from Google → Your machine → Local database.
+Dango never touches your data. You control access and can revoke anytime.
+
+Current Configuration
+────────────────────────────────
+GOOGLE_CLIENT_ID: Not configured
+GOOGLE_CLIENT_SECRET: Not configured
+
+Setup Steps
+────────────────────────────────
+1. Go to Google Cloud Console → APIs & Services → Credentials
+   https://console.cloud.google.com/apis/credentials
+
+2. Click '+ CREATE CREDENTIALS' → 'OAuth client ID'
+
+3. Application type: 'Web application'
+   Name: 'Dango Local'
+
+4. Authorized redirect URIs:
+   Add: http://localhost:8080/callback
+
+5. Click 'Create' and copy credentials
+
+Enter Google Client ID: [paste here]
+Enter Google Client Secret: [paste here]
+
+✓ Credentials saved to .env
+
+Next steps:
+  dango auth google_sheets   # Authenticate Google Sheets
+  dango auth google_analytics # Authenticate GA4
+  dango auth google_ads      # Authenticate Google Ads
+```
+
+**After setup**:
+
+```bash
+# Authenticate with the provider
+dango auth google_sheets
+dango auth google_analytics
+dango auth facebook_ads
+
+# Then add a source
+dango source add
+```
+
+---
+
+## Metabase Operations
+
+### dango metabase save
+
+Save Metabase dashboards and questions to JSON files.
+
+**Syntax**:
+
+```bash
+dango metabase save [OPTIONS]
+```
+
+**Options**:
+
+| Option | Description |
+|--------|-------------|
+| `--output DIR` | Output directory (default: `.dango/metabase/`) |
+
+**Example**:
+
+```bash
+dango metabase save
+```
+
+---
+
+### dango metabase load
+
+Load Metabase dashboards and questions from JSON files.
+
+**Syntax**:
+
+```bash
+dango metabase load [OPTIONS]
+```
+
+**Options**:
+
+| Option | Description |
+|--------|-------------|
+| `--input DIR` | Input directory (default: `.dango/metabase/`) |
+
+**Example**:
+
+```bash
+dango metabase load
+```
+
+---
+
+### dango metabase refresh
+
+Refresh Metabase database connection to discover new schemas.
+
+**Syntax**:
+
+```bash
+dango metabase refresh
+```
+
+**When to use**:
+
+- After creating new marts (analytics models)
+- When new schemas are added to the warehouse
+- After dbt transformations that create new tables
+- When Metabase doesn't show recently created tables
+
+**Prerequisites**:
+
+- Metabase must be running (`dango start`)
+- Metabase must be configured (`.dango/metabase.yml` exists)
+
+**Example**:
+
+```bash
+dango metabase refresh
+```
+
+**Output**:
+
+```
+Step 1: Logging in to Metabase...
+✓ Logged in successfully
+
+Step 2: Removing old database connection...
+✓ Old connection removed
+
+Step 3: Creating new database connection...
+✓ New connection created
+
+Step 4: Updating configuration...
+✓ Configuration updated
+
+Step 5: Waiting for schema sync...
+✓ Schema sync complete
+
+Discovered schemas: raw, raw_stripe, staging, marts
+Total tables: 15
+
+  raw: csv_uploads
+  raw_stripe: charges, customers, subscriptions
+  staging: stg_stripe_charges, stg_stripe_customers, ...
+  marts: customer_metrics, revenue_by_month
+
+✨ Metabase connection refreshed successfully!
+```
+
+**Troubleshooting**:
+
+| Error | Solution |
+|-------|----------|
+| "Metabase is not running" | Run `dango start` first |
+| "Metabase not configured" | Run `dango start` to initialize Metabase |
+| "Cannot connect to Metabase" | Check Docker is running, try `dango stop && dango start` |
 
 ---
 

@@ -208,6 +208,8 @@ nav:
 
   - Reference:
     - reference/index.md
+    - Configuration: reference/configuration.md
+    - API Reference: reference/api.md
 
   - Community:
     - community/index.md
