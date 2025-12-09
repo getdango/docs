@@ -15,6 +15,119 @@ When built-in sources don't fit your needs, create custom sources using Python. 
 - Web scraping
 - Custom data transformation logic
 - Proprietary data formats
+- **Using dlt verified sources not yet in the Dango wizard** (HubSpot, Notion, Asana, etc.)
+
+---
+
+## Using dlt Verified Sources (Advanced)
+
+Many popular sources like HubSpot, Notion, Asana, and Salesforce are available as [dlt verified sources](https://dlthub.com/docs/dlt-ecosystem/verified-sources/) but not yet in the Dango wizard. You can still use them by configuring them manually via `dlt_native`.
+
+### Quick Guide
+
+**Step 1: Find the dlt Source**
+
+Browse https://dlthub.com/docs/dlt-ecosystem/verified-sources/ and find your source (e.g., `hubspot`, `notion`, `asana`).
+
+**Step 2: Install the Source**
+
+```bash
+# Install the specific dlt source
+pip install dlt[hubspot]  # Replace 'hubspot' with your source
+```
+
+**Step 3: Configure in sources.yml**
+
+```yaml
+version: '1.0'
+sources:
+  - name: my_hubspot
+    type: dlt_native
+    enabled: true
+    dlt_native:
+      source_module: dlt.sources.hubspot  # From dlt verified sources
+      source_function: hubspot            # Function name from docs
+      function_kwargs:
+        api_key: ${HUBSPOT_API_KEY}      # Reference from env/secrets
+```
+
+**Step 4: Add Credentials**
+
+Create `.dlt/secrets.toml` (gitignored):
+
+```toml
+[sources.my_hubspot]
+api_key = "your-hubspot-api-key-here"
+```
+
+Or use environment variables in `.env`:
+
+```bash
+HUBSPOT_API_KEY="your-hubspot-api-key-here"
+```
+
+**Step 5: Sync**
+
+```bash
+dango sync --source my_hubspot
+```
+
+### Real Example: HubSpot
+
+Based on the [dlt HubSpot docs](https://dlthub.com/docs/dlt-ecosystem/verified-sources/hubspot), here's a complete configuration:
+
+**1. Install:**
+```bash
+pip install dlt[hubspot]
+```
+
+**2. Configure `.dango/sources.yml`:**
+```yaml
+sources:
+  - name: hubspot_crm
+    type: dlt_native
+    enabled: true
+    dlt_native:
+      source_module: dlt.sources.hubspot
+      source_function: hubspot
+      function_kwargs:
+        api_key: ${HUBSPOT_API_KEY}
+        include_history: false  # Set to true for historical data
+```
+
+**3. Add credentials to `.dlt/secrets.toml`:**
+```toml
+[sources.hubspot_crm]
+api_key = "your-hubspot-private-app-token"
+```
+
+**4. Sync:**
+```bash
+dango sync --source hubspot_crm
+```
+
+**What gets loaded:**
+- `raw_hubspot_crm.contacts`
+- `raw_hubspot_crm.companies`
+- `raw_hubspot_crm.deals`
+- `raw_hubspot_crm.tickets`
+- And more (depends on HubSpot source configuration)
+
+### Common Manual Sources
+
+| Source | Module | Function | Pip Install |
+|--------|--------|----------|-------------|
+| HubSpot | `dlt.sources.hubspot` | `hubspot` | `pip install dlt[hubspot]` |
+| Notion | `dlt.sources.notion` | `notion` | `pip install dlt[notion]` |
+| Asana | `dlt.sources.asana` | `asana` | `pip install dlt[asana]` |
+| Salesforce | `dlt.sources.salesforce` | `salesforce` | `pip install dlt[salesforce]` |
+| MongoDB | `dlt.sources.mongodb` | `mongodb` | `pip install dlt[mongodb]` |
+| PostgreSQL | `dlt.sources.sql_database` | `sql_database` | `pip install dlt[postgres]` |
+| MySQL | `dlt.sources.sql_database` | `sql_database` | `pip install dlt[mysql]` |
+
+!!! tip "Finding Configuration"
+    Always check the official dlt docs for each source's specific `function_kwargs` options:
+    https://dlthub.com/docs/dlt-ecosystem/verified-sources/
 
 ---
 

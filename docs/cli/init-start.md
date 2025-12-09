@@ -396,17 +396,23 @@ Stop: dango stop
 Status: dango status
 ```
 
-**View logs**:
+**View logs** (using Docker):
+
+!!! note "No Logs Command"
+    Dango does not have a dedicated `logs` command. View logs using Docker:
 
 ```bash
-# Tail logs
-dango logs --follow
+# Tail all platform logs
+docker compose logs -f
+
+# View Metabase logs only
+docker compose logs -f metabase
 
 # Last 100 lines
-dango logs --tail 100
+docker compose logs --tail 100
 
 # Logs since timestamp
-dango logs --since "2024-12-09 12:00"
+docker compose logs --since "2024-12-09 12:00"
 ```
 
 ---
@@ -594,19 +600,12 @@ All Dango projects stopped.
 
 ## Restarting the Platform
 
-### Quick Restart
+!!! note "No Restart Command"
+    Dango does not have a dedicated `restart` command. To restart the platform, use:
 
-Restart all services:
-
-```bash
-dango restart
-```
-
-**Equivalent to**:
-
-```bash
-dango stop && dango start
-```
+    ```bash
+    dango stop && dango start
+    ```
 
 **Use when**:
 
@@ -614,17 +613,11 @@ dango stop && dango start
 - Upgrading Dango version
 - Resolving stuck processes
 
-### Restart with Options
+**Example**:
 
 ```bash
-# Restart on different port
-dango restart --port 8888
-
-# Restart without Metabase
-dango restart --no-metabase
-
-# Restart in background
-dango restart --background
+# Stop and start the platform
+dango stop && dango start
 ```
 
 ---
@@ -687,32 +680,17 @@ dango start
 - my-analytics: http://localhost:8800
 - marketing-data: http://localhost:8801
 
-### List All Projects
+!!! note "No Projects List Command"
+    Dango does not have a `projects list` command. Each Dango project is an independent directory. Use standard file system commands to list projects:
 
-```bash
-dango projects list
-```
+    ```bash
+    # List your Dango projects
+    ls ~/projects/
 
-**Output**:
-
-```
-Dango Projects:
-
-  ● my-analytics (Running)
-      Path: /Users/alice/projects/my-analytics
-      Port: 8800
-      Started: 2 hours ago
-
-  ○ marketing-data (Stopped)
-      Path: /Users/alice/projects/marketing-data
-      Port: 8801
-      Last started: Yesterday
-
-  ○ finance-etl (Stopped)
-      Path: /Users/alice/projects/finance-etl
-      Port: 8802
-      Last started: 3 days ago
-```
+    # Check if a specific project is running
+    cd ~/projects/my-analytics
+    dango status
+    ```
 
 ### Switch Between Projects
 
@@ -955,22 +933,24 @@ dango run
 dango source add  # Second source
 ```
 
-### 4. Use Templates for Consistency
+### 4. Use Manual Configuration for Consistency
 
-For multiple similar projects:
+!!! note "No Template Commands"
+    Dango does not have `template export` or `init --template` commands. For multiple similar projects:
 
-```bash
-# Create first project with full config
-dango init project-a
-# ... configure everything ...
+    1. Create and configure first project fully
+    2. Copy `.dango/` directory to new projects manually:
+       ```bash
+       # Create new project
+       cd ~/projects/project-b
+       dango init .
 
-# Export as template
-dango template export project-a my-company-template
+       # Copy configuration from template project
+       cp -r ~/projects/project-a/.dango/* .dango/
 
-# Use template for new projects
-dango init project-b --template my-company-template
-dango init project-c --template my-company-template
-```
+       # Update project-specific settings
+       vim .dango/project.yml  # Change project name
+       ```
 
 ### 5. Monitor Resource Usage
 

@@ -6,21 +6,24 @@ Monitor and manage your data platform through a modern web interface.
 
 ## Overview
 
-The Dango Web UI is a FastAPI-powered web application that provides real-time monitoring, source management, and validation reporting for your data platform. Access it at **http://localhost:8800** when your Dango platform is running.
+The Dango Web UI is a FastAPI-powered web application that provides monitoring, source management, and validation reporting for your data platform. Access it at **http://localhost:8800** when your Dango platform is running.
+
+!!! info "WebSocket Status"
+    WebSocket infrastructure is available for real-time communication. Currently supports basic messaging and CSV upload notifications. Active sync event streaming is planned for future releases.
 
 **Key Features**:
 
-- **Real-time monitoring** - Live sync progress with WebSocket updates
-- **Source management** - Add, edit, and remove data sources
-- **File uploads** - Drag-and-drop CSV file management
+- **Source management** - Add, edit, and remove data sources via web interface
+- **File uploads** - Drag-and-drop CSV file management with optional auto-sync
 - **Validation reports** - Configuration health checks
 - **Quick actions** - One-click sync, generate, and run operations
 - **System status** - Database stats, service health, recent activity
+- **WebSocket support** - Infrastructure for real-time updates (basic implementation)
 
 **Technology**:
 
 - **FastAPI** - Modern Python web framework
-- **WebSockets** - Real-time log streaming
+- **WebSockets** - Available for messaging and notifications
 - **Responsive UI** - Works on desktop and mobile
 - **RESTful API** - All features accessible via HTTP endpoints
 

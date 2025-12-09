@@ -8,16 +8,17 @@ Connect to cloud services like Google Sheets, Facebook Ads, and HubSpot using OA
 
 OAuth sources require authentication through the provider's web interface. Dango handles the OAuth flow and stores tokens securely in your environment.
 
-**Supported OAuth Sources**:
+**Wizard-Supported OAuth Sources** (via `dango source add`):
 
 - Google Sheets
 - Google Analytics 4 (GA4)
 - Facebook Ads
-- HubSpot
-- Notion
-- Asana
-- Slack
-- And more (any dlt source with OAuth)
+- Google Ads
+
+**Manual OAuth Sources** (require dlt_native configuration):
+
+- HubSpot, Notion, Asana, Slack, and other dlt verified sources
+- See [Custom Sources](custom-sources.md) for manual dlt_native setup
 
 ---
 

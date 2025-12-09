@@ -8,12 +8,22 @@ Connect to CSV files, APIs, databases, and 30+ verified dlt sources.
 
 Dango supports multiple types of data sources through dlt (data load tool). Whether you're working with local CSV files, cloud APIs, or existing databases, Dango provides a unified configuration interface.
 
+!!! info "Wizard vs Manual Sources"
+    **Wizard-supported sources** (8 sources): Can be added via `dango source add` interactive wizard:
+
+    - CSV, dlt Native, REST API, Google Sheets, Facebook Ads, Google Analytics 4, Stripe, Google Ads
+
+    **Manual sources** (25+ sources): Require dlt_native configuration in sources.yml:
+
+    - HubSpot, Notion, Asana, Shopify, PostgreSQL, MySQL, and all other dlt verified sources
+    - See [Custom Sources](custom-sources.md) for manual setup guide
+
 **Available Source Types**:
 
 - **CSV Files** - Upload and auto-sync flat files
-- **OAuth Sources** - Connect to Google Sheets, Facebook Ads, GA4, and more
-- **Built-in dlt Sources** - 30+ verified integrations (Stripe, HubSpot, Shopify, etc.)
-- **Database Sources** - PostgreSQL, MySQL, SQL Server, Snowflake, and more
+- **OAuth Sources** - Google Sheets, Facebook Ads, GA4, Google Ads (wizard-supported)
+- **Built-in dlt Sources** - 30+ verified integrations (requires manual dlt_native config)
+- **Database Sources** - PostgreSQL, MySQL, SQL Server, Snowflake (requires manual config)
 - **Custom Sources** - Build your own Python-based integrations
 
 ---
