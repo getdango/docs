@@ -337,15 +337,15 @@ dango start
 ### Reading Logs
 
 ```bash
-# Recent Dango logs
+# Recent Dango logs (JSON lines format)
 ls -lt .dango/logs/ | head -5
-cat .dango/logs/sync_latest.log
+cat .dango/logs/activity.jsonl | tail -20
 
 # dbt logs
 cat dbt/logs/dbt.log | tail -100
 
 # Search for errors
-grep -r "ERROR" .dango/logs/
+grep -i "error" .dango/logs/activity.jsonl
 ```
 
 ---
@@ -367,7 +367,7 @@ cat .dango/sources.yml
 cat .dango/project.yml
 
 # Error logs
-cat .dango/logs/latest.log
+cat .dango/logs/activity.jsonl | tail -50
 ```
 
 ### Support Channels
