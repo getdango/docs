@@ -124,35 +124,36 @@ dango auth google_sheets
 # List all authenticated providers
 dango auth list
 
-# Check specific provider
-dango auth status --provider google_sheets
+# Check OAuth credential status (shows all credentials)
+dango auth status
 ```
 
 Example output:
 ```
-Provider: google_sheets
-Status: Authenticated
-Expires: 2024-01-15 10:30:00
-Scopes: spreadsheets.readonly
+OAuth Credentials Status:
+
+  google_sheets_123456789
+    Status: Valid
+    Expires: 2024-01-15 10:30:00
 ```
 
 ### Refresh Manually
 
 ```bash
-# Force token refresh
-dango auth refresh --provider google_sheets
+# Force token refresh (use credential name from auth list)
+dango auth refresh google_sheets_123456789
 ```
 
 ### Remove Authorization
 
 ```bash
-# Remove stored tokens
-dango auth remove --provider google_sheets
+# Remove stored tokens (use source type)
+dango auth remove google_sheets
 ```
 
 This removes local tokens but doesn't revoke access at the provider. To fully revoke:
 
-1. Remove from Dango: `dango auth remove`
+1. Remove from Dango: `dango auth remove <source_type>`
 2. Revoke in provider settings (see below)
 
 ---
@@ -208,9 +209,9 @@ Dango requests only the minimum scopes needed:
 
 ## Multi-Account Handling
 
-### Same Provider, Different Accounts
+### Same Provider, Multiple Sources
 
-Each source can have its own OAuth credentials:
+OAuth credentials are shared per source type. Multiple sources of the same type use the same OAuth credentials:
 
 ```yaml
 # .dango/sources.yml
@@ -226,21 +227,22 @@ sources:
       spreadsheet_url_or_id: "yyy"
 ```
 
-Authenticate each:
+Authenticate once for all Google Sheets sources:
 ```bash
-dango auth google_sheets --source sheets_personal
-dango auth google_sheets --source sheets_work
+dango auth google_sheets
 ```
+
+Both sources will use the same OAuth credentials.
 
 ### Switching Accounts
 
 ```bash
 # Remove current auth
-dango auth remove --provider google_sheets --source my_source
+dango auth remove google_sheets
 
 # Re-authenticate with different account
-dango auth google_sheets --source my_source
-# Login with different Google account
+dango auth google_sheets
+# Login with different Google account when browser opens
 ```
 
 ---
@@ -284,7 +286,7 @@ Dango's OAuth clients:
 
 **Solution**:
 ```bash
-dango auth remove --provider google_sheets
+dango auth remove google_sheets
 dango auth google_sheets
 ```
 

@@ -82,12 +82,11 @@ dango sync --source my_source --full-refresh
 
 **Solution**:
 ```bash
-# Re-authenticate
-dango auth [provider]
-# Example: dango auth google_sheets
+# Re-authenticate (replace with your provider)
+dango auth google_sheets
 
-# Check token status
-dango auth status --provider google_sheets
+# Check token status (shows all OAuth credentials)
+dango auth status
 ```
 
 ### API Key Invalid

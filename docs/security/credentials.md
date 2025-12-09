@@ -155,9 +155,9 @@ dango config show
 # API Key: sk_live_***************
 ```
 
-To verify a credential exists:
+To verify OAuth credentials exist:
 ```bash
-dango auth status --provider stripe
+dango auth status
 ```
 
 ### Updating Credentials
@@ -174,7 +174,7 @@ nano .dlt/secrets.toml
 
 ```bash
 # Remove OAuth token
-dango auth remove --provider google_sheets
+dango auth remove google_sheets
 
 # Remove from secrets.toml manually
 nano .dlt/secrets.toml
