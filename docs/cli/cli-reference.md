@@ -17,6 +17,7 @@ The Dango CLI provides a comprehensive set of commands for managing your data pl
 - [Database](#database-operations) - db status, db clean
 - [Authentication](#authentication) - auth list/refresh/status/check/setup
 - [Metabase](#metabase-operations) - metabase save/load/refresh
+- [Dashboard](#dashboard-operations) - dashboard provision
 - [Documentation](#documentation) - docs
 - [Configuration](#configuration) - config validate/show
 
@@ -1366,6 +1367,42 @@ Total tables: 15
 | "Metabase is not running" | Run `dango start` first |
 | "Metabase not configured" | Run `dango start` to initialize Metabase |
 | "Cannot connect to Metabase" | Check Docker is running, try `dango stop && dango start` |
+
+---
+
+## Dashboard Operations
+
+### dango dashboard provision
+
+Provision pre-built dashboards in Metabase.
+
+**Syntax**:
+
+```bash
+dango dashboard provision [OPTIONS]
+```
+
+**Options**:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--url` | `http://localhost:3001` | Metabase URL |
+| `--username` | `admin@example.com` | Metabase admin username |
+| `--password` | (prompted) | Metabase admin password |
+
+**Example**:
+
+```bash
+dango dashboard provision
+```
+
+**What it creates**:
+
+- Data Pipeline Health dashboard with:
+  - Source sync status overview
+  - Recent sync failures
+  - Data freshness metrics
+  - Row count trends
 
 ---
 
