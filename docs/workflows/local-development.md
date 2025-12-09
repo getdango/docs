@@ -233,8 +233,8 @@ dango validate --source my_source
 # Dry run to see what would be synced
 dango sync --dry-run
 
-# Sync with verbose output
-dango sync --verbose
+# Sync with debug logging
+RUNTIME__LOG_LEVEL=DEBUG dango sync
 ```
 
 ### Test Transformations
