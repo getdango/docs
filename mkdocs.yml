@@ -173,11 +173,11 @@ nav:
 
   - Data Sources:
     - data-sources/index.md
+    - Built-in Sources: data-sources/built-in-sources.md
     - CSV Files: data-sources/csv-files.md
     - OAuth Sources: data-sources/oauth-sources.md
-    - Custom Sources: data-sources/custom-sources.md
     - Database Sources: data-sources/database-sources.md
-    - Built-in Sources: data-sources/built-in-sources.md
+    - Custom Sources: data-sources/custom-sources.md
 
   - Transformations:
     - transformations/index.md
