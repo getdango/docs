@@ -30,6 +30,39 @@ Dango supports multiple types of data sources through dlt (data load tool). Whet
 
 ---
 
+## For dlt Users
+
+If you're already familiar with [dlt (data load tool)](https://dlthub.com/docs), here's how Dango relates:
+
+**Dango wraps dlt** with:
+
+- YAML configuration instead of Python scripts
+- Automatic dbt staging model generation
+- Unified CLI (`dango sync`) for all sources
+- Web UI for monitoring and management
+
+**What stays the same**:
+
+- Credentials in `.dlt/secrets.toml` (same format)
+- All dlt verified sources available via `dlt_native`
+- Standard dlt decorators (`@dlt.source`, `@dlt.resource`)
+
+**When to use what**:
+
+| Scenario | Use |
+|----------|-----|
+| Standard sources (Stripe, Google Sheets, etc.) | Dango wizard or YAML config |
+| Custom API with simple logic | Dango `dlt_native` + Python file |
+| Complex pipelines, custom destinations | Pure dlt (Dango not needed) |
+
+**Learn more**:
+
+- [Custom Sources](custom-sources.md) - "dlt vs. Dango Workflow" comparison
+- [Database Sources](database-sources.md) - "How This Differs from Standard dlt" table
+- [dlt Documentation](https://dlthub.com/docs) - Official dlt docs for advanced topics
+
+---
+
 ## Quick Start
 
 ### Add Your First Source
