@@ -45,8 +45,7 @@ cp -r .dlt "$BACKUP_DIR/"
 cp -r dbt "$BACKUP_DIR/"
 
 # 5. Metabase dashboards
-dango metabase save
-cp metabase_export.json "$BACKUP_DIR/"
+dango metabase save --output "$BACKUP_DIR/metabase/"
 
 # 6. Metabase data (Docker volume)
 if [ -d "metabase-data" ]; then
@@ -125,9 +124,8 @@ cp -r dbt backups/dbt_backup/
 Export dashboard definitions for backup:
 
 ```bash
-# Export to JSON
-dango metabase save
-cp metabase_export.json backups/
+# Export dashboards
+dango metabase save --output backups/metabase/
 
 # Full Metabase data (H2 database)
 cp -r metabase-data backups/metabase_backup/
@@ -169,7 +167,7 @@ cp /path/to/backup/warehouse.duckdb data/
 dango start
 
 # 6. Restore Metabase dashboards
-dango metabase load --file /path/to/backup/metabase_export.json
+dango metabase load --input /path/to/backup/metabase/
 
 # 7. Re-enter credentials (secrets.toml)
 # Edit .dlt/secrets.toml with your credentials
@@ -191,8 +189,8 @@ dango stop
 rm -rf metabase-data
 cp -r /path/to/backup/metabase_backup metabase-data
 dango start
-# Or restore from JSON
-dango metabase load --file metabase_export.json
+# Or restore from saved dashboards
+dango metabase load --input /path/to/backup/metabase/
 ```
 
 **dbt Models Only**:

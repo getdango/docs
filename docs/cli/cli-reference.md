@@ -885,7 +885,7 @@ Starting Dango platform...
 ✓ File Watcher started (auto-sync enabled)
 ✓ Metabase starting... (this may take 30s)
 ✓ Metabase started (http://localhost:3000)
-✓ dbt-docs started (http://localhost:8081)
+✓ dbt-docs available (http://localhost:8800/dbt-docs)
 
 Platform running. Press Ctrl+C to stop.
 Open http://localhost:8800 in your browser.
@@ -984,7 +984,7 @@ Database: data/warehouse.duckdb (42.3 MB)
 Schemas:
   raw                3 tables, 12,435 rows
   raw_stripe         5 tables, 8,921 rows
-  staging           8 views
+  staging           8 tables
   intermediate      3 tables, 5,234 rows
   marts             4 tables, 2,103 rows
 

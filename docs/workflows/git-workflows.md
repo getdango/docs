@@ -23,7 +23,7 @@ Using Git with Dango projects requires care:
 | `.dango/project.yml` | Project settings |
 | `dbt/` | Transformation models |
 | `.dlt/config.toml` | dlt settings (no secrets) |
-| `metabase_export.json` | Dashboard definitions |
+| `.dango/metabase/` | Dashboard definitions |
 
 ### Project Files
 
@@ -33,7 +33,7 @@ git add .dango/sources.yml
 git add .dango/project.yml
 git add dbt/
 git add .dlt/config.toml
-git add metabase_export.json
+git add .dango/metabase/
 ```
 
 ---
@@ -127,8 +127,7 @@ my-analytics/
 │   ├── macros/
 │   ├── tests/
 │   └── dbt_project.yml
-├── data/                   # ❌ DO NOT COMMIT
-└── metabase_export.json    # ✅ Commit
+└── data/                   # ❌ DO NOT COMMIT
 ```
 
 ### Initial Setup
@@ -289,7 +288,7 @@ dango sync
 dango run
 
 # 6. Restore dashboards
-dango metabase load --file metabase_export.json
+dango metabase load
 ```
 
 ### Keeping Dashboards in Sync
@@ -297,13 +296,13 @@ dango metabase load --file metabase_export.json
 ```bash
 # After changing dashboards, export and commit
 dango metabase save
-git add metabase_export.json
+git add .dango/metabase/
 git commit -m "Update revenue dashboard"
 git push
 
 # Other team members pull and load
 git pull
-dango metabase load --file metabase_export.json
+dango metabase load
 ```
 
 ---
