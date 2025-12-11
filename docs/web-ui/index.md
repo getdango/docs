@@ -139,7 +139,7 @@ Common tasks via the Web UI:
 
 ## Web UI vs CLI
 
-Both interfaces provide similar functionality:
+The Web UI and CLI are **equal interfaces** to the same Dango functionality. Neither is "better"—they serve different workflows and preferences.
 
 | Feature | Web UI | CLI |
 |---------|--------|-----|
@@ -156,6 +156,7 @@ Both interfaces provide similar functionality:
 - Uploading files via browser
 - Exploring data interactively
 - Sharing screens with stakeholders
+- Quick ad-hoc operations
 
 **When to use CLI**:
 
@@ -163,6 +164,9 @@ Both interfaces provide similar functionality:
 - CI/CD pipelines
 - SSH remote access
 - Precise command control
+- Advanced options and flags
+
+**Use both together**: Many users keep the Web UI open in a browser tab for monitoring while running CLI commands in a terminal for precise control.
 
 ---
 

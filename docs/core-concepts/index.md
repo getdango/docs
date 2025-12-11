@@ -8,7 +8,7 @@ Understanding Dango's architecture, data flow, and key components.
 
 Dango integrates four production-grade tools into a single platform:
 
-- **dlt** - Data ingestion from 30+ verified sources
+- **dlt** - Data ingestion from 30+ sources (with access to 60+ via dlt_native)
 - **dbt** - SQL transformations and data modeling
 - **DuckDB** - Embedded analytics database
 - **Metabase** - Business intelligence and dashboards
@@ -27,7 +27,7 @@ This section explains how these components work together to create a complete da
 
     How Dango's components interact and data flows through the platform
 
-- :material-layer-group:{ .lg .middle } **[Data Layers](data-layers.md)**
+- :material-layers:{ .lg .middle } **[Data Layers](data-layers.md)**
 
     ---
 
@@ -54,8 +54,16 @@ This section explains how these components work together to create a complete da
 ### Data Flow
 
 ```
-External APIs/Files → dlt → DuckDB (raw) → dbt (staging/marts) → Metabase
+Sources → dlt → DuckDB (raw)
+                    ↓
+              dbt transforms
+                    ↓
+             DuckDB (staging/marts)
+                    ↓
+               Metabase
 ```
+
+All data layers live in DuckDB. dbt reads from and writes to DuckDB, transforming raw data into analytics-ready tables.
 
 ### Three-Layer Data Architecture
 
@@ -74,14 +82,15 @@ All functionality accessible through:
 
 ## Design Philosophy
 
-**Works on your laptop today. Designed to scale to production tomorrow.**
+Dango is built on two core principles:
 
-Dango is built chronologically:
+### Opinionated but Modular
 
-1. **Local MVP** (current) - Everything runs on your laptop
-2. **Cloud Production** (future) - Deploy to cloud infrastructure
+Best practices are built-in so you can focus on insights, not infrastructure. As the open-source data ecosystem evolves, components can be swapped for better alternatives without rebuilding your entire stack.
 
-The architecture supports both environments without major changes.
+### Democratize Analytics Infrastructure
+
+Enterprise-grade data tooling shouldn't require a dedicated platform team. Dango brings production-quality patterns to teams of any size.
 
 ---
 
