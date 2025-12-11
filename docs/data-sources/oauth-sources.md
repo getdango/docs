@@ -32,7 +32,7 @@ sequenceDiagram
     participant Dango
     participant Provider
 
-    User->>Dango: dango source add google_sheets
+    User->>Dango: dango source add (select OAuth source)
     Dango->>Provider: Open OAuth consent page
     User->>Provider: Grant permissions
     Provider->>Dango: Return access token
@@ -62,7 +62,8 @@ sequenceDiagram
 ### Step 1: Add Source
 
 ```bash
-dango source add google_sheets
+dango source add
+# Select "Google Sheets" from the list
 ```
 
 This will:
@@ -138,7 +139,8 @@ Data loads into `raw_my_google_sheets` schema in DuckDB.
 
 **Setup**:
 ```bash
-dango source add google_analytics
+dango source add
+# Select "Google Analytics 4" from the list
 # Follow OAuth flow
 # Enter GA4 property ID when prompted
 ```
@@ -158,27 +160,40 @@ dango source add google_analytics
 
 **Setup**:
 ```bash
-dango source add facebook_ads
+dango source add
+# Select "Facebook Ads" from the list
 # Follow OAuth flow (requires Facebook Business account)
-# Select Ad Account
+# Select Ad Account when prompted
 ```
 
-### HubSpot
+### HubSpot (via dlt_native)
+
+!!! note "Manual Configuration Required"
+    HubSpot is not yet wizard-supported. It requires manual dlt_native configuration.
 
 ```yaml
 - name: crm_data
-  type: hubspot
+  type: dlt_native
   enabled: true
-  hubspot:
-    include_history: true
+  dlt_native:
+    source_module: hubspot
+    source_function: hubspot
 ```
 
 **Setup**:
 ```bash
-dango source add hubspot
-# Follow OAuth flow
-# Credentials stored automatically
+# Install HubSpot dlt extras
+pip install "dlt[hubspot]"
+
+# Add credentials to .dlt/secrets.toml
+# [sources.hubspot]
+# api_key = "your-hubspot-api-key"
+
+# Sync
+dango sync --source crm_data
 ```
+
+See [Custom Sources](custom-sources.md) for detailed dlt_native setup.
 
 ---
 
@@ -297,7 +312,8 @@ For CI/CD or server deployments, use environment variables instead of interactiv
 
 Complete OAuth flow once locally:
 ```bash
-dango source add google_sheets
+dango source add
+# Select "Google Sheets" from the list
 # Authenticate in browser
 ```
 
@@ -322,6 +338,9 @@ export SOURCES__GOOGLE_SHEETS__CREDENTIALS__CLIENT_SECRET="GOCSPX-..."
 No changes needed - dlt automatically reads env vars.
 
 ### CI/CD Example (GitHub Actions)
+
+!!! warning "Experimental"
+    CI/CD deployment for OAuth sources has not been fully tested. The example below shows the expected pattern but may require adjustments for your use case.
 
 ```yaml
 name: Sync Data
@@ -373,7 +392,8 @@ jobs:
 1. Re-authenticate:
    ```bash
    dango source remove <name>
-   dango source add <type>
+   dango source add
+   # Select the source type from the list
    # Complete OAuth flow again
    ```
 
@@ -432,7 +452,7 @@ Create a `docs/SETUP.md` in your project:
 1. Go to Google Cloud Console
 2. Create OAuth client ID
 3. Add to .dlt/secrets.toml
-4. Run: dango source add google_sheets
+4. Run: dango source add (select "Google Sheets")
 ```
 
 ### 4. Use Service Accounts (When Available)

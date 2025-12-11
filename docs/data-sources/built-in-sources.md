@@ -1,6 +1,6 @@
 # Built-in Sources
 
-Overview of 30+ verified dlt sources available in Dango.
+Overview of dlt verified sources available in Dango.
 
 ---
 
@@ -62,7 +62,8 @@ dango sync --source stripe_payments
 
 **Setup**:
 ```bash
-dango source add google_sheets
+dango source add
+# Select "Google Sheets" from the list
 # Follow OAuth flow in browser
 ```
 
@@ -93,9 +94,10 @@ dango source add google_sheets
 
 **Setup**:
 ```bash
-dango source add google_analytics
+dango source add
+# Select "Google Analytics 4" from the list
 # Follow OAuth flow
-# Enter GA4 property ID
+# Enter GA4 property ID when prompted
 ```
 
 ---
@@ -116,9 +118,10 @@ dango source add google_analytics
 
 **Setup**:
 ```bash
-dango source add facebook_ads
+dango source add
+# Select "Facebook Ads" from the list
 # Follow OAuth flow
-# Select ad account
+# Select ad account when prompted
 ```
 
 ---
@@ -132,10 +135,8 @@ dango source add facebook_ads
   type: csv
   enabled: true
   csv:
-    file_path: data/sales.csv
-    delimiter: ","
-    header: true
-    watch: true
+    directory: data/uploads/sales_data
+    file_pattern: "*.csv"
 ```
 
 **Setup**: See [CSV Files](csv-files.md) for details
@@ -152,60 +153,60 @@ The following sources are available through dlt and can be configured in Dango. 
 |--------|------|---------------|--------|
 | **Google Analytics 4** | `google_analytics` | OAuth | ✅ Tested |
 | **Facebook Ads** | `facebook_ads` | OAuth | ✅ Tested |
-| Google Ads | `google_ads` | OAuth | 🔄 Planned v0.1.0 |
-| Matomo | `matomo` | API token | 🔄 Available (untested) |
+| **Google Ads** | `google_ads` | OAuth | 🔄 Wizard-supported (testing in progress) |
+| Matomo | `matomo` | API token | ⚠️ Available via dlt_native (untested) |
 
 ### CRM & Sales
 
 | Source | Type | Authentication | Status |
 |--------|------|---------------|--------|
 | **Stripe** | `stripe` | API key | ✅ Tested |
-| HubSpot | `hubspot` | OAuth | 🔄 Available (untested) |
-| Salesforce | `salesforce` | OAuth | 🔄 Available (untested) |
-| Pipedrive | `pipedrive` | API token | 🔄 Available (untested) |
+| HubSpot | `hubspot` | OAuth | ⚠️ Available via dlt_native (untested) |
+| Salesforce | `salesforce` | OAuth | ⚠️ Available via dlt_native (untested) |
+| Pipedrive | `pipedrive` | API token | ⚠️ Available via dlt_native (untested) |
 
 ### Productivity & Collaboration
 
 | Source | Type | Authentication | Status |
 |--------|------|---------------|--------|
 | **Google Sheets** | `google_sheets` | OAuth | ✅ Tested |
-| Notion | `notion` | OAuth | 🔄 Available (untested) |
-| Asana | `asana` | OAuth | 🔄 Available (untested) |
-| Slack | `slack` | OAuth | 🔄 Available (untested) |
-| Airtable | `airtable` | API key | 🔄 Available (untested) |
+| Notion | `notion` | OAuth | ⚠️ Available via dlt_native (untested) |
+| Asana | `asana` | OAuth | ⚠️ Available via dlt_native (untested) |
+| Slack | `slack` | OAuth | ⚠️ Available via dlt_native (untested) |
+| Airtable | `airtable` | API key | ⚠️ Available via dlt_native (untested) |
 
 ### Databases
 
 | Source | Type | Authentication | Status |
 |--------|------|---------------|--------|
-| PostgreSQL | `sql_database` | Connection string | ✅ Tested |
-| MySQL | `sql_database` | Connection string | ✅ Tested |
-| SQL Server | `sql_database` | Connection string | 🔄 Available (untested) |
-| MongoDB | `mongodb` | Connection string | 🔄 Available (untested) |
+| PostgreSQL | `sql_database` | Connection string | ⚠️ Experimental (uses dlt sql_database) |
+| MySQL | `sql_database` | Connection string | ⚠️ Experimental (uses dlt sql_database) |
+| SQL Server | `sql_database` | Connection string | ⚠️ Available via dlt_native (untested) |
+| MongoDB | `mongodb` | Connection string | ⚠️ Available via dlt_native (untested) |
 
 ### Data Warehouses
 
 | Source | Type | Authentication | Status |
 |--------|------|---------------|--------|
-| Snowflake | `sql_database` | Connection string | 🔄 Available (untested) |
-| BigQuery | `sql_database` | Service account | 🔄 Available (untested) |
-| Redshift | `sql_database` | Connection string | 🔄 Available (untested) |
+| Snowflake | `sql_database` | Connection string | ⚠️ Available via dlt_native (untested) |
+| BigQuery | `sql_database` | Service account | ⚠️ Available via dlt_native (untested) |
+| Redshift | `sql_database` | Connection string | ⚠️ Available via dlt_native (untested) |
 
 ### E-commerce
 
 | Source | Type | Authentication | Status |
 |--------|------|---------------|--------|
-| Shopify | `shopify` | OAuth | ⛔ Blocked (legacy auth deprecated Jan 2026) |
-| WooCommerce | `woocommerce` | API key | 🔄 Available (untested) |
+| Shopify | `shopify` | OAuth | 🔄 Deferred (awaiting dlt auth update) |
+| WooCommerce | `woocommerce` | API key | ⚠️ Available via dlt_native (untested) |
 
 ### Other
 
 | Source | Type | Authentication | Status |
 |--------|------|---------------|--------|
-| GitHub | `github` | Personal token | 🔄 Available (untested) |
-| Jira | `jira` | API token | 🔄 Available (untested) |
-| Zendesk | `zendesk` | API token | 🔄 Available (untested) |
-| Intercom | `intercom` | API token | 🔄 Available (untested) |
+| GitHub | `github` | Personal token | ⚠️ Available via dlt_native (untested) |
+| Jira | `jira` | API token | ⚠️ Available via dlt_native (untested) |
+| Zendesk | `zendesk` | API token | ⚠️ Available via dlt_native (untested) |
+| Intercom | `intercom` | API token | ⚠️ Available via dlt_native (untested) |
 
 **Full list**: See [dlt Verified Sources](https://dlthub.com/docs/dlt-ecosystem/verified-sources) for complete catalog.
 
@@ -240,7 +241,8 @@ export MY_API_KEY="your-key-here"
 
 Authenticate:
 ```bash
-dango source add <source_type>
+dango source add
+# Select OAuth source from the list
 # Follow browser OAuth flow
 ```
 
@@ -367,10 +369,10 @@ dlt sources automatically handle schema changes:
 
 ### Re-generating dbt Models
 
-When schema changes, regenerate staging models:
+When schema changes, staging models are automatically regenerated during sync. To manually trigger regeneration:
 
 ```bash
-dango generate
+dango sync --source <source_name>
 ```
 
 This updates:
@@ -470,9 +472,9 @@ Missing a source you need? We prioritize based on community demand.
 3. If no: Consider creating a [custom source](custom-sources.md)
 
 **Most requested**:
-- Google Ads (wizard-supported in v0.1.0)
-- Salesforce (requires manual dlt_native config)
-- HubSpot (requires manual dlt_native config)
+- Google Ads (wizard-supported, testing in progress)
+- Salesforce (available via dlt_native)
+- HubSpot (available via dlt_native)
 
 ---
 

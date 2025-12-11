@@ -18,26 +18,67 @@ CSV sources in Dango provide a simple way to load flat files into DuckDB with au
 
 ---
 
+## How CSV Loading Works
+
+**Core behavior**: All files matching your `file_pattern` in the directory are **combined (UNION)** into a single table. This happens on every sync.
+
+This simple design supports two common workflows:
+
+### Workflow 1: Accumulate Data Over Time
+
+Add new files to the directory and all rows combine automatically.
+
+```
+data/uploads/sales/
+├── sales_2024_01.csv    # 1,000 rows
+├── sales_2024_02.csv    # 1,200 rows
+└── sales_2024_03.csv    # 1,100 rows
+                         # ─────────────
+                         # Table: 3,300 rows (all combined)
+```
+
+**Use cases**: Monthly exports, daily transaction logs, regional data files
+
+### Workflow 2: Replace with Latest Data
+
+Keep only one file in the directory. Replace it when you have new data.
+
+```
+data/uploads/inventory/
+└── current_inventory.csv    # Latest snapshot only
+```
+
+To update: delete the old file, copy in the new one, sync.
+
+**Use cases**: Product catalogs, price lists, reference data, point-in-time snapshots
+
+!!! tip "Choose your workflow"
+    - **Growing data?** → Add files, let them accumulate
+    - **Reference data?** → Replace the single file each time
+
+---
+
 ## Quick Start
 
-### Via Web UI (Recommended)
+### Via Wizard (Recommended)
 
-1. Start the Dango platform:
-   ```bash
-   dango start
-   ```
+```bash
+dango source add
+# Select "CSV Files"
+# Enter source name (e.g., "sales_data")
+# Confirm directory (default: data/uploads/sales_data)
+# Confirm file pattern (default: *.csv)
+```
 
+The wizard creates the directory and configuration for you.
+
+### Via Web UI
+
+1. Start the platform: `dango start`
 2. Open Web UI at `http://localhost:8800`
-
 3. Click **"Add Source"** → **"CSV"**
-
-4. Upload your CSV file or enter the file path
-
-5. Configure options (delimiter, header row, etc.)
-
-6. Click **"Save"**
-
-7. Run `dango sync` to load the data
+4. Follow the prompts
+5. Upload files via the Web UI
 
 ### Via Configuration File
 
@@ -51,15 +92,20 @@ sources:
     enabled: true
     description: Monthly sales transactions
     csv:
-      file_path: data/sales.csv
-      delimiter: ","
-      header: true
-      watch: true
+      directory: data/uploads/sales_data
+      file_pattern: "*.csv"
 ```
 
-Then sync:
+Then copy files and sync:
 
 ```bash
+# Create directory if needed
+mkdir -p data/uploads/sales_data
+
+# Copy your CSV files
+cp my_sales.csv data/uploads/sales_data/
+
+# Sync
 dango sync --source sales_data
 ```
 
@@ -73,7 +119,8 @@ dango sync --source sales_data
 |-----------|-------------|---------|
 | `name` | Unique identifier for this source | `sales_data` |
 | `type` | Must be `csv` | `csv` |
-| `csv.file_path` | Path to CSV file (absolute or relative to project root) | `data/sales.csv` |
+| `csv.directory` | Directory containing CSV files | `data/uploads/sales_data` |
+| `csv.file_pattern` | Glob pattern for files to load | `*.csv`, `orders_*.csv` |
 
 ### Optional Parameters
 
@@ -81,10 +128,15 @@ dango sync --source sales_data
 |-----------|---------|-------------|
 | `enabled` | `true` | Whether this source is active |
 | `description` | `""` | Human-readable description |
-| `csv.delimiter` | `","` | Field separator (`,`, `\t`, `|`, etc.) |
-| `csv.header` | `true` | First row contains column names |
-| `csv.watch` | `false` | Auto-sync when file changes |
-| `csv.encoding` | `"utf-8"` | File encoding |
+| `csv.notes` | `null` | Notes on how to refresh this data |
+
+!!! note "Auto-detected settings"
+    The following are NOT configurable - they are auto-detected by DuckDB:
+
+    - **Delimiter** - Auto-detected (comma, tab, pipe, etc.)
+    - **Header** - Assumed true (first row = column names)
+    - **Encoding** - Assumed UTF-8
+    - **Data types** - Inferred from first ~1000 rows
 
 ---
 
@@ -95,85 +147,89 @@ dango sync --source sales_data
 ```yaml
 version: '1.0'
 sources:
-  # Standard CSV with auto-sync
-  - name: customer_data
+  # Sales data - multiple CSV files in one directory
+  - name: sales_data
+    type: csv
+    enabled: true
+    description: Monthly sales transactions
+    csv:
+      directory: data/uploads/sales_data
+      file_pattern: "*.csv"
+      notes: "Export from POS system monthly"
+
+  # Customer data - specific file pattern
+  - name: customers
     type: csv
     enabled: true
     description: Customer master data
     csv:
-      file_path: data/customers.csv
-      delimiter: ","
-      header: true
-      watch: true
+      directory: data/uploads/customers
+      file_pattern: "customer_*.csv"
 
-  # Tab-delimited file
-  - name: product_catalog
+  # Product catalog
+  - name: products
     type: csv
     enabled: true
     description: Product SKU catalog
     csv:
-      file_path: data/products.tsv
-      delimiter: "\t"
-      header: true
-      watch: false
-
-  # Pipe-delimited file without headers
-  - name: legacy_transactions
-    type: csv
-    enabled: true
-    description: Legacy transaction log
-    csv:
-      file_path: data/legacy.psv
-      delimiter: "|"
-      header: false
-      watch: false
+      directory: data/uploads/products
+      file_pattern: "*.csv"
 ```
 
 ### File Structure
+
+Each CSV source has its own directory:
 
 ```
 my-dango-project/
 ├── .dango/
 │   └── sources.yml
 ├── data/
-│   ├── customers.csv       # File path references start from here
-│   ├── products.tsv
-│   └── legacy.psv
+│   └── uploads/
+│       ├── sales_data/           # Source: sales_data
+│       │   ├── sales_2024_01.csv
+│       │   ├── sales_2024_02.csv
+│       │   └── sales_2024_03.csv
+│       ├── customers/            # Source: customers
+│       │   └── customer_list.csv
+│       └── products/             # Source: products
+│           └── catalog.csv
 └── dbt/
 ```
+
+All files matching the `file_pattern` in a source's directory are combined into one table.
 
 ---
 
 ## File Watcher (Auto-Sync)
 
-When `watch: true` is enabled, Dango monitors the CSV file and automatically triggers a sync when changes are detected.
+When auto-sync is enabled in your project configuration, Dango monitors CSV directories and automatically triggers sync when files change.
 
-### Enable File Watcher
+### Enable Auto-Sync
 
-In `.dango/config.toml`:
+In `.dango/project.yml`:
 
-```toml
-[pipeline]
-auto_sync = true
+```yaml
+platform:
+  auto_sync: true
+  debounce_seconds: 600  # Wait 10 min before triggering
 ```
 
-Or when starting the platform:
-
-```bash
-dango start --auto-sync
-```
+!!! note
+    Auto-sync is a platform configuration setting, not a CLI flag or per-source setting.
 
 ### How It Works
 
-1. File watcher monitors CSV files with `watch: true`
-2. When file is modified, triggers `dango sync --source <name>`
-3. New data is loaded into DuckDB
-4. dbt transformations run automatically (if configured)
+1. Start platform: `dango start`
+2. File watcher monitors all CSV source directories
+3. When files are added or modified, sync triggers after debounce period
+4. Data is loaded into DuckDB
+5. Staging models are regenerated
 
 ### Use Cases
 
 - **Live data feeds**: CSV files updated by external scripts
-- **Development**: Edit CSV files and see results immediately in Metabase
+- **Development**: Edit CSV files and see results in Metabase
 - **Manual exports**: Drop in new CSV files and have them auto-load
 
 ---
@@ -200,79 +256,174 @@ For append-only behavior (logs, events), use a custom dlt source instead.
 
 ### Target Schema
 
-Data is loaded into the `raw` schema:
+Data is loaded into a source-specific schema:
 
 ```
-raw.<source_name>
+raw_{source_name}.{source_name}
 ```
 
 Example:
 ```sql
 -- source name: sales_data
--- target table: raw.sales_data
-SELECT * FROM raw.sales_data LIMIT 10;
+-- target table: raw_sales_data.sales_data
+SELECT * FROM raw_sales_data.sales_data LIMIT 10;
 ```
+
+!!! note
+    All files matching the `file_pattern` are combined into a single table named after the source.
+
+### Schema Detection
+
+CSV schema (column names and types) is **fixed on first load**:
+
+- **First sync**: DuckDB analyzes file headers and infers types from first ~1000 rows
+- **Subsequent syncs**: Schema must match the original
+
+**If your CSV schema changes** (columns added/removed/renamed):
+
+1. Sync will fail with a schema mismatch error
+2. To fix: Remove and re-add the source
+
+```bash
+# Remove old source
+dango source remove sales_data
+
+# Re-add with same name (schema will be re-detected)
+dango source add
+# Select "CSV Files", use same name
+```
+
+!!! warning
+    Schema changes require re-creating the source. Plan your CSV structure before initial load.
 
 ---
 
 ## Common Patterns
 
-### Monthly Data Updates
+### Accumulating Monthly Data (Workflow 1)
+
+Keep adding files each month - all data combines automatically:
 
 ```yaml
-- name: monthly_financials
+- name: monthly_sales
   type: csv
   enabled: true
-  description: Monthly P&L data
+  description: Monthly sales exports - all months combined
   csv:
-    file_path: data/financials/2024-12.csv
-    delimiter: ","
-    header: true
-    watch: false
+    directory: data/uploads/monthly_sales
+    file_pattern: "*.csv"
+    notes: "Add new monthly export file, keep previous months"
 ```
 
-Update workflow:
+```
+data/uploads/monthly_sales/
+├── sales_2024_01.csv    # January data
+├── sales_2024_02.csv    # February data
+├── sales_2024_03.csv    # March data
+└── sales_2024_04.csv    # April data (just added)
+```
+
+**Workflow**: Each month, export your data and copy the new file into the directory:
 ```bash
-# Replace CSV file with new month
-cp financials-2025-01.csv data/financials/2024-12.csv
+# Add new month's file (don't delete old ones)
+cp sales_2024_05.csv data/uploads/monthly_sales/
 
-# Sync to reload
-dango sync --source monthly_financials
+# Sync - table now contains Jan through May
+dango sync --source monthly_sales
 ```
 
-### Multiple Related Files
+The table `raw_monthly_sales.monthly_sales` contains all rows from all months.
+
+### Reference Data Replacement (Workflow 2)
+
+Keep only the latest version - replace the file each time:
 
 ```yaml
-# Option 1: Separate sources (separate tables)
+- name: product_catalog
+  type: csv
+  enabled: true
+  description: Current product catalog
+  csv:
+    directory: data/uploads/product_catalog
+    file_pattern: "*.csv"
+    notes: "Replace with latest export from inventory system"
+```
+
+```
+data/uploads/product_catalog/
+└── products.csv    # Current catalog only
+```
+
+**Workflow**: Replace the file when you have updated data:
+```bash
+# Remove old file, add new one
+rm data/uploads/product_catalog/products.csv
+cp new_products_export.csv data/uploads/product_catalog/products.csv
+
+# Sync - table reflects only the new file
+dango sync --source product_catalog
+```
+
+### Regional/Category Files (Combined)
+
+Multiple files representing different segments, all combined:
+
+```yaml
+- name: regional_sales
+  type: csv
+  csv:
+    directory: data/uploads/regional_sales
+    file_pattern: "*.csv"
+```
+
+```
+data/uploads/regional_sales/
+├── north.csv
+├── south.csv
+├── east.csv
+└── west.csv
+```
+
+All four files are loaded into `raw_regional_sales.regional_sales`. Add a new region by adding a file.
+
+### Separate Tables per Category
+
+If you need separate tables instead of combined, use separate sources:
+
+```yaml
 - name: sales_north
   type: csv
   csv:
-    file_path: data/regions/north.csv
+    directory: data/uploads/sales_north
+    file_pattern: "*.csv"
 
 - name: sales_south
   type: csv
   csv:
-    file_path: data/regions/south.csv
-
-# Option 2: Combine in dbt intermediate layer
-# See Transformations section for union patterns
+    directory: data/uploads/sales_south
+    file_pattern: "*.csv"
 ```
 
-### Excel Exports
+Then combine in dbt if needed (see Transformations section).
 
-Export Excel to CSV first:
+### Excel Files
+
+Dango does not currently support Excel files (.xlsx) directly.
+
+**Workaround**: Export to CSV from Excel:
+
+1. Open your Excel file
+2. File → Save As → CSV (Comma delimited)
+3. Save to your source's directory
 
 ```bash
-# Using pandas (install first: pip install pandas openpyxl)
-python << EOF
-import pandas as pd
-df = pd.read_excel('data/report.xlsx', sheet_name='Sales')
-df.to_csv('data/sales.csv', index=False)
-EOF
-
-# Then configure as CSV source
-dango sync --source sales
+# Example: save to sales_data directory
+# Then sync
+dango sync --source sales_data
 ```
+
+!!! tip "Future support"
+    Native Excel support may be added in a future version.
 
 ---
 
@@ -292,29 +443,38 @@ dango sync --source sales
 
 **Problem**: Special characters display incorrectly
 
-**Solution**: Specify encoding in sources.yml:
+**Solution**: DuckDB auto-detects encoding but assumes UTF-8 by default. If special characters display incorrectly:
 
-```yaml
-csv:
-  file_path: data/latin1.csv
-  encoding: "latin-1"  # or "iso-8859-1", "cp1252", etc.
-```
-
-### File Not Found
-
-**Problem**: `FileNotFoundError: data/sales.csv`
-
-**Solution**: File paths are relative to project root (where `.dango/` is). Use:
+1. Convert your CSV file to UTF-8 before uploading
+2. Use a text editor or command-line tool:
 
 ```bash
-ls data/sales.csv  # Verify file exists
+# Convert from latin-1 to UTF-8
+iconv -f ISO-8859-1 -t UTF-8 original.csv > converted.csv
 ```
 
-Or use absolute path:
+3. Move the converted file to your source directory
+
+### Directory Not Found
+
+**Problem**: `FileNotFoundError` or no files synced
+
+**Solution**: Directory paths are relative to project root (where `.dango/` is). Verify:
+
+```bash
+# Check directory exists
+ls data/uploads/sales_data/
+
+# Check files match pattern
+ls data/uploads/sales_data/*.csv
+```
+
+Ensure your `sources.yml` directory matches the actual location:
 
 ```yaml
 csv:
-  file_path: /Users/yourname/data/sales.csv
+  directory: data/uploads/sales_data  # Must exist
+  file_pattern: "*.csv"               # Must match files
 ```
 
 ### File Watcher Not Triggering
@@ -323,10 +483,12 @@ csv:
 
 **Solution**: Check that:
 
-1. `auto_sync: true` in `.dango/config.toml`
-2. `watch: true` in source configuration
-3. Platform is running (`dango start`)
-4. File path is correct
+1. `auto_sync: true` in `.dango/project.yml` under `platform:`
+2. Platform is running (`dango start`)
+3. Directory path is correct and accessible
+4. Files match the `file_pattern` glob
+
+Note: Auto-sync has a debounce period (default 10 minutes) to avoid rapid repeated syncs.
 
 ---
 
@@ -355,11 +517,13 @@ Check for:
 Keeps configuration portable across environments:
 
 ```yaml
-# Good
-file_path: data/sales.csv
+# Good - relative to project root
+csv:
+  directory: data/uploads/sales_data
 
-# Avoid
-file_path: /Users/john/Desktop/sales.csv
+# Avoid - absolute paths break portability
+csv:
+  directory: /Users/john/Desktop/sales_data
 ```
 
 ### 5. Version Your CSV Files
