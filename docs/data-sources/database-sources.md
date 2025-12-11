@@ -1,12 +1,15 @@
 # Database Sources
 
-Connect to PostgreSQL, MySQL, SQLite, SQL Server, and 30+ other databases.
+Connect to PostgreSQL, MySQL, SQLite, SQL Server, and other databases.
+
+!!! warning "Experimental"
+    Database sources have not been fully tested with Dango. The configuration patterns below are expected to work based on dlt's `sql_database` source, but may require adjustments for your specific use case.
 
 ---
 
 ## Overview
 
-Dango supports 30+ SQL databases through dlt's `sql_database` source. Load tables directly from any SQLAlchemy-supported database into DuckDB.
+Dango supports SQL databases through dlt's `sql_database` source. Load tables directly from any SQLAlchemy-supported database into DuckDB.
 
 **Supported Databases**:
 
@@ -23,6 +26,9 @@ Dango supports 30+ SQL databases through dlt's `sql_database` source. Load table
 ---
 
 ## Quick Start: PostgreSQL
+
+!!! note "Community Feedback Welcome"
+    If you successfully connect a database using these instructions, please share your experience on [GitHub Discussions](https://github.com/getdango/dango/discussions) to help improve this documentation.
 
 ### Step 1: Install Dependencies
 
@@ -408,8 +414,8 @@ With incremental configuration:
 If source table schema changes (columns added/removed):
 
 1. Dango auto-detects and updates DuckDB schema
-2. Staging models need manual update
-3. Run `dango generate` to regenerate staging models
+2. Staging models are automatically regenerated during sync
+3. Custom dbt models may need manual updates
 
 ---
 

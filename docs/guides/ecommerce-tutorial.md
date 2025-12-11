@@ -244,7 +244,7 @@ open http://localhost:3000
 
 Login with:
 - Email: `admin@dango.local`
-- Password: `dango123!`
+- Password: `dangolocal123`
 
 ### Create Questions
 

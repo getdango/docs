@@ -94,7 +94,9 @@ graph LR
 - SQL query interface
 - Dashboard backup and restore
 
-## Current Status: v0.0.5 (MVP)
+## Current Status
+
+Dango is currently in **early development (MVP)**. Core functionality is stable and usable.
 
 ### What Works Now
 
@@ -108,46 +110,53 @@ graph LR
 
 ### Coming Soon
 
-- 🚧 **v0.1.0**: Google Ads, demo project, full documentation
-- 🔮 **Beyond v0.1.0**: Cloud deployment guides, advanced scheduling, team collaboration
+- 🚧 Additional data sources (Google Ads), demo project, expanded documentation
+- 🔮 Cloud deployment guides, advanced scheduling, team collaboration
 
 ## Design Philosophy
 
-Dango is built chronologically - starting with local support for MVP, designed to scale to cloud production later.
+Dango is built on two core principles:
 
-### Why This Approach?
+### Opinionated but Modular
 
-1. **Get started fast** - No cloud infrastructure needed
-2. **Learn the tools** - Master dlt, dbt, and SQL locally
-3. **Scale when ready** - Same tools, bigger infrastructure
-4. **Production-grade** - Best practices from day one
+Best practices are built-in so you can focus on insights, not infrastructure. As the open-source data ecosystem evolves, components can be swapped for better alternatives without rebuilding your entire stack.
+
+### Democratize Analytics Infrastructure
+
+Enterprise-grade data tooling shouldn't require a dedicated platform team. Dango brings production-quality patterns to teams of any size—the same tools used by sophisticated data teams, packaged for accessibility.
 
 ## Target Users
 
 - **Solo data professionals** - Complete stack, zero complexity
+- **Small data teams** - Full analytics stack that grows with you
 - **Fractional consultants** - Fast client onboarding
-- **SMEs** - Analytics without engineering teams
+- **SMEs** - Analytics infrastructure without the overhead
 - **Learners** - Production tools without production costs
 
 ## Why Dango vs. Alternatives?
 
 ### vs. Cloud Platforms (Snowflake, BigQuery)
 
-| Dango | Cloud Platforms |
-|-------|-----------------|
-| ✅ Free (open source) | ❌ Pay per query |
-| ✅ Runs on laptop | ❌ Requires cloud account |
-| ✅ Fast iteration | ⚠️ Can be slow/expensive during dev |
-| ⚠️ Local compute limits | ✅ Scales to petabytes |
+| Aspect | Dango | Cloud Platforms |
+|--------|-------|-----------------|
+| **Setup** | One command, ready in minutes | Assemble and integrate multiple tools |
+| **Cost** | Free and open source | Pay for compute and storage |
+| **Stack** | Integrated (dlt + dbt + DuckDB + Metabase) | Build your own toolchain |
+| **Iteration** | Instant local feedback loop | Round-trip to cloud for each change |
+| **Scale** | Local compute limits | Scales to petabytes |
 
-### vs. No-Code Tools (Fivetran, Airbyte Cloud)
+### vs. Managed ETL Tools (Fivetran, Airbyte Cloud)
 
-| Dango | No-Code Tools |
-|-------|---------------|
-| ✅ Fully customizable | ❌ Limited customization |
-| ✅ Version controlled | ⚠️ UI-based configuration |
-| ✅ Open source | ❌ Proprietary/paid |
-| ⚠️ Requires code for complex cases | ✅ Point-and-click simple cases |
+| Aspect | Dango | Managed ETL Tools |
+|--------|-------|-------------------|
+| **Customization** | Fully customizable | Limited to supported connectors |
+| **Configuration** | Version controlled (YAML, SQL) | UI-based, harder to track changes |
+| **Cost** | Free and open source | Subscription or usage-based pricing |
+| **Integration** | Complete stack included | ETL only—BI, transforms, warehouse separate |
+| **Complexity** | Requires some code for advanced use | Point-and-click for supported sources |
+
+!!! note
+    Some tools like Airbyte have open-source versions, but require separate setup for orchestration, transformations, and BI.
 
 ### vs. DIY Stack
 
@@ -163,7 +172,7 @@ Dango is built chronologically - starting with local support for MVP, designed t
 - **Not a SaaS platform** - It's a CLI tool that runs locally
 - **Not cloud-only** - MVP is local, cloud support coming later
 - **Not a BI tool** - It integrates BI (Metabase) but focuses on data infrastructure
-- **Not production-ready for enterprise** - Currently MVP (v0.0.5)
+- **Not production-ready for enterprise** - Currently in early development (MVP)
 
 ## Next Steps
 

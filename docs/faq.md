@@ -167,7 +167,7 @@ open http://localhost:3000
 
 Default credentials:
 - Email: `admin@dango.local`
-- Password: `dango123!`
+- Password: `dangolocal123`
 
 ### My tables don't show in Metabase
 

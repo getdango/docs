@@ -16,12 +16,12 @@ Dango integrates four production-grade open-source tools into a unified platform
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                    dlt (Data Load Tool)                     │
-│  • 30+ verified sources  • OAuth handling  • Incremental   │
+│  • 30+ sources (60+ via dlt_native)  • OAuth  • Incremental │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                    DuckDB (Database)                        │
-│  raw.*  →  staging.*  →  intermediate.*  →  marts.*        │
+│  raw_{source}.*  →  staging.*  →  intermediate.*  →  marts.*│
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -44,13 +44,13 @@ Dango integrates four production-grade open-source tools into a unified platform
 **Purpose**: Load data from external sources into DuckDB
 
 **Key Features**:
-- 30+ verified sources (Stripe, HubSpot, Google Analytics, Salesforce, etc.)
+- 30+ sources with wizard support (Stripe, HubSpot, Google Analytics, Salesforce, etc.)
+- Access to 60+ dlt sources via `dlt_native` for advanced users
 - CSV file ingestion with auto-detection
 - Custom REST API sources
 - OAuth 2.0 authentication handling
 - Incremental loading (only new/changed data)
-- Automatic schema evolution
-- Deduplication strategies
+- Automatic schema evolution (for dlt sources)
 
 **What it does**:
 ```bash
@@ -58,6 +58,7 @@ dango sync
 # → dlt connects to Stripe API
 # → Fetches charges, customers, subscriptions
 # → Writes to raw_stripe.* tables in DuckDB
+# → Auto-generates staging models in dbt/models/staging/
 # → Tracks metadata (_dlt_load_id, _dlt_extracted_at)
 ```
 
@@ -74,19 +75,23 @@ dango sync
 - OLAP-optimized (fast analytics queries)
 - Efficient storage (columnar format)
 - Full SQL support (window functions, CTEs, etc.)
-- Works on laptop or production servers
+- Handles datasets up to ~100GB comfortably on a modern laptop
+
+!!! note "For larger datasets"
+    DuckDB is optimized for single-machine analytical workloads. For enterprise-scale needs (petabytes), consider cloud data warehouses like Snowflake or BigQuery.
 
 **Database file**: `data/warehouse.duckdb`
 
 **Schema organization**:
 ```
 warehouse.duckdb
-├── raw                  # Raw ingested data (immutable)
-├── raw_stripe          # Multi-table sources
-├── staging             # Cleaned, deduplicated data
+├── raw_{source_name}   # Raw ingested data (e.g., raw_stripe, raw_hubspot)
+├── staging             # Cleaned data (tables, not views)
 ├── intermediate        # Reusable business logic
 └── marts               # Final metrics for BI
 ```
+
+Each data source gets its own `raw_{source_name}` schema (e.g., `raw_stripe`, `raw_csv_orders`).
 
 **Learn more**: [Data Layers](data-layers.md)
 
@@ -97,10 +102,9 @@ warehouse.duckdb
 **Purpose**: Transform raw data into analytics-ready tables
 
 **What Dango automates**:
-- Auto-generates staging models from raw tables
-- Applies deduplication logic based on source config
+- Auto-generates staging models during `dango sync`
 - Creates data lineage documentation
-- Generates dbt-docs website
+- Generates dbt-docs website (documentation and lineage visualization)
 
 **What you control**:
 - Custom transformations in `dbt/models/`
@@ -109,8 +113,7 @@ warehouse.duckdb
 
 **Example workflow**:
 ```bash
-dango sync              # Load raw data with dlt
-dango generate          # Auto-generate staging models
+dango sync              # Load raw data + auto-generate staging models
 # Edit dbt/models/marts/customer_metrics.sql
 dango run               # Run dbt transformations
 dango docs              # Generate documentation
@@ -126,18 +129,21 @@ dango docs              # Generate documentation
 
 **Auto-configured on `dango start`**:
 - DuckDB connection established
-- Admin account created
+- Admin account auto-provisioned (local development only)
 - All tables and schemas discovered
 - Sample collections set up
 
-**Access**: `http://localhost:3000`
+**Access**: Run `dango start` first, then access via:
+- Web UI at `http://localhost:8800` (recommended - includes navigation to all services)
+- Direct Metabase at `http://localhost:3000`
 
 **What you can do**:
-- Write SQL queries
+- Write SQL queries with autocomplete
 - Create visualizations (charts, tables, maps)
 - Build dashboards
-- Share with stakeholders
+- Set up alerts and notifications
 - Schedule email reports
+- Share with stakeholders
 
 **Learn more**: [Dashboards section](../dashboards/index.md)
 
@@ -169,8 +175,14 @@ Let's walk through what happens when you add a Stripe source:
 
 ### 1. Configuration
 
-You define the source in `.dango/sources.yml`:
+**Option A: Interactive wizard (recommended)**
+```bash
+dango source add
+# Select "Stripe" from the list
+# Follow the prompts
+```
 
+**Option B: Manual configuration** in `.dango/sources.yml`:
 ```yaml
 sources:
   - name: stripe_payments
@@ -181,33 +193,31 @@ sources:
       start_date: 2024-01-01
 ```
 
-### 2. Ingestion (dlt)
+You can also add sources via the Web UI at `http://localhost:8800`.
+
+### 2. Ingestion + Staging Generation
 
 When you run `dango sync`:
 
 ```bash
 dango sync
+# Or trigger from Web UI at http://localhost:8800
 ```
 
-dlt executes:
+Dango executes:
 1. Reads Stripe API credentials from environment
-2. Authenticates with Stripe
+2. Authenticates with Stripe via dlt
 3. Fetches data (charges, customers, subscriptions)
 4. Writes to DuckDB:
    - `raw_stripe.charges`
    - `raw_stripe.customers`
    - `raw_stripe.subscriptions`
 5. Tracks load metadata (`_dlt_load_id`, `_dlt_extracted_at`)
+6. Auto-generates staging models
 
-### 3. Staging Generation
+### 3. Generated Staging Models
 
-Run `dango generate` to create staging models:
-
-```bash
-dango generate
-```
-
-Dango creates:
+After sync, Dango creates:
 ```
 dbt/models/staging/
 ├── stg_stripe_charges.sql
@@ -258,7 +268,12 @@ dango run
 
 ### 5. Visualization (Metabase)
 
-Open Metabase (`http://localhost:3000`), navigate to the `marts` schema, and query `customer_metrics`:
+Start the platform if not already running:
+```bash
+dango start
+```
+
+Open the Web UI (`http://localhost:8800`) and navigate to Metabase, or go directly to `http://localhost:3000`. Query your `marts` tables:
 
 ```sql
 SELECT * FROM marts.customer_metrics
@@ -272,7 +287,7 @@ Create charts, dashboards, and share with your team.
 
 ## Tech Stack Details
 
-### Core Tools
+### Core Tools (as of Dango v0.0.5)
 
 | Tool | Version | Purpose | Language |
 |------|---------|---------|----------|
@@ -366,12 +381,12 @@ The same `.dango/` configuration files work in both environments.
 
 ## Design Principles
 
-### 1. Zero Infrastructure
+### 1. Minimal Setup
 
-No servers to configure. Everything runs on your laptop:
+Get started without complex infrastructure:
 - DuckDB is embedded (single file database)
 - Metabase runs in Docker
-- Web UI is a simple Python process
+- Web UI is a lightweight Python process
 
 ### 2. Configuration Over Code
 
@@ -393,21 +408,29 @@ pipeline.run(data)
 
 ### 3. Auto-Generated Boilerplate
 
-Dango generates the repetitive dbt staging models:
+Dango generates the repetitive dbt staging models automatically during sync:
 ```bash
-dango generate
-# → Creates 30+ staging models for Stripe
+dango sync
+# → Loads data from sources
+# → Auto-generates staging models
 # → You focus on business logic in marts/
 ```
 
 ### 4. Batteries Included
 
-Get a complete stack with one command:
+Set up a complete analytics stack with one command:
+
 ```bash
-dango init my-project
-dango source add      # Add Stripe
-dango sync           # Load data
-dango start          # Open Metabase
+curl -sSL https://raw.githubusercontent.com/getdango/dango/main/install.sh | bash
+```
+
+This gives you dlt, dbt, DuckDB, and Metabase—ready to go.
+
+Then build your data pipeline:
+```bash
+dango source add      # Add data sources
+dango sync           # Load data + generate staging
+dango start          # Launch platform
 ```
 
 ---

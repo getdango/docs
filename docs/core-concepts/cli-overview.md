@@ -11,7 +11,7 @@ Dango CLI commands are organized into logical groups:
 | Category | Commands | Purpose |
 |----------|----------|---------|
 | **Project** | `init`, `info`, `status`, `validate`, `rename` | Project lifecycle |
-| **Data** | `sync`, `source`, `run`, `generate` | Data ingestion & transformation |
+| **Data** | `sync`, `source`, `run` | Data ingestion & transformation |
 | **Platform** | `start`, `stop`, `restart` | Service management |
 | **Database** | `db status`, `db clean` | Database operations |
 | **Auth** | `auth list`, `auth refresh`, `auth <provider>` | OAuth management |
@@ -195,10 +195,13 @@ $ dango sync --source stripe_payments
 [12:35:12] Loaded 1,523 charges
 [12:35:13] Fetching customers (full refresh)
 [12:35:20] Loaded 342 customers
-[12:35:21] Writing to raw_stripe.charges
-[12:35:24] Writing to raw_stripe.customers
-[12:35:25] ✓ Sync complete (1,865 rows in 29.2s)
+[12:35:21] Writing to raw_stripe_payments.charges
+[12:35:24] Writing to raw_stripe_payments.customers
+[12:35:25] Generating staging models...
+[12:35:26] ✓ Sync complete (1,865 rows in 30.1s)
 ```
+
+Note: `dango sync` automatically generates staging models for the synced source.
 
 **WebSocket real-time logs**:
 
@@ -314,7 +317,7 @@ dango run --full-refresh --vars '{"year": 2024}'
 **What it does**:
 - Executes `dbt run` in the `dbt/` directory
 - Applies transformations defined in `dbt/models/`
-- Materializes staging views, intermediate tables, and marts
+- Materializes staging tables, intermediate tables, and marts
 
 **Example**:
 ```bash
@@ -330,50 +333,6 @@ Running dbt...
 12:45:06  1 of 1 OK created sql table model marts.customer_metrics ...... [SUCCESS in 2.1s]
 12:45:06
 12:45:06  Finished running 1 table model in 3.2s.
-```
-
----
-
-### `dango generate`
-
-Auto-generate dbt staging models from raw tables.
-
-**Usage**:
-```bash
-# Generate all staging models
-dango generate
-
-# Generate staging for specific source
-dango generate --source stripe_payments
-
-# Generate only staging layer
-dango generate --models staging
-```
-
-**What it creates**:
-```
-dbt/models/staging/
-├── stg_stripe_charges.sql           # Deduplication logic
-├── stg_stripe_customers.sql
-├── stg_stripe_subscriptions.sql
-├── _stg_stripe__sources.yml        # Documents raw tables
-└── _stg_stripe__schema.yml         # Column descriptions
-```
-
-**Example**:
-```bash
-$ dango generate --source stripe_payments
-
-Generating staging models for stripe_payments...
-Introspecting raw_stripe.* tables...
-
-✓ Generated stg_stripe_charges.sql (3 columns, latest_only dedup)
-✓ Generated stg_stripe_customers.sql (5 columns, latest_only dedup)
-✓ Generated stg_stripe_subscriptions.sql (7 columns, scd_type2 dedup)
-✓ Generated _stg_stripe__sources.yml
-✓ Generated _stg_stripe__schema.yml
-
-3 models created. Run 'dango run' to materialize.
 ```
 
 ---
@@ -487,11 +446,11 @@ dango db status
 Database: data/warehouse.duckdb (42.3 MB)
 
 Schemas:
-  raw                3 tables, 12,435 rows
-  raw_stripe         5 tables, 8,921 rows
-  staging           8 tables (views)
-  intermediate      3 tables, 5,234 rows
-  marts             4 tables, 2,103 rows
+  raw_orders         3 tables, 12,435 rows
+  raw_stripe_payments 5 tables, 8,921 rows
+  staging            8 tables
+  intermediate       3 tables, 5,234 rows
+  marts              4 tables, 2,103 rows
 
 Total: 23 tables, 28,693 rows
 ```
@@ -711,11 +670,8 @@ cd my-analytics
 # Add a CSV source
 dango source add  # Choose CSV
 
-# Sync data
+# Sync data (also generates staging models)
 dango sync
-
-# Generate staging models
-dango generate
 
 # Start platform
 dango start
@@ -738,13 +694,10 @@ echo "STRIPE_API_KEY=sk_live_abc123" >> .env
 # Test with dry run
 dango sync --source stripe_payments --dry-run
 
-# Sync for real
+# Sync for real (also generates staging models)
 dango sync --source stripe_payments
 
-# Generate staging models
-dango generate --source stripe_payments
-
-# Run dbt
+# Run dbt transformations
 dango run
 ```
 
@@ -753,11 +706,8 @@ dango run
 ### Workflow 3: Build Custom Metrics
 
 ```bash
-# Sync raw data
+# Sync raw data (generates staging models automatically)
 dango sync
-
-# Generate staging
-dango generate
 
 # Create custom model: dbt/models/marts/daily_sales.sql
 # (write SQL)
@@ -809,8 +759,27 @@ RUNTIME__LOG_LEVEL=DEBUG dango sync
 
 ---
 
+## Version Control Tips
+
+When using Dango with git, consider these practices:
+
+**Track in version control**:
+- `.dango/project.yml` - Project configuration
+- `.dango/sources.yml` - Source definitions
+- `dbt/` - All transformation logic
+- `custom_sources/` - Custom dlt sources
+
+**Do NOT track**:
+- `data/` - Database file (add to `.gitignore`)
+- `.dlt/secrets.toml` - API keys (add to `.gitignore`)
+- `.env` - Environment variables (add to `.gitignore`)
+
+The `dango init` command creates a `.gitignore` file with recommended exclusions.
+
+---
+
 ## Next Steps
 
 - **[Project Structure](project-structure.md)** - See where CLI commands operate
 - **[Data Sources](../data-sources/index.md)** - Deep dive into `dango source` and `dango sync`
-- **[Transformations](../transformations/index.md)** - Learn more about `dango run` and `dango generate`
+- **[Transformations](../transformations/index.md)** - Learn more about `dango run` and dbt models

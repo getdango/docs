@@ -161,6 +161,19 @@ The installer will:
 3. Install Dango from PyPI
 4. Initialize your project interactively
 
+### What the Installer Does
+
+The installer detects your situation and responds appropriately:
+
+| Scenario | What Happens |
+|----------|--------------|
+| **Fresh install** | Creates project directory, sets up venv, installs Dango, runs `dango init` |
+| **Run in existing directory** | Prompts for confirmation, creates venv in current directory |
+| **Dango already installed** | Offers to upgrade to the latest version |
+| **Existing project (e.g., cloned from GitHub)** | Detects existing structure, installs/upgrades Dango, skips init |
+
+You'll be prompted at each decision point—nothing runs without your confirmation.
+
 ### Security-Conscious Installation
 
 If you prefer to inspect the installer first:

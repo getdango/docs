@@ -354,7 +354,7 @@ dango generate
 dango run
 
 # Run tests
-dbt test --profiles-dir .dango --project-dir dbt
+dbt test --profiles-dir dbt --project-dir dbt
 
 echo "Daily sync complete at $(date)"
 ```
@@ -457,7 +457,7 @@ jobs:
         run: dango run
 
       - name: Run Tests
-        run: dbt test --profiles-dir .dango --project-dir dbt
+        run: dbt test --profiles-dir dbt --project-dir dbt
 
       - name: Upload Database
         uses: actions/upload-artifact@v3
@@ -504,7 +504,7 @@ transform:
 test:
   stage: test
   script:
-    - dbt test --profiles-dir .dango --project-dir dbt
+    - dbt test --profiles-dir dbt --project-dir dbt
   dependencies:
     - transform
 ```

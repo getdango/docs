@@ -301,9 +301,8 @@ order by 1, 2
 # Run full pipeline
 dango run
 
-# Check lineage
-dango docs
-# Open http://localhost:8081 and view the DAG
+# Check lineage in dbt docs
+# Open http://localhost:8800/dbt-docs and view the DAG
 ```
 
 ---

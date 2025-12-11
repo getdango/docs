@@ -1,29 +1,29 @@
 # Metabase Overview
 
-Introduction to Metabase in Dango with auto-configuration and basic features.
+How Dango auto-configures Metabase for your DuckDB warehouse.
 
 ---
 
 ## Overview
 
-Metabase is the built-in business intelligence tool in Dango, providing a powerful web-based interface for creating dashboards, writing SQL queries, and visualizing data from your DuckDB warehouse.
-
-**What Metabase provides**:
-
-- Visual query builder (no SQL required)
-- SQL editor for advanced queries
-- Interactive dashboards with filters
-- Chart and visualization library
-- Shareable reports and embeds
-- User management and permissions
+Metabase is the built-in BI tool in Dango, providing dashboards, SQL queries, and visualizations for your data.
 
 **What Dango automates**:
 
-- Metabase installation and configuration
+- Metabase installation via Docker
 - DuckDB connection setup
+- Admin user creation
 - Database schema sync
-- Container orchestration
-- Port management
+
+**What Metabase provides**:
+
+- Visual query builder
+- SQL editor
+- Interactive dashboards
+- Chart visualizations
+
+!!! info "Learn More About Metabase"
+    For detailed Metabase features (visualizations, sharing, user management), see the [official Metabase documentation](https://www.metabase.com/docs/latest/).
 
 ---
 
@@ -31,7 +31,7 @@ Metabase is the built-in business intelligence tool in Dango, providing a powerf
 
 ### Access Metabase
 
-After starting Dango:
+Start your Dango platform:
 
 ```bash
 dango start
@@ -39,391 +39,177 @@ dango start
 
 Metabase is available at: **http://localhost:3000**
 
-!!! info "Auto-Created Admin User"
-    Dango automatically creates an admin user on first start:
+### Auto-Created Credentials
 
-    - **Email**: `admin@dango.local`
-    - **Password**: `dangolocal123`
+Dango automatically creates an admin user:
 
-    The DuckDB connection is also auto-configured. You can start querying data immediately.
+- **Email**: `admin@dango.local`
+- **Password**: `dangolocal123`
+
+!!! tip "Change Password"
+    For production use, change the default password in Account Settings after first login.
 
 ### First Login
 
-1. **Open Metabase**: Navigate to http://localhost:3000
-
-2. **Login** with auto-created credentials:
-   - Email: `admin@dango.local`
-   - Password: `dangolocal123`
-
-3. **DuckDB already connected** - All schemas (raw, staging, marts) are immediately available
-
-4. **Optional**: Change admin password in Account Settings
-
-You're now ready to query your data!
+1. Open http://localhost:3000
+2. Login with credentials above
+3. Start querying - DuckDB connection is pre-configured
 
 ---
 
 ## Auto-Configuration
 
-Dango automatically configures Metabase on `dango start`:
-
 ### DuckDB Connection
 
-Pre-configured database connection:
+Dango pre-configures the database connection:
 
 - **Database Name**: DuckDB
-- **Connection Type**: DuckDB (via custom driver)
-- **Database File**: Shared volume mount to `data/warehouse.duckdb`
-- **Read-Only**: No (allows creating models in Metabase)
+- **Database File**: `data/warehouse.duckdb` (shared volume)
+- **Connection**: Automatic (no setup required)
+
+!!! warning "Do Not Modify Connection"
+    Dango manages the DuckDB connection settings. Modifying them may break integration.
 
 ### Available Schemas
 
-All Dango data layers are accessible:
+All Dango data layers are accessible in Metabase:
 
-| Schema | Description | Tables |
-|--------|-------------|--------|
-| `raw` | Source of truth from dlt | Single-table sources |
-| `raw_*` | Multi-table sources | Stripe, database exports, etc. |
-| `staging` | Auto-generated staging models | `stg_*` tables |
-| `intermediate` | Custom business logic | Your intermediate models |
-| `marts` | Analytics-ready tables | Your marts models |
+| Schema | Description | Example Tables |
+|--------|-------------|----------------|
+| `raw_*` | Source data from dlt | `raw_stripe.charges`, `raw_stripe.customers` |
+| `staging` | Auto-generated staging models | `stg_stripe_charges`, `stg_stripe_customers` |
+| `intermediate` | Your business logic models | `int_customer_orders` |
+| `marts` | Analytics-ready tables | `customer_metrics`, `revenue_by_month` |
+
+**Browse in Metabase**: Home → Browse data → DuckDB
 
 ### Database Sync
 
-Metabase automatically syncs schema metadata:
+Metabase syncs schema metadata:
 
 - **On startup**: Full schema scan
-- **Daily**: Automatic re-sync (default)
+- **Daily**: Automatic re-sync (2 AM default)
 - **Manual**: Admin → Databases → DuckDB → "Sync database schema now"
 
 ---
 
-## Metabase Interface
+## Querying Dango Data
 
-### Home Screen
+### Browse Tables
 
-After login, you'll see:
-
-- **Our analytics** - Saved questions and dashboards
-- **Databases** - Available data sources (DuckDB)
-- **Collections** - Organized folders for content
-- **Search** - Find questions, dashboards, tables
-
-### Navigation
-
-**Top Navigation Bar**:
-
-- **Home** - Dashboard overview
-- **+** - Create new question or dashboard
-- **Browse data** - Explore tables by schema
-- **SQL** - Open SQL editor
-
-**Settings (Gear Icon)**:
-
-- Admin settings
-- Account settings
-- About Metabase
-
----
-
-## Key Features
-
-### 1. Browse Data
-
-**Access**: Home → Browse data → DuckDB
-
-Explore your warehouse:
+Navigate to: **Home → Browse data → DuckDB**
 
 ```
 DuckDB
-├── raw
-│   └── csv_uploads
 ├── raw_stripe
 │   ├── charges
 │   ├── customers
 │   └── subscriptions
 ├── staging
-│   ├── stg_stripe_charges
-│   ├── stg_stripe_customers
-│   └── stg_stripe_subscriptions
-├── intermediate
-│   └── int_customer_orders
+│   └── stg_stripe_charges
 └── marts
-    ├── customer_metrics
-    └── revenue_by_month
+    └── customer_metrics
 ```
 
-Click any table to:
-- Preview first 2000 rows
-- See column types
-- View sample values
-- Create questions
+Click any table to preview data and create questions.
 
-### 2. Ask a Question
+### SQL Queries
 
-**Visual Query Builder** - No SQL required:
+Open the SQL editor: **Home → SQL**
 
-1. Click **"+ New"** → **"Question"**
-2. Select **DuckDB database**
-3. Choose a table (e.g., `marts.customer_metrics`)
-4. Add filters, aggregations, grouping
-5. Visualize results
-6. Save question
-
-**Example**: Top 10 customers by revenue:
-- Table: `marts.customer_metrics`
-- Sort by: `lifetime_value` descending
-- Limit: 10
-- Visualization: Table or Bar chart
-
-### 3. SQL Editor
-
-**Access**: Home → SQL
-
-Write custom SQL queries:
+**Example - Query marts table**:
 
 ```sql
 SELECT
-    DATE_TRUNC('month', created) as month,
+    DATE_TRUNC('month', created_at) as month,
     COUNT(*) as customer_count,
     SUM(lifetime_value) as total_revenue
 FROM marts.customer_metrics
 GROUP BY month
 ORDER BY month DESC
-LIMIT 12
 ```
 
-**Features**:
-- Auto-completion for tables and columns
-- Schema browser (left sidebar)
-- Query variables for filters
-- Save and organize queries
-- Export results (CSV, JSON, XLSX)
-
-### 4. Visualizations
-
-Available chart types:
-
-**Basic Charts**:
-- Table
-- Number (single metric)
-- Trend (time series line)
-- Bar chart
-- Line chart
-- Area chart
-- Pie chart
-
-**Advanced Charts**:
-- Funnel
-- Map (with lat/long data)
-- Scatter plot
-- Waterfall
-- Gauge
-- Progress bar
-
-**Customization**:
-- Colors and formatting
-- Axis labels and ranges
-- Goal lines
-- Multi-series charts
-
-### 5. Dashboards
-
-Combine multiple visualizations:
-
-1. Create dashboard: **"+ New"** → **"Dashboard"**
-2. Add saved questions as cards
-3. Arrange cards in grid layout
-4. Add text cards for context
-5. Add filters (apply across cards)
-6. Save and share
-
-**Dashboard Features**:
-- Auto-refresh
-- Full-screen mode
-- Public sharing links
-- PDF/PNG export
-- Time-based filters
-- Parameter drill-down
-
----
-
-## Common Workflows
-
-### View Raw Source Data
-
-```
-Home → Browse data → DuckDB → raw_stripe → charges
-```
-
-Preview Stripe charges directly from dlt ingestion.
-
-### Query Staging Tables
-
-```
-Home → SQL
-```
+**Example - Query with dlt metadata**:
 
 ```sql
-SELECT * FROM staging.stg_stripe_charges
-WHERE status = 'succeeded'
-  AND created >= CURRENT_DATE - INTERVAL 7 DAY
-ORDER BY created DESC
+SELECT *
+FROM raw_stripe.charges
+WHERE _dlt_extracted_at > CURRENT_DATE - INTERVAL 1 DAY
+ORDER BY _dlt_extracted_at DESC
 ```
 
-### Create Business Metrics
+!!! info "DuckDB SQL Syntax"
+    For DuckDB-specific SQL functions, see the [DuckDB documentation](https://duckdb.org/docs/sql/introduction).
 
-```
-Home → + New → Question → marts.revenue_by_month
-```
+### Best Practice: Query Marts
 
-Build visualizations from your dbt marts.
-
-### Build Executive Dashboard
-
-1. Create monthly revenue trend (line chart)
-2. Create customer count (number)
-3. Create top products (bar chart)
-4. Combine in dashboard
-5. Add date filter
-6. Share with team
-
----
-
-## Data Refresh
-
-### When Data Updates in DuckDB
-
-Metabase queries live data:
-
-```bash
-# 1. Sync new source data
-dango sync --source stripe_payments
-
-# 2. Run dbt transformations
-dango run
-
-# 3. Refresh Metabase dashboard
-# (Just reload the page - no action needed!)
-```
-
-### Schema Changes
-
-When you add new tables or columns:
-
-**Automatic**: Daily sync at 2 AM (default)
-
-**Manual Sync**:
-1. Admin → Databases → DuckDB
-2. Click **"Sync database schema now"**
-3. Wait 30-60 seconds
-4. New tables/columns appear
-
-**After running `dango generate`**:
-```bash
-dango generate  # Creates new staging models
-dango run       # Materializes them
-# → Sync Metabase manually or wait for daily sync
-```
-
----
-
-## User Management
-
-### Create Additional Users
-
-Admin → People → Add someone
-
-**User Roles**:
-
-| Role | Permissions |
-|------|-------------|
-| **Admin** | Full access, manage users, settings |
-| **Editor** | Create/edit questions and dashboards |
-| **Viewer** | View and filter, cannot edit |
-
-### Collections & Permissions
-
-Organize content:
-
-- **Collections** - Folders for dashboards and questions
-- **Permissions** - Control database/schema access per group
-- **Sharing** - Public links, email subscriptions
-
----
-
-## Configuration
-
-### Metabase Settings
-
-Access via: Admin → Settings
-
-**Recommended Settings**:
-
-| Setting | Recommendation | Why |
-|---------|----------------|-----|
-| Email | Configure SMTP | For subscriptions and alerts |
-| Slack | Optional | Dashboard notifications |
-| Query Caching | Enabled (default) | Faster repeat queries |
-| Auto-refresh | 1-5 minutes | Live dashboard updates |
-| Timezone | Match your team | Correct date display |
-
-### Database Settings
-
-Admin → Databases → DuckDB → Settings
-
-**Available Options**:
-
-- **Display name**: Customize (default: "DuckDB")
-- **Rerun queries for simple exploration**: Enabled (recommended)
-- **Synchronization frequency**: Daily (default) or hourly
-- **Refingerprinting frequency**: Weekly (default)
-
-!!! warning "Do Not Modify Connection"
-    Dango manages the DuckDB connection. Changing connection settings may break integration.
-
----
-
-## Performance Tips
-
-### 1. Use Marts for Dashboards
+For dashboards, query pre-aggregated marts instead of raw tables:
 
 ```sql
--- Good: Query pre-aggregated marts
+-- Good: Query marts (fast)
 SELECT * FROM marts.revenue_by_month
 
--- Avoid: Aggregating in Metabase on large raw tables
+-- Avoid: Aggregate raw data in Metabase (slow)
 SELECT DATE_TRUNC('month', created), SUM(amount)
 FROM raw_stripe.charges
 GROUP BY 1
 ```
 
-Create aggregations in dbt, not Metabase queries.
+Create aggregations in dbt, not Metabase.
 
-### 2. Enable Query Caching
+---
 
-Admin → Settings → Caching
+## Data Refresh Workflow
 
-- Caches query results for faster repeat views
-- Configurable TTL (time to live)
-- Automatic invalidation on schema changes
+### Update Data in Metabase
 
-### 3. Limit Dashboard Cards
+Metabase queries live DuckDB data. To refresh:
 
-- Aim for 6-12 cards per dashboard
-- Split large dashboards into multiple themed dashboards
-- Use tabs for related content
+```bash
+# 1. Sync new source data
+dango sync
 
-### 4. Use Filters Wisely
+# 2. Run dbt transformations
+dango run
 
-Add dashboard filters to reduce query load:
-
-```
-Date filter: Last 30 days (default)
-Status filter: Active only
+# 3. Reload Metabase dashboard (no action needed!)
 ```
 
-Reduces rows scanned on each query.
+Metabase shows updated data immediately after `dango run` completes.
+
+### Schema Changes
+
+When you add new dbt models:
+
+```bash
+# 1. Create model
+dango model add
+
+# 2. Run transformations
+dango run
+
+# 3. Sync Metabase schema
+# Admin → Databases → DuckDB → "Sync database schema now"
+```
+
+Or wait for the daily automatic sync.
+
+---
+
+## Metabase vs dbt Docs
+
+| Feature | Metabase | dbt Docs |
+|---------|----------|----------|
+| **Audience** | Business users, analysts | Data engineers |
+| **Purpose** | Dashboards, reporting | Documentation, lineage |
+| **Access** | http://localhost:3000 | http://localhost:8800/dbt-docs |
+| **Query Interface** | Visual + SQL | View only |
+| **Best For** | End-user analytics | Developer reference |
+
+**Use both**:
+
+- **dbt Docs**: Understand data lineage and transformations
+- **Metabase**: Build dashboards and share insights
 
 ---
 
@@ -432,166 +218,42 @@ Reduces rows scanned on each query.
 ### Cannot Connect to Metabase
 
 **Check if running**:
+
 ```bash
 docker ps | grep metabase
 ```
 
-**Restart if needed**:
+**Restart**:
+
 ```bash
 dango stop
 dango start
 ```
 
-**Check port availability**:
-```bash
-lsof -i :3000
-```
-
 ### Schema Not Updating
 
 **Trigger manual sync**:
+
 1. Admin → Databases → DuckDB
-2. "Sync database schema now"
-
-**Check for errors**:
-1. Admin → Databases → DuckDB
-2. View "Connection details" and "Sync status"
-
-### Query Timeout
-
-For long-running queries:
-
-1. Optimize in dbt first (create aggregated marts)
-2. Admin → Databases → DuckDB → Advanced options
-3. Increase "Query timeout" (default: 30 seconds)
+2. Click "Sync database schema now"
 
 ### Missing Tables
 
-**Verify table exists in DuckDB**:
+**Verify table exists**:
+
 ```bash
 duckdb data/warehouse.duckdb "SHOW TABLES FROM marts;"
 ```
 
-**If exists, sync Metabase**:
-- Admin → Databases → DuckDB → "Sync database schema now"
+If the table exists but doesn't appear in Metabase, trigger a manual sync.
 
----
+### Query Timeout
 
-## Metabase vs dbt Docs
+For complex queries:
 
-Both provide data exploration, with different purposes:
-
-| Feature | Metabase | dbt Docs |
-|---------|----------|----------|
-| **Audience** | Business users, analysts | Data engineers |
-| **Purpose** | BI, dashboards, reporting | Technical documentation, lineage |
-| **Access** | http://localhost:3000 | http://localhost:8081 (via `dango docs`) |
-| **Query Interface** | Visual + SQL | View only |
-| **Visualizations** | Full chart library | Sample data preview |
-| **Best For** | End-user analytics | Developer reference |
-
-**Use both**:
-- dbt Docs: Understand data lineage and transformations
-- Metabase: Build dashboards and share insights
-
----
-
-## Data Security
-
-### Access Control
-
-**Production deployments**:
-
-1. Enable authentication
-2. Create user groups
-3. Restrict database access by group
-4. Use read-only credentials for DuckDB (if possible)
-
-### Audit Logging
-
-Track query activity:
-
-- Admin → Troubleshooting → Logs
-- View query history
-- Monitor user activity
-
-### Public Sharing
-
-**Be cautious**:
-- Public links expose data without authentication
-- Use signed embeds for controlled sharing
-- Set expiration dates on public shares
-
----
-
-## Backup and Recovery
-
-### Metabase Application Database
-
-Metabase stores dashboards, questions, and users in its own database (H2 by default):
-
-**Location** (in Docker): `/metabase.db/`
-
-**Backup**:
-```bash
-# Metabase data persists in Docker volume
-docker volume ls | grep metabase
-
-# Backup volume (advanced)
-docker run --rm -v metabase_data:/data -v $(pwd):/backup ubuntu tar czf /backup/metabase-backup.tar.gz /data
-```
-
-### DuckDB Warehouse
-
-Your actual data is in DuckDB:
-
-```bash
-# Backup warehouse
-cp data/warehouse.duckdb data/warehouse-backup-$(date +%Y%m%d).duckdb
-```
-
-**Restore**:
-```bash
-cp data/warehouse-backup-20241209.duckdb data/warehouse.duckdb
-dango start
-```
-
----
-
-## Advanced Features
-
-### SQL Snippets
-
-Reusable SQL fragments:
-
-1. Admin → SQL Snippets
-2. Create snippet: `{{snippet: active_customers}}`
-3. Use in queries:
-   ```sql
-   SELECT * FROM {{ snippet: active_customers }}
-   WHERE created > CURRENT_DATE - 30
-   ```
-
-### Alerts and Subscriptions
-
-**Email Alerts**:
-- Set thresholds on metrics
-- Daily/weekly email delivery
-- Requires SMTP configuration
-
-**Slack Integration**:
-- Post dashboards to Slack channels
-- Scheduled or on-demand
-
-### Metabase Models
-
-Create logical layers in Metabase:
-
-1. Admin → Models
-2. Save complex SQL as a Model
-3. Business users query Models (not raw tables)
-
-Similar to dbt models, but defined in Metabase UI.
+1. Create a dbt mart with pre-aggregated data
+2. Query the mart instead of raw tables
+3. Optionally increase timeout: Admin → Databases → DuckDB → Advanced options
 
 ---
 
@@ -603,7 +265,7 @@ Similar to dbt models, but defined in Metabase UI.
 
     ---
 
-    Step-by-step guide to building interactive dashboards in Metabase.
+    Build your first dashboard with Dango data.
 
     [:octicons-arrow-right-24: Creating Dashboards](creating-dashboards.md)
 
@@ -611,7 +273,7 @@ Similar to dbt models, but defined in Metabase UI.
 
     ---
 
-    Learn to write SQL queries for DuckDB in Metabase.
+    DuckDB SQL syntax and patterns for Dango data.
 
     [:octicons-arrow-right-24: SQL Queries Guide](sql-queries.md)
 
@@ -619,7 +281,7 @@ Similar to dbt models, but defined in Metabase UI.
 
     ---
 
-    Create analytics-ready tables with dbt for Metabase.
+    Create analytics-ready tables with dbt.
 
     [:octicons-arrow-right-24: Transformations](../transformations/index.md)
 
@@ -627,7 +289,7 @@ Similar to dbt models, but defined in Metabase UI.
 
     ---
 
-    Explore official Metabase resources and advanced features.
+    Full Metabase features: visualizations, sharing, users.
 
     [:octicons-arrow-right-24: Metabase Docs](https://www.metabase.com/docs/latest/)
 

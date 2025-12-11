@@ -21,6 +21,9 @@ When built-in sources don't fit your needs, create custom sources using Python. 
 
 ## Using dlt Verified Sources (Advanced)
 
+!!! warning "Untested Configuration"
+    The dlt verified sources below (HubSpot, Notion, Asana, etc.) have not been fully tested with Dango. Configuration patterns are based on dlt documentation and may require adjustments for your use case.
+
 Many popular sources like HubSpot, Notion, Asana, and Salesforce are available as [dlt verified sources](https://dlthub.com/docs/dlt-ecosystem/verified-sources/) but not yet in the Dango wizard. You can still use them by configuring them manually via `dlt_native`.
 
 ### Quick Guide
@@ -375,18 +378,23 @@ def authenticated_api():
 
 ### Usage
 
-Set environment variable before running:
-
-```bash
-export MY_API_KEY="your-key-here"
-dango sync --source my_api
-```
-
-Or use `.env` file:
+**Recommended: Use `.env` file** (persists across sessions):
 
 ```bash
 # .env (gitignored)
 MY_API_KEY=your-key-here
+```
+
+Then run:
+```bash
+dango sync --source my_api
+```
+
+**Alternative: Environment variable** (current session only):
+
+```bash
+export MY_API_KEY="your-key-here"
+dango sync --source my_api
 ```
 
 ---
@@ -707,14 +715,19 @@ response.raise_for_status()  # Raises exception for 4xx/5xx
 
 ### 2. Use Environment Variables for Secrets
 
-Never hardcode credentials:
+Never hardcode credentials. Use `.env` file (recommended) or export:
 
 ```python
-# Good
+# Good - reads from .env or environment
 api_key = os.environ.get("API_KEY")
 
-# Bad
+# Bad - hardcoded credentials
 api_key = "sk_live_abc123..."
+```
+
+Store in `.env` file (gitignored):
+```bash
+API_KEY=your-key-here
 ```
 
 ### 3. Add Docstrings

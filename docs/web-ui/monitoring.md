@@ -630,7 +630,7 @@ Disk space available: 245 GB (healthy)
 ```
 raw          12.3 MB (29%)
 raw_stripe   18.5 MB (44%)
-staging      0.1 MB (0%, views)
+staging      0.1 MB (0%, tables)
 intermediate 5.2 MB (12%)
 marts        6.2 MB (15%)
 ```
