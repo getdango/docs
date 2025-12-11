@@ -6,7 +6,7 @@ Build intermediate layers and data marts for analytics.
 
 ## Overview
 
-Custom models are where you implement business logic, create reusable transformations, and build final analytics tables. Unlike staging models (which are auto-generated), custom models are written by you in SQL.
+Custom models are where you implement business logic, create reusable transformations, and build final analytics tables. Unlike staging models (which are auto-generated templates), custom models are written by you.
 
 **Two Types**:
 
@@ -18,14 +18,40 @@ Custom models are where you implement business logic, create reusable transforma
 - Full SQL and dbt functionality
 - Version controlled with Git
 - Tested and documented
-- Materialized as views or tables
+- **Materialized as tables** (required for Metabase compatibility)
 - Build on top of staging models
+
+**Creating Custom Models**:
+
+Use `dango model add` to create new models via an interactive wizard:
+
+```bash
+dango model add
+# Select "intermediate" or "marts"
+# Enter model name
+# Add optional description
+```
+
+This creates a template file you can edit with your SQL logic.
 
 ---
 
 ## Quick Start
 
 ### Create Your First Mart
+
+**Step 1: Create the model file**
+
+```bash
+dango model add
+# Select "marts"
+# Enter name: customer_metrics
+# Add description (optional)
+```
+
+**Step 2: Edit the generated template**
+
+Open `dbt/models/marts/customer_metrics.sql` and replace with your SQL:
 
 ```sql
 -- dbt/models/marts/customer_metrics.sql
@@ -64,7 +90,7 @@ FROM customers c
 LEFT JOIN customer_orders co ON c.id = co.customer_id
 ```
 
-Run the model:
+**Step 3: Run the model**
 
 ```bash
 dango run
@@ -110,9 +136,13 @@ dbt/models/
 
 | Layer | Prefix | Example | Materialization |
 |-------|--------|---------|-----------------|
-| Staging | `stg_` | `stg_stripe_charges` | view |
-| Intermediate | `int_` | `int_customer_orders` | view |
-| Marts | `fct_` or `dim_` | `fct_revenue`, `dim_customers` | table |
+| Staging | `stg_` | `stg_stripe_charges` | table |
+| Intermediate | `int_` | `int_customer_orders` | table |
+| Marts | (any) | `customer_metrics`, `revenue_by_month` | table |
+
+!!! note "Materialization"
+    All models use `table` materialization in Dango for Metabase compatibility.
+    The `int_` prefix is auto-added when you create intermediate models via `dango model add`.
 
 ---
 
@@ -127,14 +157,22 @@ Intermediate models encapsulate reusable business logic that:
 - Creates reusable building blocks
 - Reduces code duplication
 
-**Materialization**: Usually `view` (lightweight, no storage)
+**Materialization**: `table` (required for Metabase compatibility)
+
+**Creating intermediate models**:
+
+```bash
+dango model add
+# Select "intermediate"
+# The name will be auto-prefixed with "int_"
+```
 
 ### Example: Customer Orders
 
 ```sql
 -- dbt/models/intermediate/int_customer_orders.sql
 {{ config(
-    materialized='view',
+    materialized='table',
     schema='intermediate'
 ) }}
 
@@ -178,7 +216,7 @@ SELECT * FROM joined
 
 ```sql
 -- dbt/models/intermediate/int_product_performance.sql
-{{ config(materialized='view') }}
+{{ config(materialized='table', schema='intermediate') }}
 
 WITH products AS (
     SELECT
@@ -246,7 +284,15 @@ Marts are the final analytics tables designed for:
 - Reporting and dashboards
 - Data exports
 
-**Materialization**: Usually `table` (fast queries, uses storage)
+**Materialization**: `table` (required for Metabase compatibility)
+
+**Creating marts models**:
+
+```bash
+dango model add
+# Select "marts"
+# Enter the model name
+```
 
 ### Fact Tables
 
@@ -559,7 +605,7 @@ packages:
 ```
 
 ```bash
-dbt deps --profiles-dir .dango --project-dir dbt
+dbt deps --profiles-dir dbt --project-dir dbt
 ```
 
 Use in models:
@@ -576,39 +622,19 @@ FROM {{ ref('int_customer_orders') }}
 
 ## Materialization Strategies
 
-### When to Use Views
-
-```sql
-{{ config(materialized='view') }}
-```
-
-**Use for**:
-
-- Intermediate models
-- Simple transformations
-- Frequently changing data
-- Dev/test environments
-
-**Pros**: No storage, always fresh data
-**Cons**: Slower queries, recomputed each time
-
-### When to Use Tables
+### Tables (Default in Dango)
 
 ```sql
 {{ config(materialized='table') }}
 ```
 
-**Use for**:
+All Dango models use `table` materialization by default for Metabase compatibility.
 
-- Marts models
-- Complex aggregations
-- BI dashboards
-- Production reporting
+!!! info "Why tables?"
+    Metabase requires tables for reliable schema discovery. Views can work in some
+    cases but may have inconsistent behavior with Metabase features.
 
-**Pros**: Fast queries, indexed
-**Cons**: Storage cost, needs refreshing
-
-### When to Use Incremental
+### Incremental (For Large Tables)
 
 ```sql
 {{ config(
@@ -624,9 +650,9 @@ FROM {{ ref('int_customer_orders') }}
 - Historical archives
 
 **Pros**: Efficient updates, handles scale
-**Cons**: Complex logic, harder to debug
+**Cons**: More complex logic, harder to debug
 
-### When to Use Ephemeral
+### Ephemeral (Advanced)
 
 ```sql
 {{ config(materialized='ephemeral') }}
@@ -634,12 +660,12 @@ FROM {{ ref('int_customer_orders') }}
 
 **Use for**:
 
-- Helper CTEs
+- Helper CTEs that shouldn't create tables
 - Small utility models
 - Reducing table clutter
 
 **Pros**: No tables created, clean namespace
-**Cons**: Can't query directly, duplicates logic
+**Cons**: Can't query directly in Metabase
 
 ---
 
@@ -758,7 +784,7 @@ WHERE ABS(revenue_from_mart.total - revenue_from_source.total) > 0.01
 Run tests:
 
 ```bash
-dbt test --select marts.*
+dbt test --profiles-dir dbt --project-dir dbt --select marts.*
 ```
 
 ---
@@ -841,7 +867,7 @@ SELECT ... FROM (...) JOIN (...) WHERE ...
 Staging → Intermediate → Marts
   ↓           ↓            ↓
 Simple     Reusable    Complex
-Views       Views      Tables
+Tables      Tables      Tables
 ```
 
 ### 3. Document Business Rules

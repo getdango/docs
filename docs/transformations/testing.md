@@ -52,13 +52,13 @@ models:
 
 ```bash
 # Run all tests
-dbt test --profiles-dir .dango --project-dir dbt
+dbt test --profiles-dir dbt --project-dir dbt
 
 # Run tests for specific model
-dbt test --select customer_metrics
+dbt test --profiles-dir dbt --project-dir dbt --select customer_metrics
 
 # Run tests for all marts
-dbt test --select marts.*
+dbt test --profiles-dir dbt --project-dir dbt --select marts.*
 ```
 
 ### Test Output
@@ -71,6 +71,25 @@ Completed successfully
 
 Done. PASS=8 WARN=0 ERROR=0 SKIP=0 TOTAL=8
 ```
+
+---
+
+## Auto-Generated Tests
+
+When `dango sync` generates staging models, it also creates basic tests for primary key columns:
+
+```yaml
+# Auto-generated in _stg_<source>__schema.yml
+models:
+  - name: stg_stripe_charges
+    columns:
+      - name: id
+        tests:
+          - unique
+          - not_null
+```
+
+Dango automatically adds `unique` and `not_null` tests for columns that appear to be primary keys (columns named `id`, `uuid`, or ending in `_id`/`_key`).
 
 ---
 
@@ -158,7 +177,7 @@ packages:
 ```
 
 ```bash
-dbt deps --profiles-dir .dango --project-dir dbt
+dbt deps --profiles-dir dbt --project-dir dbt
 ```
 
 Use in tests:
@@ -209,7 +228,7 @@ sources:
 Test freshness:
 
 ```bash
-dbt source freshness --profiles-dir .dango --project-dir dbt
+dbt source freshness --profiles-dir dbt --project-dir dbt
 ```
 
 ---
@@ -504,7 +523,7 @@ dbt test --select customer_metrics
 dango run
 
 # Run all tests
-dbt test --profiles-dir .dango --project-dir dbt
+dbt test --profiles-dir dbt --project-dir dbt
 
 # Check exit code
 if [ $? -eq 0 ]; then
@@ -520,16 +539,16 @@ fi
 
 ```bash
 # Test specific model and dependencies
-dbt test --select customer_metrics+
+dbt test --profiles-dir dbt --project-dir dbt --select customer_metrics+
 
 # Test all marts
-dbt test --select marts.*
+dbt test --profiles-dir dbt --project-dir dbt --select marts.*
 
 # Test modified models only
-dbt test --select state:modified+
+dbt test --profiles-dir dbt --project-dir dbt --select state:modified+
 
 # Test by tag
-dbt test --select tag:daily
+dbt test --profiles-dir dbt --project-dir dbt --select tag:daily
 ```
 
 ---
@@ -540,13 +559,13 @@ dbt test --select tag:daily
 
 ```bash
 # Verbose output
-dbt test --profiles-dir .dango --project-dir dbt --debug
+dbt test --profiles-dir dbt --project-dir dbt --debug
 
 # Store failures
-dbt test --store-failures
+dbt test --profiles-dir dbt --project-dir dbt --store-failures
 
 # View failures in database
-SELECT * FROM dbt_test__audit.unique_customer_metrics_customer_id
+duckdb data/warehouse.duckdb "SELECT * FROM dbt_test__audit.unique_customer_metrics_customer_id"
 ```
 
 ### Investigate Failures
@@ -876,7 +895,7 @@ WHERE date > CURRENT_DATE
 dango sync && dango run
 
 # Run tests
-dbt test --profiles-dir .dango --project-dir dbt
+dbt test --profiles-dir dbt --project-dir dbt
 
 # Check results
 if [ $? -eq 0 ]; then
@@ -886,13 +905,22 @@ else
 fi
 ```
 
-### Automated Testing
+### Complete Pipeline Script
 
-Add to `.dango/config.toml`:
+```bash
+#!/bin/bash
+# Run full pipeline with tests
 
-```toml
-[pipeline]
-auto_test = true  # Run tests after dango run
+# Sync data (auto-generates staging templates)
+dango sync --source stripe_payments
+
+# Run transformations
+dango run
+
+# Run tests
+dbt test --profiles-dir dbt --project-dir dbt
+
+echo "Pipeline complete"
 ```
 
 ---

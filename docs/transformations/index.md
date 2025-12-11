@@ -8,11 +8,11 @@ Transform raw data into analytics-ready tables with dbt and DuckDB.
 
 Transformations in Dango use **dbt (data build tool)** to convert raw ingested data into clean, modeled tables for analytics. Dango combines the power of dbt with DuckDB to give you:
 
-- **Auto-generated staging models** from raw tables
+- **Auto-generated staging model templates** from raw tables
+- **Interactive model creation** via `dango model add`
 - **Custom SQL transformations** for business logic
-- **Data quality testing** built into your workflow
-- **Automatic documentation** with lineage graphs
-- **Version control** for all transformations
+- **Auto-generated data quality tests** (unique, not_null)
+- **dbt documentation** viewable via Web UI
 
 **Tech Stack**:
 
@@ -28,9 +28,9 @@ Understanding how data transforms through layers:
 
 ```mermaid
 graph LR
-    A[Raw Layer] -->|dango generate| B[Staging Models]
-    B -->|Your SQL| C[Intermediate Models]
-    C -->|Your SQL| D[Marts]
+    A[Raw Layer] -->|dango sync| B[Staging Models]
+    B -->|dango model add| C[Intermediate Models]
+    C -->|dango model add| D[Marts]
     D --> E[Metabase]
 
     style A fill:#f3e5f5
@@ -45,9 +45,12 @@ graph LR
 | Layer | Purpose | Created By | Materialization |
 |-------|---------|------------|-----------------|
 | **Raw** | Source of truth from dlt | `dango sync` | Tables |
-| **Staging** | Clean, deduplicated data | `dango generate` | Views |
-| **Intermediate** | Reusable business logic | You (SQL) | Views |
-| **Marts** | Final analytics tables | You (SQL) | Tables |
+| **Staging** | Template for cleaning data | `dango sync` (auto) | Tables |
+| **Intermediate** | Reusable business logic | `dango model add` | Tables |
+| **Marts** | Final analytics tables | `dango model add` | Tables |
+
+!!! note "Why Tables?"
+    All models are materialized as tables (not views) for Metabase compatibility.
 
 ---
 
@@ -56,14 +59,31 @@ graph LR
 ### End-to-End Example
 
 ```bash
-# 1. Load raw data
+# 1. Load raw data (also generates staging model templates)
 dango sync --source stripe_payments
 
-# 2. Generate staging models
-dango generate
+# 2. Create a custom mart using the wizard
+dango model add
+# Select "marts", enter "customer_metrics", add description
 
-# 3. Create custom mart
-cat > dbt/models/marts/customer_metrics.sql << 'EOF'
+# 3. Edit the generated model file
+# Open dbt/models/marts/customer_metrics.sql in your editor
+# Replace the template with your SQL logic
+
+# 4. Run transformations
+dango run
+
+# 5. View results in Metabase
+dango start
+# Open http://localhost:8800 → Metabase
+```
+
+### Example Mart SQL
+
+After creating a model with `dango model add`, edit the file:
+
+```sql
+-- dbt/models/marts/customer_metrics.sql
 {{ config(materialized='table') }}
 
 WITH customer_orders AS (
@@ -83,16 +103,6 @@ SELECT
     COALESCE(o.total_spent, 0) as lifetime_value
 FROM {{ ref('stg_stripe_customers') }} c
 LEFT JOIN customer_orders o ON c.id = o.customer
-EOF
-
-# 4. Run transformations
-dango run
-
-# 5. Test data quality
-dbt test --profiles-dir .dango --project-dir dbt
-
-# 6. View documentation
-dango docs
 ```
 
 ---
@@ -118,12 +128,12 @@ dango docs
 
     ---
 
-    Deep dive into Dango's auto-generated staging models.
+    Deep dive into Dango's auto-generated staging model templates.
 
-    - How `dango generate` works
-    - Deduplication strategies
+    - How staging templates are generated
+    - Customizing staging models
     - Column naming conventions
-    - Regeneration workflow
+    - When to regenerate
 
     [:octicons-arrow-right-24: Staging Models Guide](staging-models.md)
 
@@ -161,50 +171,41 @@ dango docs
 
 ### Auto-Generated Staging
 
-Dango automatically generates staging models from raw tables:
+When you run `dango sync`, staging model templates are automatically generated:
 
 ```bash
-dango generate
+dango sync --source stripe_payments
+# Creates raw data AND staging templates
 ```
 
 **Creates**:
 
 ```
 dbt/models/staging/
-├── stg_stripe_charges.sql          # Deduped charges
-├── stg_stripe_customers.sql        # Deduped customers
-├── stg_stripe_subscriptions.sql    # Deduped subscriptions
+├── stg_stripe_charges.sql          # Staging template
+├── stg_stripe_customers.sql        # Staging template
+├── stg_stripe_subscriptions.sql    # Staging template
 ├── _stg_stripe__sources.yml        # Source references
 └── _stg_stripe__schema.yml         # Tests & documentation
 ```
 
-**Generated SQL** (example):
+**Generated SQL** (template):
 
 ```sql
 -- stg_stripe_charges.sql
-{{ config(materialized='view') }}
+{{ config(materialized='table', schema='staging') }}
 
-WITH deduplicated AS (
-    SELECT *,
-        ROW_NUMBER() OVER (
-            PARTITION BY id
-            ORDER BY _dlt_extracted_at DESC
-        ) as _rn
-    FROM {{ source('stripe', 'charges') }}
-)
-
-SELECT
-    id,
-    customer,
-    amount,
-    currency,
-    status,
-    created,
-    _dlt_load_id,
-    _dlt_extracted_at
-FROM deduplicated
-WHERE _rn = 1
+SELECT * FROM {{ source('stripe', 'charges') }}
 ```
+
+!!! note "Template Design"
+    Staging templates are intentionally minimal (`SELECT *`). You customize them by adding:
+
+    - Column selection
+    - Type casting
+    - Deduplication logic (if needed)
+
+    See the [Staging Models Guide](staging-models.md) for customization patterns.
 
 ### Custom Business Logic
 
@@ -271,17 +272,35 @@ vim dbt/models/marts/customer_metrics.sql
 dango run --select customer_metrics
 
 # 3. Test model
-dbt test --profiles-dir .dango --project-dir dbt --select customer_metrics
+dbt test --profiles-dir dbt --project-dir dbt --select customer_metrics
 
-# 4. View in Metabase
-# Open http://localhost:3000
+# 4. View in Metabase (via dango start)
+# Open http://localhost:8800
 ```
 
 ### Adding a New Mart
 
+**Option 1: Using the wizard (recommended)**
+
+```bash
+# 1. Create model via wizard
+dango model add
+# Select "marts", enter "monthly_mrr", add description
+
+# 2. Edit the generated template
+vim dbt/models/marts/monthly_mrr.sql
+# Replace SELECT * with your SQL logic
+
+# 3. Run and test
+dango run --select monthly_mrr
+dbt test --profiles-dir dbt --project-dir dbt --select monthly_mrr
+```
+
+**Option 2: Manual creation**
+
 ```bash
 # 1. Create SQL file
-cat > dbt/models/marts/finance/monthly_mrr.sql << 'EOF'
+cat > dbt/models/marts/monthly_mrr.sql << 'EOF'
 {{ config(materialized='table') }}
 
 SELECT
@@ -292,41 +311,33 @@ WHERE status = 'active'
 GROUP BY month
 EOF
 
-# 2. Add documentation
-cat > dbt/models/marts/finance/schema.yml << 'EOF'
-version: 2
-models:
-  - name: monthly_mrr
-    description: Monthly recurring revenue from active subscriptions
-    columns:
-      - name: month
-        tests: [unique, not_null]
-      - name: mrr
-        tests: [not_null]
-EOF
-
-# 3. Run and test
+# 2. Run and test
 dango run --select monthly_mrr
-dbt test --profiles-dir .dango --project-dir dbt --select monthly_mrr
+dbt test --profiles-dir dbt --project-dir dbt --select monthly_mrr
 ```
+
+!!! tip "Schema files"
+    `dango model add` auto-generates basic tests in schema.yml. For manual creation,
+    add your own schema.yml file with documentation and tests.
 
 ### Schema Changes
 
 When source data changes:
 
 ```bash
-# 1. Sync new data
+# 1. Sync new data (auto-regenerates staging templates)
 dango sync --source stripe_payments
 
-# 2. Regenerate staging (picks up new columns)
-dango generate --source stripe_payments
-
-# 3. Update downstream models if needed
+# 2. Update downstream models if needed
 vim dbt/models/marts/customer_metrics.sql
 
-# 4. Run transformations
+# 3. Run transformations
 dango run
 ```
+
+!!! note "Automatic regeneration"
+    `dango sync` automatically regenerates staging model templates when source schemas change.
+    You only need to run `dango generate` manually if you want to regenerate without syncing data.
 
 ---
 
@@ -340,14 +351,14 @@ dbt/
 ├── profiles.yml                 # DuckDB connection (auto-configured)
 ├── packages.yml                 # dbt package dependencies
 ├── models/
-│   ├── staging/                 # Auto-generated (dango generate)
+│   ├── staging/                 # Auto-generated (dango sync)
 │   │   ├── stg_*.sql
 │   │   ├── _stg_*__sources.yml
 │   │   └── _stg_*__schema.yml
-│   ├── intermediate/            # Your reusable logic
+│   ├── intermediate/            # Your reusable logic (dango model add)
 │   │   ├── int_customer_orders.sql
 │   │   └── schema.yml
-│   └── marts/                   # Your final analytics tables
+│   └── marts/                   # Your final analytics tables (dango model add)
 │       ├── finance/
 │       │   ├── revenue_by_month.sql
 │       │   ├── mrr_analysis.sql
@@ -373,12 +384,15 @@ dbt/
 duckdb data/warehouse.duckdb "SHOW SCHEMAS;"
 
 -- Output:
-raw              -- dlt ingested data
-raw_stripe       -- Multi-table sources
-staging          -- Auto-generated staging
-intermediate     -- Your intermediate models
+raw_stripe       -- Raw data from dlt (source-specific, e.g., raw_stripe, raw_hubspot)
+staging          -- Auto-generated staging models (stg_* tables)
+intermediate     -- Your intermediate models (int_* tables)
 marts            -- Your marts models
 ```
+
+!!! note "Schema naming"
+    Raw schemas are prefixed with `raw_` followed by the source name (e.g., `raw_stripe`, `raw_hubspot`).
+    This keeps data from different sources isolated.
 
 ---
 
@@ -390,47 +404,56 @@ marts            -- Your marts models
 # Run all transformations
 dango run
 
-# Generate staging models
-dango generate
+# Run specific model
+dango run --select customer_metrics
 
-# View documentation
-dango docs
+# Create a new model (intermediate or marts)
+dango model add
+
+# Remove a model
+dango model remove customer_metrics
+
+# Regenerate staging templates (usually not needed - sync does this)
+dango generate
 ```
+
+!!! tip "Viewing documentation"
+    dbt docs are available at `http://localhost:8800/dbt-docs` when `dango start` is running.
 
 ### Via dbt Directly
 
 ```bash
 # Run all models
-dbt run --profiles-dir .dango --project-dir dbt
+dbt run --profiles-dir dbt --project-dir dbt
 
 # Run specific model
-dbt run --profiles-dir .dango --project-dir dbt --select customer_metrics
+dbt run --profiles-dir dbt --project-dir dbt --select customer_metrics
 
 # Test all models
-dbt test --profiles-dir .dango --project-dir dbt
+dbt test --profiles-dir dbt --project-dir dbt
 
-# Generate docs
-dbt docs generate --profiles-dir .dango --project-dir dbt
-dbt docs serve --profiles-dir .dango --project-dir dbt --port 8081
+# Generate and serve docs
+dbt docs generate --profiles-dir dbt --project-dir dbt
+dbt docs serve --profiles-dir dbt --project-dir dbt --port 8081
 ```
 
 ### Selective Execution
 
 ```bash
-# Run one model
-dbt run --select customer_metrics
+# Run one model (via dbt directly)
+dbt run --profiles-dir dbt --project-dir dbt --select customer_metrics
 
 # Run model and downstream dependencies
-dbt run --select customer_metrics+
+dbt run --profiles-dir dbt --project-dir dbt --select customer_metrics+
 
 # Run model and upstream dependencies
-dbt run --select +customer_metrics
+dbt run --profiles-dir dbt --project-dir dbt --select +customer_metrics
 
 # Run all marts
-dbt run --select marts.*
+dbt run --profiles-dir dbt --project-dir dbt --select marts.*
 
 # Run by tag
-dbt run --select tag:finance
+dbt run --profiles-dir dbt --project-dir dbt --select tag:finance
 ```
 
 ---
@@ -453,8 +476,8 @@ Staging models should only:
 ```
 Raw → Staging → Intermediate → Marts
  ↓       ↓           ↓            ↓
-dlt   Generate   Reusable     Analytics
-              Business Logic
+sync   sync      model add    model add
+       (auto)
 ```
 
 ### 3. Use CTEs for Readability
@@ -507,14 +530,20 @@ git commit -m "Add customer metrics mart"
 
 ## Performance Tips
 
-### Materialize Wisely
+### Materialization in Dango
+
+All Dango models use **table** materialization by default for Metabase compatibility.
+
+!!! info "Why tables?"
+    Metabase requires tables for reliable schema discovery. Views can work but may have
+    inconsistent behavior with some Metabase features.
+
+For large datasets with frequent updates, consider incremental materialization:
 
 | Use Case | Materialization | Why |
 |----------|-----------------|-----|
-| Staging | `view` | Lightweight, no storage |
-| Intermediate | `view` | Reusable, stays fresh |
-| Marts (small) | `table` | Fast queries |
-| Marts (large) | `incremental` | Efficient updates |
+| Most models | `table` | Metabase compatibility, fast queries |
+| Large event tables | `incremental` | Efficient updates |
 
 ### Optimize Complex Queries
 
@@ -559,22 +588,25 @@ WHERE event_timestamp > (SELECT MAX(event_timestamp) FROM {{ this }})
 **Check dependencies**:
 
 ```bash
-dbt compile --select customer_metrics
+dbt compile --profiles-dir dbt --project-dir dbt --select customer_metrics
 ```
 
 **View compiled SQL**:
 
 ```bash
-cat dbt/target/compiled/your_project/models/marts/customer_metrics.sql
+cat dbt/target/compiled/dango/models/marts/customer_metrics.sql
 ```
 
 ### Staging Models Out of Date
 
-**Regenerate**:
+If staging templates don't reflect source schema changes:
 
 ```bash
+# Option 1: Re-sync (recommended - also updates data)
+dango sync --source stripe_payments
+
+# Option 2: Regenerate templates only
 dango generate
-dango run
 ```
 
 ### Tests Failing
@@ -582,13 +614,13 @@ dango run
 **Run with debug**:
 
 ```bash
-dbt test --select customer_metrics --debug
+dbt test --profiles-dir dbt --project-dir dbt --select customer_metrics --debug
 ```
 
 **Check failed rows**:
 
 ```bash
-dbt test --store-failures
+dbt test --profiles-dir dbt --project-dir dbt --store-failures
 duckdb data/warehouse.duckdb "SELECT * FROM dbt_test__audit.unique_customer_metrics_customer_id"
 ```
 
@@ -621,17 +653,13 @@ dango sync --source stripe_payments
 - `raw_stripe.customers`
 - `raw_stripe.subscriptions`
 
-### 3. Generate Staging
+### 3. Staging Templates (Auto-Generated)
 
-```bash
-dango generate
-```
-
-**Creates**:
+`dango sync` automatically creates staging templates:
 
 - `dbt/models/staging/stg_stripe_charges.sql`
 - `dbt/models/staging/stg_stripe_customers.sql`
-- Schema YAML files
+- Schema YAML files with basic tests
 
 ### 4. Create Custom Mart
 
@@ -690,7 +718,7 @@ models:
 
 ```bash
 dango run
-dbt test --profiles-dir .dango --project-dir dbt
+dbt test --profiles-dir dbt --project-dir dbt
 ```
 
 ### 7. Query Results
