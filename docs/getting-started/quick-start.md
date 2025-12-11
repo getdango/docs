@@ -12,31 +12,45 @@ Before starting, make sure you have:
 
 ---
 
-## Step 1: Initialize Your Project
+## Step 1: Install and Initialize
 
-If you haven't already initialized Dango:
+Run the install script to set up your project:
 
 === "macOS / Linux"
 
     ```bash
-    cd my-analytics
-    source venv/bin/activate
-    dango init
+    curl -sSL https://raw.githubusercontent.com/getdango/dango/main/install.sh | bash
     ```
 
 === "Windows"
 
     ```powershell
-    cd my-analytics
-    .\venv\Scripts\Activate.ps1
-    dango init
+    irm https://raw.githubusercontent.com/getdango/dango/main/install.ps1 | iex
     ```
 
-The interactive wizard will guide you through:
+The installer will:
 
-- Project name and configuration
-- Initial data source setup (optional)
-- Directory structure creation
+- Create a project directory
+- Set up an isolated virtual environment
+- Install Dango from PyPI
+- Run `dango init` to configure your project
+
+!!! tip "Already installed?"
+    If you've already run the installer, activate your environment and skip to Step 2:
+
+    === "macOS / Linux"
+
+        ```bash
+        cd my-analytics
+        source venv/bin/activate
+        ```
+
+    === "Windows"
+
+        ```powershell
+        cd my-analytics
+        .\venv\Scripts\Activate.ps1
+        ```
 
 ---
 
@@ -156,7 +170,10 @@ $ dango start
 [18:31:05] ✓ Metabase ready
 [18:31:06] ✓ Web UI ready at http://localhost:8800
 [18:31:06] ✓ Platform started successfully
+[18:31:06] Opening http://localhost:8800 in your browser...
 ```
+
+Your browser should open automatically. If it doesn't, visit `http://localhost:8800` manually.
 
 ### Open the Dashboard
 
@@ -222,7 +239,7 @@ D SELECT * FROM marts.dim_customers LIMIT 10;
 D .exit
 ```
 
-**Recommended**: Use Metabase's SQL editor at `http://localhost:3000` for a better query experience with autocomplete and visualization.
+**Recommended**: Use Metabase's SQL editor (accessible via the Web UI at `http://localhost:8800`) for a better query experience with autocomplete and visualization.
 
 ---
 
