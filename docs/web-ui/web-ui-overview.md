@@ -277,7 +277,7 @@ Result: Pass/fail with fix suggestions
 - **Platform Status**: Running / Stopped
 - **Web UI**: http://localhost:8800 (active)
 - **Metabase**: http://localhost:3000 (active)
-- **dbt-docs**: http://localhost:8081 (active)
+- **dbt-docs**: http://localhost:8800/dbt-docs (active)
 - **Database**: data/warehouse.duckdb (42.3 MB)
 - **File Watcher**: Active (auto-sync enabled)
 
@@ -352,11 +352,11 @@ Each card shows:
 
 Dango uses these ports by default:
 
-| Service | Default Port | Configurable | Config Location |
+| Service | Default URL | Configurable | Config Location |
 |---------|-------------|--------------|-----------------|
-| Web UI | 8800 | Yes | `.dango/project.yml` |
-| Metabase | 3000 | Yes | `docker-compose.yml` |
-| dbt-docs | 8081 | Yes | `.dango/project.yml` |
+| Web UI | http://localhost:8800 | Yes | `.dango/project.yml` |
+| Metabase | http://localhost:3000 | Yes | `docker-compose.yml` |
+| dbt-docs | http://localhost:8800/dbt-docs | No | Served via Web UI |
 
 ### Change Web UI Port
 
