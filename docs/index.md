@@ -10,7 +10,7 @@ Works on your laptop today. Designed to scale to production tomorrow.
 
 ```bash
 # Install Dango
-curl -sSL https://raw.githubusercontent.com/getdango/dango/main/install.sh | bash
+curl -sSL https://getdango.dev/install.sh | bash
 
 # Add a data source
 dango source add

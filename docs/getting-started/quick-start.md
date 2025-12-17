@@ -19,13 +19,13 @@ Run the install script to set up your project:
 === "macOS / Linux"
 
     ```bash
-    curl -sSL https://raw.githubusercontent.com/getdango/dango/main/install.sh | bash
+    curl -sSL https://getdango.dev/install.sh | bash
     ```
 
 === "Windows"
 
     ```powershell
-    irm https://raw.githubusercontent.com/getdango/dango/main/install.ps1 | iex
+    irm https://getdango.dev/install.ps1 | iex
     ```
 
 The installer will:
