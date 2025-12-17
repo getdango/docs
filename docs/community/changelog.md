@@ -17,13 +17,19 @@ Dango follows [Semantic Versioning](https://semver.org/):
 
 ## Current Version
 
-### v0.0.5 (Current)
+### v0.1.0 (Current)
 
-*Released: December 2024*
+*Released: December 17, 2025*
 
-**Status**: MVP (Minimum Viable Product)
+**Status**: MVP Release - First stable release for early adopters
 
-This is the initial public release of Dango, focused on local development workflows.
+This is the v0.1.0 MVP release marking Dango as ready for early adopters.
+
+#### What's New in v0.1.0
+
+- **Google Ads** - Full OAuth support (tested and working)
+- **Shorter install URLs** - Now available at `getdango.dev/install.sh`
+- **Windows support** - Fully tested and documented
 
 #### Features
 
@@ -70,19 +76,19 @@ This is the initial public release of Dango, focused on local development workfl
 
 ---
 
+## Previous Releases
+
+### v0.0.5
+
+*Released: December 8, 2025*
+
+- `dango sync --dry-run` to preview without executing
+- Unreferenced custom sources warning
+- Better validation output (database check, model count)
+
+---
+
 ## Planned Releases
-
-### v0.1.0 (Planned)
-
-*Target: Q1 2025*
-
-**Focus**: Stability and usability improvements
-
-Planned features:
-- [ ] Improved error messages and handling
-- [ ] Better validation feedback
-- [ ] Documentation improvements
-- [ ] Bug fixes from v0.0.5 feedback
 
 ### v0.2.0 (Planned)
 

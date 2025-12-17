@@ -421,7 +421,7 @@ dango sync
 Set up a complete analytics stack with one command:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/getdango/dango/main/install.sh | bash
+curl -sSL https://getdango.dev/install.sh | bash
 ```
 
 This gives you dlt, dbt, DuckDB, and Metabase—ready to go.

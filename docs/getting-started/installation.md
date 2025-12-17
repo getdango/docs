@@ -145,13 +145,13 @@ The bootstrap installer creates a project directory, sets up a virtual environme
 === "macOS / Linux"
 
     ```bash
-    curl -sSL https://raw.githubusercontent.com/getdango/dango/main/install.sh | bash
+    curl -sSL https://getdango.dev/install.sh | bash
     ```
 
 === "Windows"
 
     ```powershell
-    irm https://raw.githubusercontent.com/getdango/dango/main/install.ps1 | iex
+    irm https://getdango.dev/install.ps1 | iex
     ```
 
 The installer will:
@@ -182,7 +182,7 @@ If you prefer to inspect the installer first:
 
     ```bash
     # Download the installer
-    curl -sSL https://raw.githubusercontent.com/getdango/dango/main/install.sh -o install.sh
+    curl -sSL https://getdango.dev/install.sh -o install.sh
 
     # Review what it does
     cat install.sh
@@ -195,7 +195,7 @@ If you prefer to inspect the installer first:
 
     ```powershell
     # Download the installer
-    Invoke-WebRequest -Uri https://raw.githubusercontent.com/getdango/dango/main/install.ps1 -OutFile install.ps1
+    Invoke-WebRequest -Uri https://getdango.dev/install.ps1 -OutFile install.ps1
 
     # Review what it does
     Get-Content install.ps1
@@ -292,7 +292,7 @@ If you installed with the bootstrap script:
 
 ```bash
 cd your-project
-curl -sSL https://raw.githubusercontent.com/getdango/dango/main/install.sh | bash
+curl -sSL https://getdango.dev/install.sh | bash
 # Select [u] to upgrade when prompted
 ```
 
