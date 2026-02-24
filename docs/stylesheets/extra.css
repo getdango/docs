@@ -4,10 +4,62 @@
  *
  * Colors: Teal #14B8A6, Indigo #6366F1, Dark Teal #0D9488
  * Typography: Inter font with Tailwind-inspired scale
- * Note: Fonts are loaded via mkdocs.yml theme.font configuration
+ * Fonts are self-hosted for privacy (no Google Fonts CDN)
  */
 
+/* Self-hosted font declarations */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/InterVariable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/InterVariable-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/JetBrainsMono-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/JetBrainsMono-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('../assets/fonts/JetBrainsMono-BoldItalic.woff2') format('woff2');
+}
+
 :root {
+  /* Font families - replaces Material's inline Google Fonts style */
+  --md-text-font: 'Inter';
+  --md-code-font: 'JetBrains Mono';
   /* Brand colors from getdango.dev */
   --md-primary-fg-color: #14B8A6;
   --md-primary-fg-color--light: #5EEAD4;

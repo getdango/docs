@@ -24,3 +24,11 @@ Thumbs.db
 
 # Local development
 .cache/
+
+# Credentials & secrets
+.env
+.env.*
+*.pem
+*.key
+credentials.json
+service_account*.json
