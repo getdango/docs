@@ -66,10 +66,9 @@ theme:
     # Header
     - announce.dismiss
 
-  # Font
-  font:
-    text: Inter
-    code: JetBrains Mono
+  # Font - self-hosted for privacy (no Google Fonts CDN)
+  font: false
+  custom_dir: overrides
 
   # Icon
   icon:
@@ -141,6 +140,7 @@ plugins:
 
 # Extra configuration
 extra:
+  generator: false
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/getdango/dango
@@ -236,6 +236,9 @@ nav:
     - API Reference: reference/api.md
 
   - FAQ: faq.md
+
+  - Legal:
+    - Privacy Policy: legal/privacy.md
 
   - Community:
     - community/index.md
