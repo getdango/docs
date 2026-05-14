@@ -982,7 +982,7 @@ duckdb data/warehouse.duckdb "VACUUM;"
 
     Learn how to sync data and run transformations.
 
-    [:octicons-arrow-right-24: Sync & Run Guide](sync-run.md)
+    [:octicons-arrow-right-24: Source & Sync Guide](source-sync.md)
 
 -   :material-database-outline: **Source Management**
 
@@ -990,7 +990,7 @@ duckdb data/warehouse.duckdb "VACUUM;"
 
     Add and configure data sources via CLI.
 
-    [:octicons-arrow-right-24: Source Management](source-management.md)
+    [:octicons-arrow-right-24: Source & Sync](source-sync.md)
 
 -   :material-check-circle-outline: **Validation**
 
@@ -998,7 +998,7 @@ duckdb data/warehouse.duckdb "VACUUM;"
 
     Validate configuration and troubleshoot issues.
 
-    [:octicons-arrow-right-24: Validation Guide](validation.md)
+    [:octicons-arrow-right-24: Other Commands](other-commands.md)
 
 -   :material-book-open-outline: **CLI Reference**
 

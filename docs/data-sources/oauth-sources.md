@@ -496,7 +496,7 @@ For security:
 
 ## Next Steps
 
-- **[Built-in Sources](built-in-sources.md)** - See all available dlt sources
+- **[Source Catalog](source-catalog.md)** - See all available dlt sources
 - **[Custom Sources](custom-sources.md)** - Build OAuth sources for custom APIs
-- **[Web UI](../web-ui/managing-sources.md)** - Manage OAuth sources visually
+- **[Web UI](../web-ui/sources.md)** - Manage OAuth sources visually
 - **[Troubleshooting](../getting-started/troubleshooting.md)** - Common OAuth issues

@@ -936,15 +936,15 @@ Debug mode is verbose:
 
     Learn how to configure and manage data sources.
 
-    [:octicons-arrow-right-24: Managing Sources](managing-sources.md)
+    [:octicons-arrow-right-24: Sources Page](sources.md)
 
--   :material-console: **CLI Validation**
+-   :material-console: **CLI Commands**
 
     ---
 
     Use CLI commands for validation and troubleshooting.
 
-    [:octicons-arrow-right-24: Validation CLI](../cli/validation.md)
+    [:octicons-arrow-right-24: Other Commands](../cli/other-commands.md)
 
 -   :material-help-circle: **Troubleshooting Guide**
 

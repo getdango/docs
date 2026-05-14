@@ -10,14 +10,18 @@ A Dango project has a standard directory structure created by `dango init`:
 
 ```
 my-analytics/
-├── .dango/                    # Project configuration
+├── .dango/                    # Project configuration (13 config files)
+│   ├── state/                 # Runtime state (locks, sync status, deploy journal)
+│   ├── logs/                  # Application logs
+│   └── snapshots/             # DuckDB read-only snapshots for notebooks
 ├── .dlt/                      # dlt configuration
 ├── data/                      # Database and uploads
 ├── dbt/                       # dbt project
 ├── custom_sources/            # Custom dlt sources
+├── notebooks/                 # Marimo notebooks
 ├── dashboards/                # Metabase exports (optional)
 ├── docker-compose.yml         # Docker services
-├── Dockerfile                 # Metabase DuckDB driver
+├── Dockerfile.metabase        # Metabase DuckDB driver
 ├── .gitignore                 # Git ignore patterns
 ├── .env                       # Environment variables
 └── README.md                  # Auto-generated docs
@@ -27,20 +31,46 @@ my-analytics/
 
 ## .dango/ - Project Configuration
 
-The `.dango/` directory contains all Dango-specific configuration.
+The `.dango/` directory contains all Dango-specific configuration, runtime state, and logs.
 
 ### Directory Contents
 
 ```
 .dango/
-├── project.yml       # Project metadata and platform settings
-├── sources.yml       # Data source definitions
-├── routing.json      # Multi-project domain routing (auto-generated)
-└── metabase.yml      # Metabase credentials (auto-generated)
+├── project.yml           # Project metadata and platform settings
+├── sources.yml           # Data source definitions
+├── schedules.yml         # Sync schedules (cron/interval)
+├── monitors.yml          # Metric analysis configuration
+├── notifications.yml     # Webhook notification configs
+├── pii-overrides.yml     # PII detection overrides
+├── cloud.yml             # Cloud deployment details (auto-generated)
+├── metabase.yml          # Metabase admin credentials (auto-generated)
+├── state/                # Runtime state files
+│   ├── dbt.lock          # DuckDB write lock
+│   ├── dbt.lock.json     # Lock holder metadata
+│   ├── sync_status_*.json # Sync progress tracking
+│   └── deployments.jsonl  # Deployment journal (append-only)
+├── logs/                 # Application logs
+└── snapshots/            # DuckDB read-only snapshots for notebooks
 ```
 
-**What to commit**: `project.yml`, `sources.yml`
-**What to ignore**: `routing.json`, `metabase.yml`
+### Configuration Files (13 total)
+
+| File | Purpose | Commit to Git? |
+|------|---------|----------------|
+| `.dango/project.yml` | Project metadata, platform settings | Yes |
+| `.dango/sources.yml` | Source definitions and config | Yes |
+| `.dango/schedules.yml` | Sync schedules | Yes |
+| `.dango/monitors.yml` | Metric analysis config | Yes |
+| `.dango/notifications.yml` | Webhook configs | Yes |
+| `.dango/pii-overrides.yml` | PII status overrides | Yes |
+| `.dango/metabase.yml` | Metabase admin creds (auto-generated) | No |
+| `.dango/cloud.yml` | Cloud server details (auto-generated) | No |
+| `.env` | API keys, environment variables | No |
+| `.dlt/secrets.toml` | OAuth tokens, dlt credentials | No |
+| `dbt/profiles.yml` | DuckDB connection for dbt | Yes |
+| `dbt/dbt_project.yml` | dbt project config | Yes |
+| `docker-compose.yml` | Docker service definitions | Yes |
 
 ---
 
@@ -85,7 +115,10 @@ platform:
 
   watch_patterns:
     - "*.csv"
-    - "*.xlsx"
+    - "*.json"
+    - "*.jsonl"
+    - "*.ndjson"
+    - "*.parquet"
   watch_directories:
     - "data/uploads"
 
@@ -526,49 +559,57 @@ Service definitions.
 
 **Location**: `docker-compose.yml`
 
-**Auto-generated content**:
+**Auto-generated content** (simplified):
 ```yaml
-version: '3.8'
-
 services:
   metabase:
-    image: metabase/metabase:latest
-    container_name: dango-metabase-my-analytics
+    build:
+      context: .
+      dockerfile: Dockerfile.metabase
     ports:
       - "3000:3000"
     volumes:
-      - ./data/warehouse.duckdb:/duckdb/warehouse.duckdb
-      - ./metabase-plugins:/plugins
+      - metabase-data:/metabase-data
+      # :ro prevents Metabase JDBC driver from acquiring DuckDB write lock
+      - ./data:/data:ro
+      - ./metabase-plugins:/app/plugins
     environment:
+      MB_DB_TYPE: h2
       MB_DB_FILE: /metabase-data/metabase.db
-      MB_PLUGINS_DIR: /plugins
+    restart: unless-stopped
 
   dbt-docs:
-    image: fishtownanalytics/dbt:latest
-    container_name: dango-dbt-docs-my-analytics
+    image: nginx:alpine
     ports:
-      - "8081:8080"
+      - "8081:80"
     volumes:
-      - ./dbt/target:/usr/app/target
-    command: docs serve --port 8080
+      - ./dbt/target:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+volumes:
+  metabase-data:
+    driver: local
 ```
+
+!!! note "Why `:ro`?"
+    The `./data:/data:ro` mount prevents Metabase's JDBC driver from acquiring a DuckDB write lock. See [DuckDB & Single-Writer](duckdb.md) for details.
 
 ---
 
-### Dockerfile
+### Dockerfile.metabase
 
-Metabase with DuckDB driver.
+Custom Metabase image with DuckDB support.
 
-**Location**: `Dockerfile`
+**Location**: `Dockerfile.metabase`
 
-**Auto-generated content**:
+**Why a custom image?** Standard Metabase images use Alpine Linux which lacks the glibc/libstdc++ libraries that DuckDB requires. This Dockerfile uses Eclipse Temurin (Debian-based) as the base image.
+
 ```dockerfile
-FROM metabase/metabase:latest
+FROM eclipse-temurin:21-jre-jammy
+ENV MB_VERSION=v0.59.1
 
-# Install DuckDB driver
-COPY metabase-plugins/duckdb.metabase-driver.jar /plugins/
-
-ENV MB_PLUGINS_DIR=/plugins
+# Download Metabase jar
+ADD https://downloads.metabase.com/${MB_VERSION}/metabase.jar /app/metabase.jar
 ```
 
 ---
@@ -786,5 +827,5 @@ dango stop --all
 
 - **[Architecture](architecture.md)** - See how files relate to components
 - **[Data Layers](data-layers.md)** - Understand where data lives in DuckDB
-- **[CLI Overview](cli-overview.md)** - Commands that operate on this structure
+- **[DuckDB & Single-Writer](duckdb.md)** - How the database lock and snapshots work
 - **[Quick Start](../getting-started/quick-start.md)** - Create your first project

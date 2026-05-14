@@ -63,35 +63,77 @@ The Web UI is ready immediately—no configuration or login required for local d
 
     [:octicons-arrow-right-24: Web UI Overview](web-ui-overview.md)
 
--   :material-database-outline: **Managing Sources**
+-   :material-view-dashboard-variant: **Dashboard Page**
 
     ---
 
-    Add, edit, and manage data sources through the Web UI.
+    Health widgets, service cards, and activity log.
 
-    - Interactive source wizard
-    - CSV file upload and management
-    - OAuth source authentication
-    - Database source configuration
-    - Source status indicators
-    - Bulk operations
+    [:octicons-arrow-right-24: Dashboard Page](dashboard.md)
 
-    [:octicons-arrow-right-24: Managing Sources Guide](managing-sources.md)
-
--   :material-chart-line: **Monitoring**
+-   :material-database-outline: **Sources Page**
 
     ---
 
-    Real-time sync status, logs, and health checks.
+    View and manage data sources, trigger syncs, inspect details.
 
-    - Real-time log streaming
-    - Sync progress tracking
-    - System health checks
-    - Activity history
-    - Performance metrics
-    - Error monitoring
+    [:octicons-arrow-right-24: Sources Page](sources.md)
 
-    [:octicons-arrow-right-24: Monitoring Guide](monitoring.md)
+-   :material-file-tree: **Models Page**
+
+    ---
+
+    Browse and run dbt models from the web interface.
+
+    [:octicons-arrow-right-24: Models Page](models.md)
+
+-   :material-heart-pulse: **Health & Logs**
+
+    ---
+
+    DuckDB capacity, service status, and activity logs.
+
+    [:octicons-arrow-right-24: Health & Logs](health-logs.md)
+
+-   :material-book-search: **Catalog Page**
+
+    ---
+
+    Model browser, lineage, profiling, and impact analysis.
+
+    [:octicons-arrow-right-24: Catalog Page](catalog.md)
+
+-   :material-chart-line: **Monitoring Page**
+
+    ---
+
+    Metric results, trends, and dbt test outcomes.
+
+    [:octicons-arrow-right-24: Monitoring Page](monitoring-page.md)
+
+-   :material-clock-outline: **Schedules Page**
+
+    ---
+
+    Schedule configurations and execution history.
+
+    [:octicons-arrow-right-24: Schedules Page](schedules.md)
+
+-   :material-notebook: **Notebooks Page**
+
+    ---
+
+    Create, open, and manage Marimo notebooks.
+
+    [:octicons-arrow-right-24: Notebooks Page](notebooks.md)
+
+-   :material-shield-key: **Secrets & Admin**
+
+    ---
+
+    Environment variables, OAuth credentials, and user administration.
+
+    [:octicons-arrow-right-24: Secrets & Admin](secrets-admin.md)
 
 </div>
 
@@ -324,21 +366,21 @@ Tested browsers:
 
     [:octicons-arrow-right-24: Web UI Overview](web-ui-overview.md)
 
--   :material-database-outline: **Managing Sources**
+-   :material-database-outline: **Sources Page**
 
     ---
 
-    Learn how to add and manage data sources.
+    Learn how to view and manage data sources.
 
-    [:octicons-arrow-right-24: Managing Sources](managing-sources.md)
+    [:octicons-arrow-right-24: Sources Page](sources.md)
 
--   :material-chart-line: **Monitoring**
+-   :material-chart-line: **Monitoring Page**
 
     ---
 
     Master real-time monitoring and health checks.
 
-    [:octicons-arrow-right-24: Monitoring](monitoring.md)
+    [:octicons-arrow-right-24: Monitoring Page](monitoring-page.md)
 
 -   :material-console: **CLI Alternative**
 
