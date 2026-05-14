@@ -927,7 +927,7 @@ Keeps configuration versioned and shareable.
 
     Learn how to monitor sync progress and system health.
 
-    [:octicons-arrow-right-24: Monitoring Guide](monitoring.md)
+    [:octicons-arrow-right-24: Monitoring Page](monitoring-page.md)
 
 -   :material-database-outline: **Data Sources**
 
@@ -943,7 +943,7 @@ Keeps configuration versioned and shareable.
 
     Alternative CLI commands for source management.
 
-    [:octicons-arrow-right-24: Source Management CLI](../cli/source-management.md)
+    [:octicons-arrow-right-24: Source & Sync CLI](../cli/source-sync.md)
 
 -   :material-view-dashboard: **Web UI Overview**
 

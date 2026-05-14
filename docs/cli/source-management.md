@@ -956,7 +956,7 @@ git commit -m "Add production database source"
 
     Learn how to sync sources and run transformations.
 
-    [:octicons-arrow-right-24: Sync & Run Guide](sync-run.md)
+    [:octicons-arrow-right-24: Source & Sync Guide](source-sync.md)
 
 -   :material-check-circle-outline: **Validation**
 
@@ -964,7 +964,7 @@ git commit -m "Add production database source"
 
     Validate source configuration and troubleshoot.
 
-    [:octicons-arrow-right-24: Validation Guide](validation.md)
+    [:octicons-arrow-right-24: Other Commands](other-commands.md)
 
 -   :material-database-outline: **Data Sources**
 

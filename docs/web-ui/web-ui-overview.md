@@ -93,7 +93,7 @@ The main dashboard shows:
     - Enable/disable sources
     - Upload CSV files
 
-    [:octicons-arrow-right-24: Managing Sources Guide](managing-sources.md)
+    [:octicons-arrow-right-24: Sources Page](sources.md)
 
 -   :material-text-box-outline: **Logs**
 
@@ -107,7 +107,7 @@ The main dashboard shows:
     - Download log files
     - Clear log history
 
-    [:octicons-arrow-right-24: Monitoring Guide](monitoring.md)
+    [:octicons-arrow-right-24: Monitoring Page](monitoring-page.md)
 
 -   :material-cog-outline: **Settings**
 
@@ -845,7 +845,7 @@ For production use:
 
     Learn how to add, edit, and manage data sources via the Web UI.
 
-    [:octicons-arrow-right-24: Managing Sources Guide](managing-sources.md)
+    [:octicons-arrow-right-24: Sources Page](sources.md)
 
 -   :material-chart-line: **Monitoring**
 
@@ -853,7 +853,7 @@ For production use:
 
     Master real-time monitoring, logs, and health checks.
 
-    [:octicons-arrow-right-24: Monitoring Guide](monitoring.md)
+    [:octicons-arrow-right-24: Monitoring Page](monitoring-page.md)
 
 -   :material-console: **CLI Reference**
 

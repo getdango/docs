@@ -963,7 +963,7 @@ dango run
 
     Learn how to add and configure sources via CLI.
 
-    [:octicons-arrow-right-24: Source Management](source-management.md)
+    [:octicons-arrow-right-24: Source & Sync](source-sync.md)
 
 -   :material-check-circle-outline: **Validation**
 
@@ -971,7 +971,7 @@ dango run
 
     Validate configuration and troubleshoot issues.
 
-    [:octicons-arrow-right-24: Validation Guide](validation.md)
+    [:octicons-arrow-right-24: Other Commands](other-commands.md)
 
 -   :material-application-braces-outline: **Transformations**
 

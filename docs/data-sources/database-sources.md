@@ -563,6 +563,6 @@ Try:
 ## Next Steps
 
 - **[Custom Sources](custom-sources.md)** - Write custom SQL with Python
-- **[Built-in Sources](built-in-sources.md)** - See all available dlt sources
+- **[Source Catalog](source-catalog.md)** - See all available dlt sources
 - **[Transformations](../transformations/index.md)** - Transform database data with dbt
 - **[dlt sql_database docs](https://dlthub.com/docs/dlt-ecosystem/verified-sources/sql_database)** - Official dlt documentation

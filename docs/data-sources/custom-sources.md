@@ -800,6 +800,6 @@ Run as standalone dlt script first, then integrate with Dango.
 ## Next Steps
 
 - **[Database Sources](database-sources.md)** - Connect to SQL databases
-- **[Built-in Sources](built-in-sources.md)** - See all dlt verified sources
+- **[Source Catalog](source-catalog.md)** - See all dlt verified sources
 - **[dlt Documentation](https://dlthub.com/docs)** - Official dlt docs
 - **[Transformations](../transformations/index.md)** - Transform your custom source data

@@ -33,7 +33,7 @@ pip install getdango
 
 ```bash
 dango --version
-# Output: dango version 0.0.5
+# Output: dango version x.y.z
 ```
 
 ### Create Your First Project
@@ -477,7 +477,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install Dango
         run: pip install getdango

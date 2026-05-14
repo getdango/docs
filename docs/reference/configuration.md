@@ -187,7 +187,7 @@ sources:
 - `notion`, `asana`, `jira` - Productivity
 - `github`, `slack` - Development
 - `postgres`, `mysql`, `mongodb` - Databases
-- See [Built-in Sources](../data-sources/built-in-sources.md) for full list
+- See [Source Catalog](../data-sources/source-catalog.md) for full list
 
 ---
 

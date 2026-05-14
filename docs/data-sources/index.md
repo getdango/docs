@@ -409,7 +409,7 @@ export MY_API_KEY="your-key-here"
 | Google Ads | 🔄 In Progress | Wizard-supported, testing ongoing |
 | dlt_native | ✅ Works | Registry bypass verified |
 | Database sources | ⚠️ Experimental | Uses dlt sql_database, not fully tested |
-| Other dlt sources | ⚠️ Experimental | Available via dlt_native, see [Built-in Sources](built-in-sources.md) |
+| Other dlt sources | ⚠️ Experimental | Available via dlt_native, see [Source Catalog](source-catalog.md) |
 
 ---
 

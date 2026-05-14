@@ -990,7 +990,7 @@ dango validate
 
     Once validated, sync data and run transformations.
 
-    [:octicons-arrow-right-24: Sync & Run Guide](sync-run.md)
+    [:octicons-arrow-right-24: Source & Sync Guide](source-sync.md)
 
 -   :material-database-outline: **Source Management**
 
@@ -998,7 +998,7 @@ dango validate
 
     Add and manage sources with confidence.
 
-    [:octicons-arrow-right-24: Source Management](source-management.md)
+    [:octicons-arrow-right-24: Source & Sync](source-sync.md)
 
 -   :material-help-circle: **Troubleshooting**
 

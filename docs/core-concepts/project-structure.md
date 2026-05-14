@@ -115,7 +115,10 @@ platform:
 
   watch_patterns:
     - "*.csv"
-    - "*.xlsx"
+    - "*.json"
+    - "*.jsonl"
+    - "*.ndjson"
+    - "*.parquet"
   watch_directories:
     - "data/uploads"
 
@@ -556,49 +559,57 @@ Service definitions.
 
 **Location**: `docker-compose.yml`
 
-**Auto-generated content**:
+**Auto-generated content** (simplified):
 ```yaml
-version: '3.8'
-
 services:
   metabase:
-    image: metabase/metabase:latest
-    container_name: dango-metabase-my-analytics
+    build:
+      context: .
+      dockerfile: Dockerfile.metabase
     ports:
       - "3000:3000"
     volumes:
-      - ./data/warehouse.duckdb:/duckdb/warehouse.duckdb
-      - ./metabase-plugins:/plugins
+      - metabase-data:/metabase-data
+      # :ro prevents Metabase JDBC driver from acquiring DuckDB write lock
+      - ./data:/data:ro
+      - ./metabase-plugins:/app/plugins
     environment:
+      MB_DB_TYPE: h2
       MB_DB_FILE: /metabase-data/metabase.db
-      MB_PLUGINS_DIR: /plugins
+    restart: unless-stopped
 
   dbt-docs:
-    image: fishtownanalytics/dbt:latest
-    container_name: dango-dbt-docs-my-analytics
+    image: nginx:alpine
     ports:
-      - "8081:8080"
+      - "8081:80"
     volumes:
-      - ./dbt/target:/usr/app/target
-    command: docs serve --port 8080
+      - ./dbt/target:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+volumes:
+  metabase-data:
+    driver: local
 ```
+
+!!! note "Why `:ro`?"
+    The `./data:/data:ro` mount prevents Metabase's JDBC driver from acquiring a DuckDB write lock. See [DuckDB & Single-Writer](duckdb.md) for details.
 
 ---
 
-### Dockerfile
+### Dockerfile.metabase
 
-Metabase with DuckDB driver.
+Custom Metabase image with DuckDB support.
 
-**Location**: `Dockerfile`
+**Location**: `Dockerfile.metabase`
 
-**Auto-generated content**:
+**Why a custom image?** Standard Metabase images use Alpine Linux which lacks the glibc/libstdc++ libraries that DuckDB requires. This Dockerfile uses Eclipse Temurin (Debian-based) as the base image.
+
 ```dockerfile
-FROM metabase/metabase:latest
+FROM eclipse-temurin:21-jre-jammy
+ENV MB_VERSION=v0.59.1
 
-# Install DuckDB driver
-COPY metabase-plugins/duckdb.metabase-driver.jar /plugins/
-
-ENV MB_PLUGINS_DIR=/plugins
+# Download Metabase jar
+ADD https://downloads.metabase.com/${MB_VERSION}/metabase.jar /app/metabase.jar
 ```
 
 ---

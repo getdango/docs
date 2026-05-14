@@ -9,7 +9,7 @@ This page covers the key differences so you know what to expect in each environm
 | Feature | Local | Cloud |
 |---------|-------|-------|
 | **Start command** | `dango start` | `dango deploy` + `dango remote push` |
-| **Authentication** | Optional (can disable) | Required (always enabled) |
+| **Authentication** | Enabled (can disable) | Required (always enabled) |
 | **Session idle timeout** | 24 hours (default) | 60 minutes (recommended) |
 | **Session max lifetime** | 365 days (default) | 30 days (recommended) |
 | **Web server** | Uvicorn (single worker) | Uvicorn (multi-worker) behind Caddy |
