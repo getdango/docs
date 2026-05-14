@@ -44,6 +44,30 @@ Security is a shared responsibility:
 
 <div class="grid cards" markdown>
 
+-   :material-login: **Authentication**
+
+    ---
+
+    How Dango authentication works: passwords, sessions, and login flows.
+
+    [:octicons-arrow-right-24: Authentication](authentication.md)
+
+-   :material-account-group: **Users & Roles**
+
+    ---
+
+    Manage users with admin, editor, and viewer roles.
+
+    [:octicons-arrow-right-24: Users & Roles](users-roles.md)
+
+-   :material-two-factor-authentication: **Two-Factor Auth**
+
+    ---
+
+    TOTP-based two-factor authentication for enhanced security.
+
+    [:octicons-arrow-right-24: Two-Factor Auth](two-factor.md)
+
 -   :material-key: **Credential Management**
 
     ---
@@ -59,6 +83,22 @@ Security is a shared responsibility:
     OAuth token lifecycle and security considerations.
 
     [:octicons-arrow-right-24: OAuth Tokens](oauth.md)
+
+-   :material-shield-lock: **Hardening Guide**
+
+    ---
+
+    Security hardening for production and cloud deployments.
+
+    [:octicons-arrow-right-24: Hardening Guide](hardening.md)
+
+-   :material-text-box-search: **Audit Logging**
+
+    ---
+
+    Track security-relevant events with the audit log.
+
+    [:octicons-arrow-right-24: Audit Logging](audit-logging.md)
 
 -   :material-security: **Best Practices**
 
@@ -106,14 +146,11 @@ Security is a shared responsibility:
 
 ### Out of Scope
 
-Dango is a local-first MVP. The following are not currently covered:
+The following are not currently covered:
 
-- Network security (Dango runs locally)
-- Database access control (DuckDB is single-user)
 - Enterprise authentication (SSO, LDAP)
-- Audit logging for compliance
-
-These features may be added in future cloud-enabled versions.
+- Row-level security / database access control
+- Network-level DDoS protection (recommend IP restriction or CDN)
 
 ---
 
@@ -130,6 +167,7 @@ If you discover a security vulnerability:
 
 ## Next Steps
 
+- [Authentication](authentication.md) - How Dango authentication works
+- [Users & Roles](users-roles.md) - User management and permissions
 - [Credential Management](credentials.md) - How credentials are stored
-- [OAuth Tokens](oauth.md) - Token security details
-- [Best Practices](best-practices.md) - Security recommendations
+- [Hardening Guide](hardening.md) - Production security recommendations

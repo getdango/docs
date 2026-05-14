@@ -33,17 +33,23 @@ This section explains how these components work together to create a complete da
 
     Understanding raw, staging, intermediate, and marts schemas
 
-- :material-console:{ .lg .middle } **[CLI Overview](cli-overview.md)**
-
-    ---
-
-    Command categories and common workflows
-
 - :material-folder-open:{ .lg .middle } **[Project Structure](project-structure.md)**
 
     ---
 
     Directory layout and configuration files
+
+- :material-database:{ .lg .middle } **[DuckDB & Single-Writer](duckdb.md)**
+
+    ---
+
+    How DuckDB works as Dango's embedded database and the single-writer constraint
+
+- :material-cloud-outline:{ .lg .middle } **[Local vs Cloud](local-vs-cloud.md)**
+
+    ---
+
+    Behavioral differences between local development and cloud deployment
 
 </div>
 

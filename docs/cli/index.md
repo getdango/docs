@@ -105,48 +105,90 @@ dango source add --help
 
     [:octicons-arrow-right-24: Init & Start Guide](init-start.md)
 
--   :material-sync: **Sync & Run**
+-   :material-sync: **Source & Sync**
 
     ---
 
-    Data syncing and running transformations.
-
-    - Sync data from sources
-    - Generate staging models
-    - Run dbt transformations
-    - Incremental vs full-refresh
-    - Performance optimization
-    - Troubleshoot failures
-
-    [:octicons-arrow-right-24: Sync & Run Guide](sync-run.md)
-
--   :material-database-outline: **Source Management**
-
-    ---
-
-    CLI commands for managing data sources.
+    Add, manage, and sync data sources from the CLI.
 
     - Add sources interactively
-    - List and inspect sources
-    - Edit configurations
-    - Manage OAuth credentials
-    - Import/export sources
+    - Sync data from sources
+    - Incremental vs full-refresh
+    - Manage source configurations
 
-    [:octicons-arrow-right-24: Source Management](source-management.md)
+    [:octicons-arrow-right-24: Source & Sync](source-sync.md)
 
--   :material-check-circle-outline: **Validation**
+-   :material-cog-transfer: **Transform & Model**
 
     ---
 
-    Validate configuration and troubleshoot issues.
+    Run dbt transformations and manage models.
 
-    - Validate project configuration
-    - Check source connections
-    - Verify database health
-    - Auto-fix common issues
-    - CI/CD integration
+    - Run dbt transformations
+    - Generate staging models
+    - Add/remove custom models
 
-    [:octicons-arrow-right-24: Validation Guide](validation.md)
+    [:octicons-arrow-right-24: Transform & Model](transform-model.md)
+
+-   :material-shield-account: **Auth Commands**
+
+    ---
+
+    Manage authentication, users, and roles.
+
+    - Enable/disable auth
+    - Add and manage users
+    - Role management
+
+    [:octicons-arrow-right-24: Auth Commands](auth-commands.md)
+
+-   :material-key: **OAuth Commands**
+
+    ---
+
+    Set up and manage OAuth connections.
+
+    - Configure OAuth providers
+    - Check token status
+    - Refresh tokens
+
+    [:octicons-arrow-right-24: OAuth Commands](oauth-commands.md)
+
+-   :material-cloud-upload: **Deploy & Remote**
+
+    ---
+
+    Deploy to cloud and manage remote servers.
+
+    - Deploy to DigitalOcean or BYOS
+    - Push config to remote
+    - Remote management commands
+
+    [:octicons-arrow-right-24: Deploy & Remote](deploy-remote.md)
+
+-   :material-clock-outline: **Schedule Commands**
+
+    ---
+
+    Configure scheduled syncs and webhooks.
+
+    - Add/remove schedules
+    - Configure webhooks
+    - View execution history
+
+    [:octicons-arrow-right-24: Schedule Commands](schedule-commands.md)
+
+-   :material-dots-horizontal: **Other Commands**
+
+    ---
+
+    Validate, cleanup, upgrade, info, and more.
+
+    - Configuration validation
+    - Database cleanup
+    - Version management
+
+    [:octicons-arrow-right-24: Other Commands](other-commands.md)
 
 </div>
 
@@ -634,13 +676,13 @@ Choose the right interface for your task:
 
     [:octicons-arrow-right-24: Init & Start Guide](init-start.md)
 
--   :material-sync: **Sync & Run**
+-   :material-sync: **Source & Sync**
 
     ---
 
-    Master data syncing and transformation workflows.
+    Master data syncing and source management workflows.
 
-    [:octicons-arrow-right-24: Sync & Run Guide](sync-run.md)
+    [:octicons-arrow-right-24: Source & Sync](source-sync.md)
 
 -   :material-view-dashboard: **Web UI Alternative**
 

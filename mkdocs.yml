@@ -157,55 +157,140 @@ extra:
 nav:
   - Home: index.md
 
+  # --- TAB 1: GETTING STARTED ---
   - Getting Started:
     - getting-started/index.md
     - What is Dango?: getting-started/what-is-dango.md
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quick-start.md
+    - Your First Dashboard: getting-started/first-dashboard.md
     - Troubleshooting: getting-started/troubleshooting.md
 
+  # --- TAB 2: CORE CONCEPTS ---
   - Core Concepts:
     - core-concepts/index.md
     - Architecture: core-concepts/architecture.md
     - Data Layers: core-concepts/data-layers.md
-    - CLI Overview: core-concepts/cli-overview.md
     - Project Structure: core-concepts/project-structure.md
+    - DuckDB & Single-Writer: core-concepts/duckdb.md
+    - Local vs Cloud: core-concepts/local-vs-cloud.md
 
+  # --- TAB 3: DATA SOURCES ---
   - Data Sources:
     - data-sources/index.md
-    - Built-in Sources: data-sources/built-in-sources.md
-    - CSV Files: data-sources/csv-files.md
-    - OAuth Sources: data-sources/oauth-sources.md
+    - Adding Sources: data-sources/adding-sources.md
+    - Source Catalog: data-sources/source-catalog.md
+    - Local Files:
+      - data-sources/local-files/index.md
+    - OAuth Sources:
+      - data-sources/oauth-sources.md
+      - Google Sheets: data-sources/google-sheets.md
+      - Google Analytics: data-sources/google-analytics.md
+      - Google Ads: data-sources/google-ads.md
+      - Facebook Ads: data-sources/facebook-ads.md
+      - GitHub: data-sources/github.md
+    - API Key Sources:
+      - Stripe: data-sources/stripe.md
+      - HubSpot: data-sources/hubspot.md
+      - Salesforce: data-sources/salesforce.md
+      - Slack: data-sources/slack.md
     - Database Sources: data-sources/database-sources.md
-    - Custom Sources: data-sources/custom-sources.md
+    - REST API: data-sources/rest-api.md
+    - Custom Sources (dlt_native): data-sources/custom-sources.md
+    - CSV Files: data-sources/csv-files.md
+    - Sync Modes: data-sources/sync-modes.md
+    - Deduplication: data-sources/deduplication.md
 
+  # --- TAB 4: TRANSFORMATIONS ---
   - Transformations:
     - transformations/index.md
     - dbt Basics: transformations/dbt-basics.md
     - Staging Models: transformations/staging-models.md
     - Custom Models: transformations/custom-models.md
+    - Snapshots (SCD Type 2): transformations/snapshots.md
     - Testing: transformations/testing.md
+    - Dev Workflow: transformations/dev-workflow.md
 
+  # --- TAB 5: DASHBOARDS ---
   - Dashboards:
     - dashboards/index.md
     - Metabase Overview: dashboards/metabase-overview.md
     - Creating Dashboards: dashboards/creating-dashboards.md
     - SQL Queries: dashboards/sql-queries.md
+    - Dashboard Provisioning: dashboards/provisioning.md
+    - Save & Load (YAML): dashboards/save-load.md
 
+  # --- TAB 6: NOTEBOOKS ---
+  - Notebooks:
+    - notebooks/index.md
+    - Getting Started: notebooks/getting-started.md
+    - Templates: notebooks/templates.md
+    - DuckDB Snapshots: notebooks/duckdb-snapshots.md
+    - File Locking: notebooks/file-locking.md
+
+  # --- TAB 7: SCHEDULING & MONITORING ---
+  - Scheduling & Monitoring:
+    - scheduling-monitoring/index.md
+    - Scheduled Syncs: scheduling-monitoring/scheduled-syncs.md
+    - Webhook Notifications: scheduling-monitoring/webhooks.md
+    - Monitoring Metrics: scheduling-monitoring/metrics.md
+    - Configuring Monitors: scheduling-monitoring/configuring.md
+    - Schema Drift: scheduling-monitoring/schema-drift.md
+    - PII Scanning: scheduling-monitoring/pii-scanning.md
+    - Data Catalog: scheduling-monitoring/data-catalog.md
+
+  # --- TAB 8: DEPLOYMENT ---
+  - Deployment:
+    - deployment/index.md
+    - DigitalOcean: deployment/digitalocean.md
+    - Bring Your Own Server: deployment/byos.md
+    - Post-Deploy Setup: deployment/post-deploy.md
+    - Remote Management: deployment/remote-management.md
+    - Environment Variables: deployment/environment-variables.md
+    - Backups: deployment/backups.md
+    - Server Operations: deployment/server-operations.md
+    - Destroy & Cleanup: deployment/destroy.md
+
+  # --- TAB 9: SECURITY ---
+  - Security:
+    - security/index.md
+    - Authentication: security/authentication.md
+    - Users & Roles: security/users-roles.md
+    - Two-Factor Auth: security/two-factor.md
+    - Credential Management: security/credentials.md
+    - OAuth Tokens: security/oauth.md
+    - Hardening Guide: security/hardening.md
+    - Audit Logging: security/audit-logging.md
+    - Best Practices: security/best-practices.md
+
+  # --- TAB 10: WEB UI ---
   - Web UI:
     - web-ui/index.md
     - Overview: web-ui/web-ui-overview.md
-    - Managing Sources: web-ui/managing-sources.md
-    - Monitoring: web-ui/monitoring.md
+    - Dashboard Page: web-ui/dashboard.md
+    - Sources Page: web-ui/sources.md
+    - Models Page: web-ui/models.md
+    - Health & Logs: web-ui/health-logs.md
+    - Catalog Page: web-ui/catalog.md
+    - Monitoring Page: web-ui/monitoring-page.md
+    - Schedules Page: web-ui/schedules.md
+    - Notebooks Page: web-ui/notebooks.md
+    - Secrets & Admin: web-ui/secrets-admin.md
 
+  # --- TAB 11: CLI ---
   - CLI:
     - cli/index.md
     - Command Reference: cli/cli-reference.md
     - Init & Start: cli/init-start.md
-    - Sync & Run: cli/sync-run.md
-    - Source Management: cli/source-management.md
-    - Validation: cli/validation.md
+    - Source & Sync: cli/source-sync.md
+    - Transform & Model: cli/transform-model.md
+    - Auth Commands: cli/auth-commands.md
+    - OAuth Commands: cli/oauth-commands.md
+    - Deploy & Remote: cli/deploy-remote.md
+    - Schedule Commands: cli/schedule-commands.md
+    - Other Commands: cli/other-commands.md
 
+  # --- TAB 12: WORKFLOWS & GUIDES ---
   - Workflows:
     - workflows/index.md
     - Local Development: workflows/local-development.md
@@ -223,17 +308,17 @@ nav:
     - Financial Reporting: guides/financial-reporting.md
     - Multi-Source Integration: guides/multi-source.md
     - Custom API Integration: guides/custom-api.md
+    - Team Setup Guide: guides/team-setup.md
+    - Migration from Spreadsheets: guides/spreadsheet-migration.md
 
-  - Security:
-    - security/index.md
-    - Credential Management: security/credentials.md
-    - OAuth Tokens: security/oauth.md
-    - Best Practices: security/best-practices.md
-
+  # --- TAB 13: REFERENCE ---
   - Reference:
     - reference/index.md
-    - Configuration: reference/configuration.md
+    - Configuration Files: reference/configuration.md
     - API Reference: reference/api.md
+    - Environment Variables: reference/environment-variables.md
+    - Permissions Matrix: reference/permissions.md
+    - Source Registry: reference/source-registry.md
 
   - FAQ: faq.md
 

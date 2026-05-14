@@ -216,17 +216,41 @@ Choose your source type and follow the guide:
 
     [:octicons-arrow-right-24: Custom Sources Guide](custom-sources.md)
 
--   :material-store-outline: **Built-in Sources**
+-   :material-store-outline: **Source Catalog**
 
     ---
 
-    Explore wizard-supported sources and dlt_native options.
+    Complete catalog of all 33 supported data sources.
 
-    - 7 wizard-supported sources
-    - 60+ available via dlt_native
-    - Community-maintained dlt sources
+    - Source types and auth methods
+    - Configuration examples
+    - Sync behavior details
 
-    [:octicons-arrow-right-24: Built-in Sources Catalog](built-in-sources.md)
+    [:octicons-arrow-right-24: Source Catalog](source-catalog.md)
+
+-   :material-plus-circle-outline: **Adding Sources**
+
+    ---
+
+    Step-by-step guide to adding and configuring data sources.
+
+    [:octicons-arrow-right-24: Adding Sources](adding-sources.md)
+
+-   :material-sync-circle: **Sync Modes**
+
+    ---
+
+    Incremental loading, full refresh, and date range syncs.
+
+    [:octicons-arrow-right-24: Sync Modes](sync-modes.md)
+
+-   :material-content-duplicate: **Deduplication**
+
+    ---
+
+    Four strategies for handling duplicate records in your data.
+
+    [:octicons-arrow-right-24: Deduplication](deduplication.md)
 
 </div>
 
@@ -498,13 +522,13 @@ When APIs change:
 
     [:octicons-arrow-right-24: CSV Files Guide](csv-files.md)
 
--   :material-store-outline: **Built-in Sources**
+-   :material-store-outline: **Source Catalog**
 
     ---
 
-    Explore wizard-supported and dlt_native sources.
+    Explore all supported data source types.
 
-    [:octicons-arrow-right-24: Built-in Sources](built-in-sources.md)
+    [:octicons-arrow-right-24: Source Catalog](source-catalog.md)
 
 -   :material-application-braces-outline: **Transformations**
 

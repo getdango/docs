@@ -10,14 +10,18 @@ A Dango project has a standard directory structure created by `dango init`:
 
 ```
 my-analytics/
-├── .dango/                    # Project configuration
+├── .dango/                    # Project configuration (13 config files)
+│   ├── state/                 # Runtime state (locks, sync status, deploy journal)
+│   ├── logs/                  # Application logs
+│   └── snapshots/             # DuckDB read-only snapshots for notebooks
 ├── .dlt/                      # dlt configuration
 ├── data/                      # Database and uploads
 ├── dbt/                       # dbt project
 ├── custom_sources/            # Custom dlt sources
+├── notebooks/                 # Marimo notebooks
 ├── dashboards/                # Metabase exports (optional)
 ├── docker-compose.yml         # Docker services
-├── Dockerfile                 # Metabase DuckDB driver
+├── Dockerfile.metabase        # Metabase DuckDB driver
 ├── .gitignore                 # Git ignore patterns
 ├── .env                       # Environment variables
 └── README.md                  # Auto-generated docs
@@ -27,20 +31,46 @@ my-analytics/
 
 ## .dango/ - Project Configuration
 
-The `.dango/` directory contains all Dango-specific configuration.
+The `.dango/` directory contains all Dango-specific configuration, runtime state, and logs.
 
 ### Directory Contents
 
 ```
 .dango/
-├── project.yml       # Project metadata and platform settings
-├── sources.yml       # Data source definitions
-├── routing.json      # Multi-project domain routing (auto-generated)
-└── metabase.yml      # Metabase credentials (auto-generated)
+├── project.yml           # Project metadata and platform settings
+├── sources.yml           # Data source definitions
+├── schedules.yml         # Sync schedules (cron/interval)
+├── monitors.yml          # Metric analysis configuration
+├── notifications.yml     # Webhook notification configs
+├── pii-overrides.yml     # PII detection overrides
+├── cloud.yml             # Cloud deployment details (auto-generated)
+├── metabase.yml          # Metabase admin credentials (auto-generated)
+├── state/                # Runtime state files
+│   ├── dbt.lock          # DuckDB write lock
+│   ├── dbt.lock.json     # Lock holder metadata
+│   ├── sync_status_*.json # Sync progress tracking
+│   └── deployments.jsonl  # Deployment journal (append-only)
+├── logs/                 # Application logs
+└── snapshots/            # DuckDB read-only snapshots for notebooks
 ```
 
-**What to commit**: `project.yml`, `sources.yml`
-**What to ignore**: `routing.json`, `metabase.yml`
+### Configuration Files (13 total)
+
+| File | Purpose | Commit to Git? |
+|------|---------|----------------|
+| `.dango/project.yml` | Project metadata, platform settings | Yes |
+| `.dango/sources.yml` | Source definitions and config | Yes |
+| `.dango/schedules.yml` | Sync schedules | Yes |
+| `.dango/monitors.yml` | Metric analysis config | Yes |
+| `.dango/notifications.yml` | Webhook configs | Yes |
+| `.dango/pii-overrides.yml` | PII status overrides | Yes |
+| `.dango/metabase.yml` | Metabase admin creds (auto-generated) | No |
+| `.dango/cloud.yml` | Cloud server details (auto-generated) | No |
+| `.env` | API keys, environment variables | No |
+| `.dlt/secrets.toml` | OAuth tokens, dlt credentials | No |
+| `dbt/profiles.yml` | DuckDB connection for dbt | Yes |
+| `dbt/dbt_project.yml` | dbt project config | Yes |
+| `docker-compose.yml` | Docker service definitions | Yes |
 
 ---
 
@@ -786,5 +816,5 @@ dango stop --all
 
 - **[Architecture](architecture.md)** - See how files relate to components
 - **[Data Layers](data-layers.md)** - Understand where data lives in DuckDB
-- **[CLI Overview](cli-overview.md)** - Commands that operate on this structure
+- **[DuckDB & Single-Writer](duckdb.md)** - How the database lock and snapshots work
 - **[Quick Start](../getting-started/quick-start.md)** - Create your first project
