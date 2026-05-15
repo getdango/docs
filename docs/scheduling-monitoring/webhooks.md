@@ -170,12 +170,12 @@ For non-Slack endpoints, use `format: generic`. The payload is a JSON object:
 
 ```json
 {
-  "event_type": "sync_completed",
-  "schedule_name": "daily_sync",
+  "event": "sync_completed",
+  "schedule": "daily_sync",
   "sources": ["stripe", "google_sheets"],
   "duration_seconds": 145.2,
   "rows_loaded": 12500,
-  "occurred_at": "2026-05-15T06:02:30+00:00",
+  "timestamp": "2026-05-15T06:02:30+00:00",
   "dashboard_url": "https://your-domain.com/",
   "error": null,
   "stale_hours": null,
@@ -187,8 +187,8 @@ For non-Slack endpoints, use `format: generic`. The payload is a JSON object:
 
 | Field | Type | Present When |
 |-------|------|-------------|
-| `event_type` | string | Always |
-| `schedule_name` | string | Always |
+| `event` | string | Always — the event type value (e.g., `sync_completed`) |
+| `schedule` | string | Always — the schedule name |
 | `sources` | list | Always (may be empty for `dbt` schedules) |
 | `duration_seconds` | float | `sync_completed` |
 | `rows_loaded` | int | `sync_completed` |
@@ -196,7 +196,7 @@ For non-Slack endpoints, use `format: generic`. The payload is a JSON object:
 | `stale_hours` | float | `sync_stale` |
 | `attempt_number` | int | `sync_retrying` |
 | `next_retry_at` | datetime | `sync_retrying` |
-| `occurred_at` | datetime | Always |
+| `timestamp` | datetime | Always — ISO 8601 UTC |
 | `dashboard_url` | string | When configured |
 | `metadata` | object | `metric_alert` (contains `summary`, `flagged_count`, `total_count`) |
 
@@ -204,12 +204,12 @@ For non-Slack endpoints, use `format: generic`. The payload is a JSON object:
 
 Webhook delivery retries on transient failures:
 
-| Attempt | Delay After Failure | Retried On |
-|---------|-------------------|------------|
+| Attempt | Delay Before | Retried On |
+|---------|-------------|------------|
 | 1 | — | First delivery attempt |
 | 2 | 5 seconds | 5xx status, timeout, connection error |
-| 3 | 15 seconds | 5xx status, timeout, connection error |
-| *(give up)* | 45 seconds | Final attempt before discarding |
+| 3 | 15 seconds | Final attempt |
+| *(give up)* | — | All 3 attempts exhausted, discarded |
 
 - **HTTP timeout:** 10 seconds per request
 - **Retryable errors:** 5xx server errors, connection errors, DNS failures, timeouts

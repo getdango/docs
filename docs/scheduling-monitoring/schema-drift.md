@@ -113,7 +113,7 @@ When you see breaking drift, review the changes and decide whether to accept:
 === "CLI"
 
     ```bash
-    dango governance drift-accept stripe
+    dango governance accept stripe
     ```
 
 === "API"
@@ -163,7 +163,7 @@ A SaaS API (e.g., Stripe) adds a new field to their response. This shows up as `
 A field you reference in your dbt models gets removed. This shows up as `column_removed` — breaking drift. dbt is blocked until you:
 
 1. Update your dbt models to remove references to the deleted column
-2. Accept the drift via `dango governance drift-accept <source>`
+2. Accept the drift via `dango governance accept <source>`
 
 **CSV column type changes**
 

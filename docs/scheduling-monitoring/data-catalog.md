@@ -20,19 +20,9 @@ The catalog is powered by your dbt manifest (for model metadata and lineage) and
 
 ### Browsing Models & Sources
 
-The catalog lists all dbt models from your project, classified into layers:
+The catalog lists all dbt models from your project, classified into layers: **staging**, **intermediate**, and **marts**. Classification uses schema name first, then name prefix, with a fallback to intermediate. See [Model Classification Rules](#model-classification-rules) for the full priority table.
 
-| Classification Rule | Priority | Layer |
-|--------------------|----------|-------|
-| Schema name = `staging` | 1 (highest) | Staging |
-| Schema name = `intermediate` | 1 | Intermediate |
-| Schema name = `marts` | 1 | Marts |
-| Name starts with `stg_` | 2 | Staging |
-| Name starts with `fct_` or `dim_` | 2 | Marts |
-| Name starts with `int_` | 2 | Intermediate |
-| *(fallback)* | 3 (lowest) | Intermediate |
-
-Raw source tables (in `raw_*` schemas) are also browsable — they appear under their source name.
+Raw source tables (in `raw_*` schemas) are also browsable — they appear under their source name, even if they aren't yet referenced in dbt models.
 
 ### Model Detail View
 

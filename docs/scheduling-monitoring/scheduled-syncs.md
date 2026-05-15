@@ -44,25 +44,29 @@ $ dango schedule add
 
 Schedule name (lowercase, letters/numbers/underscores): daily_sync
 Schedule type:
-  1. sync       — Sync sources + run dbt (recommended)
-  2. sync_only  — Sync sources only, skip dbt
-  3. dbt        — Run dbt only (no source sync)
-Choice [1]: 1
+  Sync & Transform (recommended)
+  Sync only (no transform)
+  Transform only (dbt)
+Choice: Sync & Transform (recommended)
 
 Select sources to sync:
-  [1] stripe
-  [2] google_sheets
-  [3] hubspot
-Enter source numbers (comma-separated, or 'all'): all
+  [x] stripe
+  [x] google_sheets
+  [x] hubspot
+(SPACE to toggle, ENTER to confirm)
 
-Frequency:
-  1. Every 15 minutes    (*/15 * * * *)
-  2. Every hour           (0 * * * *)
-  3. Every 6 hours        (0 */6 * * *)
-  4. Daily at 6 AM        (0 6 * * *)
-  5. Weekly (Monday 6 AM) (0 6 * * 1)
-  6. Custom cron expression
-Choice [4]: 4
+Run frequency:
+  Every hour
+  Every 2 hours
+  Every 3 hours
+  Every 4 hours
+  Every 6 hours
+  Every 8 hours
+  Every 12 hours
+  Daily
+  Weekly
+  Custom cron
+Choice: Daily
 
 Timezone (leave blank for UTC): America/New_York
 
@@ -83,16 +87,22 @@ Timezone (leave blank for UTC): America/New_York
 
 ### Frequency Options
 
-Dango provides built-in presets, or you can write a custom cron expression:
+The wizard offers these frequency presets, then prompts for specific time details (hour, minute, day of week):
 
-| Preset | Cron Expression | Description |
-|--------|----------------|-------------|
-| Every 15 minutes | `*/15 * * * *` | High-frequency syncs for real-time data |
-| Every hour | `0 * * * *` | Standard hourly sync |
-| Every 6 hours | `0 */6 * * *` | Four times daily |
-| Daily at 6 AM | `0 6 * * *` | Once per day (default) |
-| Weekly (Monday 6 AM) | `0 6 * * 1` | Weekly sync |
-| Custom | *you define it* | Any valid 5-field cron expression |
+| Preset | Description |
+|--------|-------------|
+| Every hour | Standard hourly sync |
+| Every 2 hours | Twice-daily-ish |
+| Every 3 hours | 8 times daily |
+| Every 4 hours | 6 times daily |
+| Every 6 hours | 4 times daily |
+| Every 8 hours | 3 times daily |
+| Every 12 hours | Twice daily |
+| Daily | Once per day at a chosen time |
+| Weekly | Once per week on a chosen day and time |
+| Custom cron | Any valid 5-field cron expression |
+
+After selecting a preset, the wizard prompts for time details. For example, choosing "Daily" asks for the hour and minute; choosing "Weekly" asks for the day, hour, and minute.
 
 ### Timezone Handling
 
@@ -259,14 +269,14 @@ Scheduled jobs have built-in retry and timeout handling:
 
 ### Retry Behavior
 
-| Attempt | Delay Before Retry | What Happens |
-|---------|-------------------|--------------|
+| Attempt | Delay Before | What Happens |
+|---------|-------------|--------------|
 | 1 | — | First attempt runs immediately at the scheduled time |
-| 2 | 30 seconds | Retry after transient failure |
-| 3 | 2 minutes | Second retry |
-| *(failure)* | 5 minutes | Final retry before marking as failed |
+| 2 | 30 seconds | First retry after transient failure |
+| 3 | 2 minutes | Final retry |
+| *(failure)* | — | All retries exhausted, marked as failed |
 
-After 3 failed attempts, the job is marked as `failed` and a `sync_failed` webhook notification is sent (if configured).
+After all 3 attempts fail, the job is marked as `failed` and a `sync_failed` webhook notification is sent (if configured).
 
 ### Timeout
 
@@ -303,9 +313,6 @@ dango schedule list
 
 # Check a specific schedule's details and next run time
 dango schedule status daily_sync
-
-# Watch the execution history for the next scheduled run
-dango schedule status daily_sync --watch
 ```
 
 Expected output from `dango schedule list`:
@@ -313,9 +320,9 @@ Expected output from `dango schedule list`:
 ```
 Schedules
 ─────────
-Name          Type   Cron          Enabled  Next Run
-daily_sync    sync   0 6 * * *     ✓        2026-05-16 06:00 EDT
-hourly_marts  dbt    0 * * * *     ✓        2026-05-15 15:00 EDT
+Name          Type   Cron          Sources                Enabled  Next Run
+daily_sync    sync   0 6 * * *     stripe, google_sheets  yes      2026-05-16 06:00
+hourly_marts  dbt    0 * * * *                            yes      2026-05-15 15:00
 ```
 
 ## Troubleshooting

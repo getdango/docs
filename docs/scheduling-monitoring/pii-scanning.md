@@ -21,7 +21,7 @@ Automatically detect personally identifiable information in your synced data —
 3. **Mark false positives:**
 
     ```bash
-    dango governance pii-set stripe charge customer_name not_pii --reason "Business name, not person"
+    dango governance pii-set stripe charge customer_name --status not_pii --reason "Business name, not person"
     ```
 
 ## Detailed Steps
@@ -123,11 +123,11 @@ If the scanner flags a column incorrectly, mark it as `not_pii`:
 
 ```bash
 # Mark a column as not PII
-dango governance pii-set stripe customer business_name not_pii \
+dango governance pii-set stripe customer business_name --status not_pii \
   --reason "Contains company names, not person names"
 
 # Mark a column as confirmed PII
-dango governance pii-set stripe customer email pii \
+dango governance pii-set stripe customer email --status pii \
   --reason "Customer email addresses"
 
 # List all overrides
