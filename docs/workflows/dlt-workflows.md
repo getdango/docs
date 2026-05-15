@@ -103,7 +103,7 @@ dango sync --source my_source --full-refresh
 
 ## Schema Drift Interaction
 
-After each sync, Dango runs a post-sync hook that detects schema drift — changes to column names or types in your source data.
+After each sync, Dango runs a post-sync hook that detects schema drift — columns removed or column types changed in your source data.
 
 **Additive changes** (new columns) are recorded but don't block anything.
 

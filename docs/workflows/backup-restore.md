@@ -327,19 +327,22 @@ If the cloud server is lost:
 
 ## What NOT to Backup
 
-Some files should be excluded from backups:
+Some files can be excluded from **manual local backups** (they are regenerable or transient):
 
 ```bash
-# .gitignore patterns for backup exclusion
+# Excludable from manual backups
 *.log
 *.tmp
 __pycache__/
-.dlt/pipelines/        # Can be regenerated
+.dlt/pipelines/        # Can be regenerated (but slows restore — re-syncs from scratch)
 dbt/target/            # Compiled artifacts
 dbt/logs/              # dbt logs
 .dango/state/          # Runtime state (locks, sync status)
 .dango/dev/            # Dev mode artifacts
 ```
+
+!!! note "Cloud backups include `.dlt/pipelines/`"
+    Dango's automated cloud backups include pipeline state for faster restores. If you exclude it from manual backups, the next sync will do a full refresh instead of incremental — slower but not destructive.
 
 ---
 

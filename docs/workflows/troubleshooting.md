@@ -708,7 +708,7 @@ cat .dango/logs/activity.jsonl | tail -50
 
 ### Issue Template
 
-```markdown
+````markdown
 **Describe the issue**
 What happened vs what you expected
 
@@ -730,7 +730,7 @@ Paste relevant log output
 ```yaml
 Paste relevant config
 ```
-```
+````
 
 ---
 
