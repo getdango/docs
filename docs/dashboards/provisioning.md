@@ -51,7 +51,7 @@ Password: ********
 ## Command Options
 
 ```bash
-dango dashboard provision [--url URL] [--username EMAIL]
+dango dashboard provision [--url URL] [--username EMAIL] [--password PASSWORD]
 ```
 
 | Option | Default | Description |
@@ -139,7 +139,7 @@ For updating an existing dashboard, edit it directly in the Metabase UI instead.
 Error: Authentication failed. Check your credentials.
 ```
 
-Verify your Metabase admin email and password. The password is the one set during `dango init`, not the random Metabase password (which is managed internally by Dango's SSO).
+Verify your Metabase admin email and password. The Metabase admin password was auto-generated during `dango start` and stored in `.dango/metabase.yml`. This is separate from the Dango admin password set during `dango init`.
 
 === "Local"
 

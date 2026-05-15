@@ -273,9 +273,9 @@ SELECT * FROM {{ source('analytics', 'events') }}
 
 Dango's model generator supports 4 named deduplication strategies. When you run `dango generate`, the generator uses `infer_dedup_strategy()` to auto-detect the best strategy based on column names.
 
-### `last_modified` (Auto-Detected)
+### `last_modified` (Auto-Generated)
 
-Keeps the most recent record based on a timestamp column. Auto-detected when columns named `updated_at`, `modified_at`, or `last_modified` exist in the source table.
+Keeps the most recent record based on a timestamp column. This is the only strategy that `dango generate` auto-detects — it triggers when columns named `updated_at`, `modified_at`, or `last_modified` exist in the source table.
 
 ```sql
 {{ config(materialized='table', schema='staging') }}
@@ -293,9 +293,9 @@ SELECT * FROM deduplicated
 WHERE _rn = 1
 ```
 
-### `first_seen`
+### `first_seen` (Manual)
 
-Keeps the oldest record (first occurrence). Useful for append-only event logs where you want the original version.
+Keeps the oldest record (first occurrence). Useful for append-only event logs where you want the original version. Apply by editing the generated staging model SQL.
 
 ```sql
 {{ config(materialized='table', schema='staging') }}
@@ -313,9 +313,9 @@ SELECT * FROM deduplicated
 WHERE _rn = 1
 ```
 
-### `composite_key`
+### `composite_key` (Manual)
 
-Deduplicates using multiple columns as a composite key. Use this when no single column uniquely identifies a row.
+Deduplicates using multiple columns as a composite key. Use this when no single column uniquely identifies a row. Apply by editing the generated staging model SQL.
 
 ```sql
 {{ config(materialized='table', schema='staging') }}
@@ -333,9 +333,9 @@ SELECT * FROM deduplicated
 WHERE _rn = 1
 ```
 
-### `row_number`
+### `row_number` (Manual)
 
-Custom sort-based deduplication with user-specified columns. A general-purpose strategy when the others don't fit.
+Custom sort-based deduplication with user-specified columns. A general-purpose strategy when the others don't fit. Apply by editing the generated staging model SQL.
 
 ```sql
 {{ config(materialized='table', schema='staging') }}

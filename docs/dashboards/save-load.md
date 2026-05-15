@@ -69,6 +69,9 @@ dango metabase save --collections "Our analytics"
 dango metabase save --collections "Shared,Marketing,Finance"
 ```
 
+!!! note
+    The `--all` flag exists but is currently a no-op. Only the Shared collection (or those specified with `--collections`) are exported.
+
 ### Export Directory Structure
 
 Saved files are organized by type in the `metabase/` directory:

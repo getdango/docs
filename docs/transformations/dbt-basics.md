@@ -146,8 +146,7 @@ dbt/
 │   ├── intermediate/         # Reusable business logic (your code)
 │   └── marts/                # Final tables for BI (your code)
 ├── tests/                    # Custom data tests
-├── macros/                   # Reusable SQL snippets
-└── snapshots/                # Slowly changing dimensions
+└── macros/                   # Reusable SQL snippets
 ```
 
 ---
