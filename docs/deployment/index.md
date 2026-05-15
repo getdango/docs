@@ -38,27 +38,7 @@ Dango offers two deployment paths. Both result in the same server setup &mdash; 
 
 ## What Gets Deployed
 
-Both paths set up the same server environment:
-
-```
-Your Server
-├── /srv/dango/                  # Project root
-│   ├── .dango/                  # Configuration and state
-│   │   ├── sources.yml          # Source definitions
-│   │   ├── schedule.yml         # Sync schedules
-│   │   ├── cloud.yml            # Server metadata
-│   │   └── state/               # Sync status, deploy journal
-│   ├── .dlt/                    # dlt credentials
-│   │   └── secrets.toml         # API keys and tokens
-│   ├── dbt_project/             # dbt models and config
-│   ├── warehouse.duckdb         # DuckDB database
-│   └── docker-compose.yml       # Metabase container
-├── Caddy                        # Reverse proxy + auto-TLS
-├── Docker                       # Container runtime (Metabase)
-├── systemd                      # Dango service management
-├── fail2ban                     # SSH brute-force protection
-└── unattended-upgrades          # Automatic security patches
-```
+Both paths set up the same server environment: Python venv, DuckDB warehouse, dbt project, Metabase (Docker), Caddy (reverse proxy + auto-TLS), fail2ban, systemd service, and unattended security upgrades. See the [detailed server layout](digitalocean.md#remote-server-layout) for the full directory structure.
 
 ## Deployment Commands
 
@@ -78,8 +58,8 @@ Your Server
 Once your server is running, you'll typically want to:
 
 1. **Verify** the deployment is healthy &mdash; `dango remote status`
-2. **Configure a domain** for HTTPS &mdash; `dango remote domain set`
-3. **Set up firewall rules** to restrict access &mdash; `dango remote firewall`
+2. **Configure a domain** for HTTPS &mdash; `dango remote domain set <domain>`
+3. **Set up firewall rules** to restrict access &mdash; `dango remote firewall` (DO) or UFW (BYOS)
 4. **Re-authenticate OAuth sources** with the new redirect URI
 5. **Configure scheduled syncs** via the web UI or `dango schedule`
 

@@ -114,7 +114,7 @@ The BYOS wizard installs and configures Dango on your server. It does **not** ma
 
 ## Server Setup Steps
 
-After the wizard completes, the following is installed and configured on your server (approximately 2&ndash;4 minutes):
+After the wizard validates your SSH connection, the following is installed and configured on your server (approximately 2&ndash;4 minutes):
 
 1. **System packages** &mdash; `apt` update and install build dependencies
 2. **Dango user** &mdash; creates a `dango` system user

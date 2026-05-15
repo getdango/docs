@@ -183,6 +183,9 @@ Proceed with deployment? [y/N]
 !!! note
     Dango does not charge anything. All costs are billed directly by DigitalOcean to your account. The estimates shown are based on DigitalOcean's published pricing and may vary.
 
+!!! tip "Set a domain during deployment"
+    You can pass `--domain analytics.yourcompany.com` to configure HTTPS during initial deployment, skipping the [post-deploy domain setup](post-deploy.md#2-custom-domain). Make sure your DNS A record is already pointing to a placeholder or you configure it immediately after the droplet IP is assigned.
+
 ---
 
 ## Provisioning
@@ -227,6 +230,9 @@ Provisioning server...
 ╰─────────────────────────────────────────╯
 ```
 
+!!! note
+    The step numbers and grouping shown above are a documentation summary. The actual CLI output may show a different breakdown depending on your configuration (e.g., backup steps are skipped if you opted out).
+
 If any step fails, the wizard performs **automatic cleanup** &mdash; destroying the droplet, removing the SSH key, and deleting the firewall to avoid orphaned resources.
 
 ---
@@ -242,7 +248,6 @@ dango deploy \
   --size s-2vcpu-4gb \
   --admin-email admin@yourcompany.com \
   --admin-password "$DANGO_ADMIN_PASSWORD" \
-  --skip-backups \
   --skip-initial-sync
 ```
 
@@ -256,7 +261,7 @@ dango deploy \
 | `--domain` | Custom domain for HTTPS | None |
 | `--admin-email` | Admin account email | Prompted |
 | `--admin-password` | Admin account password | Auto-generated |
-| `--skip-backups` | Skip automated backup setup | Off |
+| `--skip-backups` | Skip automated backup setup (backups require Spaces keys) | Off |
 | `--skip-initial-sync` | Skip first data sync after deploy | Off |
 | `--reconnect` | Reconnect to an existing server | Off |
 | `--ip` | Server IP for `--reconnect` | Prompted |
