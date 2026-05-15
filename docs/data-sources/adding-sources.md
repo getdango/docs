@@ -259,7 +259,7 @@ Each source type has its own config section using the source type name (or `gene
 dango source edit
 
 # Open with focus on a specific source
-dango source edit --name stripe_prod
+dango source edit stripe_prod
 ```
 
 The edit command validates YAML syntax before saving.

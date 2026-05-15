@@ -179,12 +179,47 @@ If no `deduplication` field is specified, Dango uses sensible defaults:
 
 ## Auto-Inference
 
-When generating staging models, Dango can automatically infer a deduplication strategy based on column patterns:
+When generating staging models, Dango can automatically infer a deduplication approach based on column patterns:
 
-1. If the table has an `updated_at` or `modified_at` column **and** an ID column (`id`, `uuid`, `key`), Dango suggests `last_modified` deduplication in the staging model
-2. Otherwise, no deduplication is applied
+1. If the table has an `updated_at` or `modified_at` column **and** an ID column (`id`, `uuid`, `key`), the generated staging model includes a `ROW_NUMBER()` window function to keep only the most recent record per key — equivalent to the `latest_only` strategy
+2. Otherwise, no deduplication is applied in the staging model
 
-This auto-inference only affects auto-generated staging models. You can always override it by setting `deduplication` explicitly in `sources.yml` or editing the generated staging SQL.
+This auto-inference only affects auto-generated staging models. You can always override it by setting `deduplication` explicitly in `sources.yml` or editing the generated staging SQL directly.
+
+---
+
+## Common Patterns
+
+### Which strategy for which source?
+
+| Source Type | Recommended Strategy | Reason |
+|-------------|---------------------|--------|
+| **Google Sheets** | `latest_only` (default) | Sheets are living documents — you want current state |
+| **Stripe charges** | `append_only` | Charges are immutable events |
+| **HubSpot contacts** | `latest_only` | Contact records get updated frequently |
+| **Product prices** | `scd_type2` | Track price changes over time |
+| **Server logs** | `none` | Each log entry is unique |
+| **CSV exports** | `none` or `latest_only` | Depends on whether exports contain updates |
+
+### Changing strategies
+
+You can change a source's deduplication strategy at any time:
+
+```yaml
+sources:
+  - name: contacts
+    type: hubspot
+    deduplication: scd_type2  # Changed from latest_only
+```
+
+After changing to `scd_type2`, run a full refresh to initialize the snapshot baseline:
+
+```bash
+dango sync contacts --full-refresh
+```
+
+!!! warning "Changing from `scd_type2` to another strategy"
+    Switching away from `scd_type2` does not delete the snapshot table. The snapshot stops receiving updates, but existing history is preserved in the `snapshots` schema.
 
 ---
 

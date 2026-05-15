@@ -26,10 +26,10 @@ dlt tracks sync state automatically — each pipeline remembers its last cursor 
 
 ```bash
 # First sync: loads all historical data
-dango sync --source stripe_prod
+dango sync stripe_prod
 
 # Subsequent syncs: loads only new/changed records
-dango sync --source stripe_prod
+dango sync stripe_prod
 ```
 
 ### Lookback Window
@@ -57,10 +57,10 @@ Full refresh drops all existing data for a source and reloads everything from sc
 
 ```bash
 # Full refresh with confirmation prompt
-dango sync --source sales_data --full-refresh
+dango sync sales_data --full-refresh
 
 # Skip confirmation
-dango sync --source sales_data --full-refresh --yes
+dango sync sales_data --full-refresh --yes
 ```
 
 ### Safety Guard Rails
@@ -97,16 +97,16 @@ Date range sync lets you load data for a specific time period. This is useful fo
 
 ```bash
 # Load data from a specific date forward
-dango sync --source ga4_data --since 2026-01-01
+dango sync ga4_data --since 2026-01-01
 
 # Load a specific date range
-dango sync --source ga4_data --since 2026-01-01 --until 2026-03-31
+dango sync ga4_data --since 2026-01-01 --until 2026-03-31
 
 # Backfill last 30 days
-dango sync --source ga4_data --backfill 30d
+dango sync ga4_data --backfill 30d
 
 # Backfill last 2 weeks
-dango sync --source ga4_data --backfill 2w
+dango sync ga4_data --backfill 2w
 ```
 
 ### Backfill Durations
@@ -173,7 +173,7 @@ When a sync is running:
 - If the process crashes, the stale lock is detected and cleaned up on the next sync
 
 ```
-$ dango sync --source orders
+$ dango sync orders
 ⏳ Another sync is running. Waiting for lock (up to 5 minutes)...
 ✓ Lock acquired. Starting sync.
 ```
@@ -194,7 +194,7 @@ Another sync process holds the lock. Wait for it to complete, or check for a sta
 ps aux | grep "dango sync"
 
 # If no sync is running, the lock is stale — the next sync will clean it up
-dango sync --source my_source
+dango sync my_source
 ```
 
 ### Full refresh loaded fewer rows

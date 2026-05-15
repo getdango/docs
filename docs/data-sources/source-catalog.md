@@ -14,6 +14,17 @@ Dango ships with **33 built-in source connectors** powered by [dlt (data load to
 
 Every source is defined in the [source registry](../reference/source-registry.md) with its authentication type, default resources, and configuration parameters.
 
+### Reading the Tables
+
+Each category table includes an **Incremental** column indicating sync behavior:
+
+- **Yes** — supports incremental sync (only new/changed data loaded on each run)
+- **Partial** — some resources are incremental, others always reload all data
+- **No** — always reloads all data on each sync (full refresh)
+- **Varies** — depends on user configuration (e.g., dlt_native sources)
+
+See [Sync Modes](sync-modes.md) for details on incremental vs full refresh behavior.
+
 !!! tip "Can't find your source?"
     Use the **REST API** source to connect to any API with JSON responses, or **dlt_native** to bring in any [dlt verified source](https://dlthub.com/docs/dlt-ecosystem/verified-sources/). See [Custom Sources](custom-sources.md) for details.
 
@@ -23,13 +34,13 @@ Every source is defined in the [source registry](../reference/source-registry.md
 
 Sources for local files, generic APIs, and advanced dlt integrations.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `local_files` | File Import (CSV, JSON, Parquet) | None | Yes | [Local Files Guide](local-files/index.md) |
-| `rest_api` | REST API (Generic) | API Key | Yes | Connect to any REST API — [REST API Guide](rest-api.md) |
-| `dlt_native` | dlt Native (Advanced) | None | Yes | Bring any dlt source — [Custom Sources Guide](custom-sources.md) |
-| `csv` | CSV Files | None | No | **Hidden** — use `local_files` instead |
-| `filesystem` | Files & Cloud Storage | None | No | **Hidden** — use `local_files` for local files |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `local_files` | File Import (CSV, JSON, Parquet) | None | Yes | Yes | [Local Files Guide](local-files/index.md) |
+| `rest_api` | REST API (Generic) | API Key | Yes | Yes | Connect to any REST API — [REST API Guide](rest-api.md) |
+| `dlt_native` | dlt Native (Advanced) | None | Varies | Yes | Bring any dlt source — [Custom Sources Guide](custom-sources.md) |
+| `csv` | CSV Files | None | Yes | No | **Hidden** — use `local_files` instead |
+| `filesystem` | Files & Cloud Storage | None | No | No | **Hidden** — use `local_files` for local files |
 
 ---
 
@@ -37,15 +48,15 @@ Sources for local files, generic APIs, and advanced dlt integrations.
 
 Sources for advertising platforms, analytics tools, and marketing data.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `google_sheets` | Google Sheets | OAuth | Yes | [Google Sheets Guide](google-sheets.md) |
-| `facebook_ads` | Facebook Ads | OAuth | Yes | [Facebook Ads Guide](facebook-ads.md) |
-| `google_analytics` | Google Analytics 4 | OAuth | Yes | [Google Analytics Guide](google-analytics.md) |
-| `google_ads` | Google Ads | OAuth | Yes | [Google Ads Guide](google-ads.md) |
-| `airtable` | Airtable | API Key | Yes | Bases and tables |
-| `mux` | Mux | API Key | Yes | Video analytics |
-| `matomo` | Matomo | API Key | No | **Coming Soon** |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `google_sheets` | Google Sheets | OAuth | No | Yes | [Google Sheets Guide](google-sheets.md) |
+| `facebook_ads` | Facebook Ads | OAuth | Yes | Yes | [Facebook Ads Guide](facebook-ads.md) |
+| `google_analytics` | Google Analytics 4 | OAuth | Yes | Yes | [Google Analytics Guide](google-analytics.md) |
+| `google_ads` | Google Ads | OAuth | No | Yes | [Google Ads Guide](google-ads.md) |
+| `airtable` | Airtable | API Key | No | Yes | Bases and tables |
+| `mux` | Mux | API Key | Partial | Yes | Video analytics |
+| `matomo` | Matomo | API Key | Yes | No | **Coming Soon** |
 
 ---
 
@@ -53,16 +64,16 @@ Sources for advertising platforms, analytics tools, and marketing data.
 
 Sources for CRM platforms, helpdesks, project management, and HR tools.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `hubspot` | HubSpot | API Key | Yes | [HubSpot Guide](hubspot.md) — contacts, companies, deals, tickets |
-| `salesforce` | Salesforce | Service Account | Yes | [Salesforce Guide](salesforce.md) |
-| `pipedrive` | Pipedrive | API Key | Yes | 16 resources available |
-| `freshdesk` | Freshdesk | API Key | Yes | Support tickets and contacts |
-| `zendesk` | Zendesk | Basic | Yes | Support tickets and users |
-| `workable` | Workable | API Key | Yes | Applicant tracking |
-| `jira` | Jira | Basic | No | **Coming Soon** |
-| `asana` | Asana | API Key | No | **Coming Soon** |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `hubspot` | HubSpot | API Key | Yes | Yes | [HubSpot Guide](hubspot.md) — contacts, companies, deals, tickets |
+| `salesforce` | Salesforce | Service Account | Partial | Yes | [Salesforce Guide](salesforce.md) |
+| `pipedrive` | Pipedrive | API Key | Yes | Yes | 16 resources available |
+| `freshdesk` | Freshdesk | API Key | Yes | Yes | Support tickets and contacts |
+| `zendesk` | Zendesk | Basic | Partial | Yes | Support tickets and users |
+| `workable` | Workable | API Key | Partial | Yes | Applicant tracking |
+| `jira` | Jira | Basic | No | No | **Coming Soon** |
+| `asana` | Asana | API Key | Partial | No | **Coming Soon** |
 
 ---
 
@@ -70,10 +81,10 @@ Sources for CRM platforms, helpdesks, project management, and HR tools.
 
 Sources for payment processors and online stores.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `stripe` | Stripe | API Key | Yes | [Stripe Guide](stripe.md) — charges, customers, subscriptions |
-| `shopify` | Shopify | OAuth | No | **Coming Soon** — pending OAuth flow update |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `stripe` | Stripe | API Key | Partial | Yes | [Stripe Guide](stripe.md) — charges, customers, subscriptions |
+| `shopify` | Shopify | OAuth | — | No | **Coming Soon** — pending OAuth flow update |
 
 ---
 
@@ -81,9 +92,9 @@ Sources for payment processors and online stores.
 
 Sources for developer tools and code repositories.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `github` | GitHub | API Key | Yes | [GitHub Guide](github.md) — issues, PRs, commits |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `github` | GitHub | API Key | No | Yes | [GitHub Guide](github.md) — issues, PRs, commits |
 
 ---
 
@@ -91,9 +102,9 @@ Sources for developer tools and code repositories.
 
 Sources for team messaging and collaboration.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `slack` | Slack | API Key | Yes | [Slack Guide](slack.md) — channels, messages, users |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `slack` | Slack | API Key | Partial | Yes | [Slack Guide](slack.md) — channels, messages, users |
 
 ---
 
@@ -101,10 +112,10 @@ Sources for team messaging and collaboration.
 
 Sources for knowledge bases and email.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `notion` | Notion | API Key | Yes | Pages and databases |
-| `inbox` | Email (IMAP) | Basic | Yes | IMAP email import |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `notion` | Notion | API Key | No | Yes | Pages and databases |
+| `inbox` | Email (IMAP) | Basic | Yes | Yes | IMAP email import |
 
 ---
 
@@ -112,10 +123,10 @@ Sources for knowledge bases and email.
 
 Sources for relational and document databases.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `postgres` | PostgreSQL | Basic | Yes | Full table or incremental loading |
-| `mongodb` | MongoDB | Basic | Yes | Collections with optional filtering |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `postgres` | PostgreSQL | Basic | Yes | Yes | Full table or incremental loading |
+| `mongodb` | MongoDB | Basic | Yes | Yes | Collections with optional filtering |
 
 !!! note "Other databases"
     Connect to MySQL, SQL Server, and other databases via the `dlt_native` source type using dlt's [sql_database](https://dlthub.com/docs/dlt-ecosystem/verified-sources/sql_database) source. See [Database Sources](database-sources.md).
@@ -126,10 +137,10 @@ Sources for relational and document databases.
 
 Sources for real-time data streams.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `kafka` | Apache Kafka | None | Yes | Consumer-based ingestion |
-| `kinesis` | AWS Kinesis | Service Account | Yes | AWS stream processing |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `kafka` | Apache Kafka | None | Yes | Yes | Consumer-based ingestion |
+| `kinesis` | AWS Kinesis | Service Account | Yes | Yes | AWS stream processing |
 
 ---
 
@@ -137,11 +148,29 @@ Sources for real-time data streams.
 
 Utility and niche sources.
 
-| Source | Display Name | Auth | Wizard | Notes |
-|--------|-------------|------|--------|-------|
-| `chess` | Chess.com | None | Yes | Public API — great for testing |
-| `strapi` | Strapi | API Key | No | **Coming Soon** |
-| `personio` | Personio | API Key | No | **Coming Soon** |
+| Source | Display Name | Auth | Incremental | Wizard | Notes |
+|--------|-------------|------|-------------|--------|-------|
+| `chess` | Chess.com | None | Partial | Yes | Public API — great for testing |
+| `strapi` | Strapi | API Key | No | No | **Coming Soon** |
+| `personio` | Personio | API Key | Partial | No | **Coming Soon** |
+
+---
+
+## Source Counts by Category
+
+| Category | Total | Wizard | Coming Soon |
+|----------|-------|--------|-------------|
+| Local & Custom | 5 | 3 | 0 |
+| Marketing & Analytics | 7 | 6 | 1 |
+| Business & CRM | 8 | 5 | 3 |
+| E-commerce & Payment | 2 | 1 | 1 |
+| Development | 1 | 1 | 0 |
+| Communication | 1 | 1 | 0 |
+| Files & Storage | 2 | 2 | 0 |
+| Databases | 2 | 2 | 0 |
+| Streaming | 2 | 2 | 0 |
+| Other | 3 | 1 | 2 |
+| **Total** | **33** | **25** | **6** |
 
 ---
 

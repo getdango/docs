@@ -397,20 +397,21 @@ export MY_API_KEY="your-key-here"
 
 | Source Type | Status | Notes |
 |-------------|--------|-------|
-| Local Files | Tested | CSV, JSON, JSONL, Parquet — production-ready |
-| Stripe | Tested | All resources supported |
-| Google Sheets | Tested | OAuth flow verified |
-| Google Analytics 4 | Tested | OAuth flow verified |
-| Facebook Ads | Tested | OAuth flow verified |
-| Google Ads | Tested | OAuth flow verified |
-| HubSpot | Tested | Contacts, companies, deals, tickets |
-| GitHub | Tested | Issues, PRs, commits |
-| Salesforce | Tested | Service account auth |
-| Slack | Tested | Channels, messages, users |
-| PostgreSQL | Tested | Full table and incremental |
-| MongoDB | Tested | Collections with filtering |
-| REST API | Tested | Generic API connector |
-| dlt_native | Tested | Registry bypass for any dlt source |
+| Local Files | :white_check_mark: Production-ready | CSV, JSON, JSONL, Parquet |
+| Stripe | :white_check_mark: Production-ready | All resources supported |
+| Google Sheets | :white_check_mark: Production-ready | OAuth flow verified |
+| Google Analytics 4 | :white_check_mark: Production-ready | OAuth flow verified |
+| Facebook Ads | :white_check_mark: Production-ready | OAuth flow verified |
+| Google Ads | :white_check_mark: Production-ready | OAuth flow verified |
+| HubSpot | :white_check_mark: Production-ready | Contacts, companies, deals, tickets |
+| GitHub | :white_check_mark: Production-ready | Issues, PRs, commits |
+| Salesforce | :white_check_mark: Tested | Service account auth |
+| Slack | :white_check_mark: Tested | Channels, messages, users |
+| PostgreSQL | :white_check_mark: Tested | Full table and incremental |
+| MongoDB | :white_check_mark: Tested | Collections with filtering |
+| REST API | :white_check_mark: Tested | Generic API connector |
+| dlt_native | :white_check_mark: Tested | Registry bypass for any dlt source |
+| Coming Soon sources | :material-clock-outline: Pending | Shopify, Matomo, Jira, Asana, Strapi, Personio |
 
 ---
 
