@@ -20,7 +20,7 @@ Dango uses OAuth for sources that require user authorization:
 ### Authentication Flow
 
 ```
-1. You run: dango auth google_sheets
+1. You run: dango oauth google_sheets
 
 2. Browser opens to Google login
 
@@ -75,7 +75,7 @@ The `secrets.toml` file contains:
 
 ```bash
 # Authenticate with Google Sheets
-dango auth google_sheets
+dango oauth google_sheets
 ```
 
 1. Opens browser to Google consent screen
@@ -111,7 +111,7 @@ No manual intervention needed for routine refresh.
 **When refresh token expires**:
 ```bash
 # Re-authenticate
-dango auth google_sheets
+dango oauth google_sheets
 ```
 
 ---
@@ -122,10 +122,10 @@ dango auth google_sheets
 
 ```bash
 # List all authenticated providers
-dango auth list
+dango oauth list
 
 # Check OAuth credential status (shows all credentials)
-dango auth status
+dango oauth status
 ```
 
 Example output:
@@ -134,26 +134,26 @@ OAuth Credentials Status:
 
   google_sheets_123456789
     Status: Valid
-    Expires: 2024-01-15 10:30:00
+    Expires: 2026-06-15 10:30:00
 ```
 
 ### Refresh Manually
 
 ```bash
 # Force token refresh (use credential name from auth list)
-dango auth refresh google_sheets_123456789
+dango oauth refresh google_sheets_123456789
 ```
 
 ### Remove Authorization
 
 ```bash
 # Remove stored tokens (use source type)
-dango auth remove google_sheets
+dango oauth remove google_sheets
 ```
 
 This removes local tokens but doesn't revoke access at the provider. To fully revoke:
 
-1. Remove from Dango: `dango auth remove <source_type>`
+1. Remove from Dango: `dango oauth remove <source_type>`
 2. Revoke in provider settings (see below)
 
 ---
@@ -229,7 +229,7 @@ sources:
 
 Authenticate once for all Google Sheets sources:
 ```bash
-dango auth google_sheets
+dango oauth google_sheets
 ```
 
 Both sources will use the same OAuth credentials.
@@ -238,10 +238,10 @@ Both sources will use the same OAuth credentials.
 
 ```bash
 # Remove current auth
-dango auth remove google_sheets
+dango oauth remove google_sheets
 
 # Re-authenticate with different account
-dango auth google_sheets
+dango oauth google_sheets
 # Login with different Google account when browser opens
 ```
 
@@ -286,8 +286,8 @@ Dango's OAuth clients:
 
 **Solution**:
 ```bash
-dango auth remove google_sheets
-dango auth google_sheets
+dango oauth remove google_sheets
+dango oauth google_sheets
 ```
 
 ### "Access Denied" Error
@@ -306,7 +306,7 @@ dango auth google_sheets
 
 **Manual auth**:
 ```bash
-dango auth google_sheets
+dango oauth google_sheets
 # If browser doesn't open, copy the URL from terminal
 # Paste in browser manually
 ```
@@ -326,28 +326,44 @@ pip install keyrings.alt
 
 ---
 
-## Provider-Specific Notes
+## Provider Token Details
+
+### Token Expiry by Provider
+
+| Provider | Access Token | Refresh Token | Auto-Refresh | Re-auth Trigger |
+|----------|-------------|---------------|:------------:|-----------------|
+| **Google** (Sheets, GA4, Ads) | 1 hour | No expiry (revocable) | Yes (dlt) | Revocation, password change, 6 months unused |
+| **Facebook Ads** | 1 hour | 60 days (long-lived) | No | Must re-auth before 60-day expiry |
+| **GitHub** | No expiry (PAT) | N/A | N/A | Manual revocation only |
 
 ### Google
 
-- Tokens valid for 6 months if unused
-- Re-auth required after password change
-- Workspace accounts may need admin approval
+- Refresh tokens have no fixed expiry but can be revoked
+- Tokens become invalid after 6 months of inactivity
+- Re-auth required after Google password change
+- Google Workspace accounts may need admin approval for the OAuth app
 
 ### Facebook
 
-- Tokens have 60-day expiry for long-lived tokens
+- Long-lived tokens expire after **60 days** — set a calendar reminder
 - Business accounts require Business Manager access
-- App must have ads_management permission
+- App must have `ads_read` permission
 
-### Best Practice
+### GitHub
 
-Set up calendar reminders to re-authenticate OAuth sources every 3-6 months to prevent sync failures.
+- Uses personal access tokens (PATs), not OAuth refresh tokens
+- PATs have no automatic expiry (unless configured in GitHub settings)
+- Revocation is manual via GitHub Settings → Developer Settings → Personal Access Tokens
+
+!!! tip "Prevent Sync Failures"
+    Set calendar reminders to re-authenticate Facebook OAuth sources every 45 days (before the 60-day expiry). Google sources with dlt auto-refresh rarely need manual re-auth.
 
 ---
 
 ## Next Steps
 
-- [Credential Management](credentials.md) - API key security
-- [Best Practices](best-practices.md) - Security recommendations
-- [Troubleshooting](../workflows/troubleshooting.md) - Auth issues
+- [Authentication](authentication.md) — login flows and session management
+- [Two-Factor Auth](two-factor.md) — enable 2FA for user accounts
+- [Credential Management](credentials.md) — API key security
+- [Best Practices](best-practices.md) — security recommendations
+- [Troubleshooting](../workflows/troubleshooting.md) — auth issues
