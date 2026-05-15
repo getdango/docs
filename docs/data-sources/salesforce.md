@@ -185,7 +185,7 @@ LIMIT 10;
 ## Sync Behavior
 
 - **Incremental**: After the first full sync, subsequent syncs fetch only records modified since the last sync.
-- **Write disposition**: `merge` — existing records are updated, new records are inserted.
+- **Write disposition**: Varies by resource — `merge` for account, opportunity, task, event (upsert by ID); `replace` for contact, lead, campaign, sf_user, user_role, product_2 (full reload each sync).
 - **First sync**: Loads all objects. Large Salesforce orgs (100k+ records) may take 30+ minutes.
 
 ---

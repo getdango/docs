@@ -75,12 +75,6 @@ sources:
       start_date: "2024-01-01"  # Optional: defaults to 90 days ago
 ```
 
-Add your API key to `.env` (gitignored):
-
-```bash
-STRIPE_API_KEY=sk_test_your_key_here
-```
-
 === "Local"
 
     Store the key in your project's `.env` file:
@@ -168,8 +162,8 @@ LIMIT 10;
 
 ## Sync Behavior
 
-- **Incremental**: After the first full sync, subsequent syncs fetch only new and updated records since the last sync.
-- **Write disposition**: `merge` — existing records are updated, new records are inserted.
+- **Incremental**: Yes — the `start_date` / `end_date` parameters control the date range fetched.
+- **Write disposition**: `replace` — the full dataset within the date range is reloaded on each sync.
 - **First sync**: Loads all data within the date range. Large Stripe accounts (100k+ charges) may take 10-20 minutes.
 
 !!! note "Stripe API rate limits"

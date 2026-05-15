@@ -173,7 +173,7 @@ LIMIT 10;
 ## Sync Behavior
 
 - **Incremental**: After the first full sync, subsequent syncs fetch only records modified since the last sync.
-- **Write disposition**: `merge` — existing records are updated, new records are inserted.
+- **Write disposition**: `merge` for most resources (upsert by ID). The `properties` resource uses `replace` (full reload each sync).
 - **First sync**: Loads all historical data. Large accounts (100k+ contacts) may take 15-30 minutes.
 
 ---

@@ -63,6 +63,9 @@ sources:
         - products
 ```
 
+!!! note "Why `generic_config` instead of `postgres`?"
+    PostgreSQL and MongoDB use `generic_config` as the YAML key because they share a common configuration model. Sources with dedicated config models (like Stripe, HubSpot) use their type name as the key.
+
 === "Local"
 
     Store the connection URL in `.env`:

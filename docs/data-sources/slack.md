@@ -158,19 +158,24 @@ sources:
 
 ## Tables Loaded
 
-Data loads into the `raw_{source_name}` schema:
+Data loads into the `raw_{source_name}` schema. By default, each channel gets its own message table:
 
 | Table | Description |
 |-------|-------------|
-| `raw_slack.messages` | Channel messages with timestamps, user IDs, and text |
 | `raw_slack.channels` | Channel metadata (name, topic, purpose, member count) |
 | `raw_slack.users` | User profiles (display name, email, status) |
+| `raw_slack.{channel_name}` | Messages for each channel (one table per channel) |
+
+For example, if the bot is in `#general` and `#engineering`:
+
+- `raw_slack.general` — messages from #general
+- `raw_slack.engineering` — messages from #engineering
 
 Query example:
 
 ```sql
-SELECT channel, user, text, ts
-FROM raw_slack.messages
+SELECT user, text, ts
+FROM raw_slack.general
 ORDER BY ts DESC
 LIMIT 20;
 ```
