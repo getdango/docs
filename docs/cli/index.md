@@ -214,7 +214,7 @@ Load and transform data:
 
 ```bash
 dango sync                  # Sync all sources
-dango sync --source stripe  # Sync specific source
+dango sync stripe           # Sync specific source
 dango generate              # Auto-generate staging
 dango run                   # Run dbt transformations
 dango run --select marts.*  # Run specific models
@@ -228,8 +228,8 @@ Configure data sources:
 dango source add            # Add new source (wizard)
 dango source list           # List all sources
 dango source remove name    # Remove source
-dango auth list             # List OAuth credentials
-dango auth refresh name     # Refresh OAuth token
+dango oauth list            # List OAuth credentials
+dango oauth refresh name    # Refresh OAuth token
 ```
 
 ### Platform Control
@@ -239,8 +239,8 @@ Start and stop services:
 ```bash
 dango start                 # Start all services
 dango stop                  # Stop all services
-dango restart               # Restart platform
-dango start --no-metabase   # Skip Metabase
+dango stop --all            # Stop ALL projects' containers
+dango serve                 # Production mode (foreground)
 ```
 
 ### Database Operations
@@ -257,8 +257,7 @@ dango db clean              # Remove orphaned tables
 Generate dbt documentation:
 
 ```bash
-dango docs                  # Generate and serve docs
-dango docs --port 8082      # Custom port
+dango docs                  # Generate dbt docs
 ```
 
 ---
@@ -328,13 +327,13 @@ duckdb data/warehouse.duckdb "SELECT * FROM marts.my_metric LIMIT 10"
 
 ```bash
 # Single source
-dango sync --source stripe_payments
+dango sync stripe_payments
 
-# Multiple sources
-dango sync --source stripe --source google_sheets
+# Full refresh
+dango sync stripe_payments --full-refresh
 
-# All except one
-dango sync --exclude old_source
+# Backfill last 7 days
+dango sync stripe_payments --backfill 7d
 ```
 
 ### Run Specific Models
@@ -384,7 +383,7 @@ set -e
 echo "Starting daily sync at $(date)"
 
 # Validate configuration
-dango validate --strict
+dango validate
 
 # Sync all sources
 dango sync
@@ -441,9 +440,9 @@ echo "Success!"
 #!/bin/bash
 
 # Sync sources in parallel
-dango sync --source stripe &
-dango sync --source google_sheets &
-dango sync --source sales_data &
+dango sync stripe &
+dango sync google_sheets &
+dango sync sales_data &
 
 # Wait for all to complete
 wait
@@ -483,7 +482,7 @@ jobs:
         run: pip install getdango
 
       - name: Validate Configuration
-        run: dango validate --strict
+        run: dango validate
         env:
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
 
@@ -523,7 +522,7 @@ validate:
   stage: validate
   script:
     - pip install getdango
-    - dango validate --strict
+    - dango validate
 
 sync:
   stage: sync

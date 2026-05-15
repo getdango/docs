@@ -268,11 +268,8 @@ dango info
 # YAML format
 dango config show
 
-# JSON format
-dango config show --format json
-
-# Specific section
-dango config show --section platform
+# Show current config
+dango config show
 ```
 
 ---
@@ -330,60 +327,33 @@ Press Ctrl+C to stop, or run 'dango stop' in another terminal.
 
 **Subsequent starts are faster** (~10 seconds).
 
-### Custom Port
+### Skip Confirmation
 
-Override default Web UI port:
+Skip startup confirmation prompts:
 
 ```bash
-dango start --port 8888
+dango start -y
+dango start --yes
 ```
 
-**Access at**: http://localhost:8888
+### Custom Port
 
-**Persistent port change** - edit `.dango/project.yml`:
+Change the default Web UI port in `.dango/project.yml`:
 
 ```yaml
 platform:
   port: 8888
 ```
 
-### Selective Services
+### Production Mode
 
-Start only specific services:
-
-```bash
-# Skip Metabase
-dango start --no-metabase
-
-# Skip dbt-docs
-dango start --no-docs
-
-# Skip file watcher
-dango start --no-watcher
-
-# Only Web UI
-dango start --no-metabase --no-docs --no-watcher
-```
-
-**Use cases**:
-
-- **No Metabase**: Docker not available, or using external BI tool
-- **No dbt-docs**: Don't need documentation UI
-- **No watcher**: Disable auto-sync for production
-
-### Background Mode
-
-Run platform in background:
+For cloud deployments, use `dango serve` instead of `dango start`:
 
 ```bash
-dango start --background
+dango serve --host 0.0.0.0 --port 8800 --workers 2
 ```
 
-**Or use shorthand**:
-
-```bash
-dango start -d
-```
+Unlike `dango start`, `serve` binds to all interfaces, runs in the foreground (for systemd), and skips browser/file-watcher.
 
 **Background output**:
 
@@ -548,22 +518,6 @@ Stopping Dango platform...
 
 Platform stopped successfully.
 ```
-
-### Force Stop
-
-Force kill processes if graceful stop fails:
-
-```bash
-dango stop --force
-```
-
-**Use when**:
-
-- Normal stop hangs
-- Services not responding
-- Process crashed
-
-**Warning**: May cause data loss if sync in progress.
 
 ### Stop All Projects
 
@@ -772,11 +726,7 @@ sudo systemctl start docker
 dango start
 ```
 
-**Or skip Docker**:
-
-```bash
-dango start --no-metabase
-```
+**Or check that Docker is installed and running before starting Dango.**
 
 ### Database Locked
 
@@ -861,8 +811,8 @@ platform:
   file_watcher:
     enabled: true  # Should be true
 
-# Restart
-dango restart
+# Restart platform
+dango stop && dango start
 ```
 
 **Check watched patterns**:
