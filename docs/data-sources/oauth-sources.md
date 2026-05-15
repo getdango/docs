@@ -264,7 +264,7 @@ Edit `.dango/sources.yml`:
   type: google_sheets  # or facebook_ads, google_analytics, etc.
   enabled: true
   google_sheets:
-    spreadsheet_url: "https://docs.google.com/spreadsheets/d/..."
+    spreadsheet_url_or_id: "https://docs.google.com/spreadsheets/d/..."
 ```
 
 ### Step 4: Authenticate
