@@ -106,7 +106,7 @@ Authentication is enabled by default for both local and cloud deployments.
 - 30-day session duration
 - 60-minute idle timeout
 - HTTPS required (via Caddy auto-TLS)
-- 2FA recommended (yellow banner if not enabled)
+- 2FA recommended (a yellow banner appears on every page until enabled)
 
 ### Roles
 

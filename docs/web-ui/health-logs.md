@@ -71,7 +71,7 @@ If any data sources use OAuth authentication, this section shows each source's t
 - **Expires in Xd** (yellow) — token expires within 7 days
 - **No expiry** (green) — token is valid with no upcoming expiry
 
-A link to [Secrets & Credentials](/settings/secrets) lets you reconnect expired tokens.
+A link to [Secrets & Credentials](secrets-admin.md) lets you reconnect expired tokens.
 
 ??? info "How it works"
     - **Health data:** `GET /api/health/platform` returns a comprehensive status object including database stats, disk usage, sync/dbt failures, scheduler state, cloud resources, backup health, and OAuth token status.

@@ -28,14 +28,14 @@ Click the **refresh icon** in the table header to reload the sources list.
 
 ### Status Badges
 
-- **Success** (green) — last sync completed successfully
-- **Running** (blue, pulsing) — sync currently in progress
+Status badges reflect the source's freshness state:
+
+- **Synced** (green) — last sync completed successfully
+- **Syncing...** (blue, pulsing) — sync currently in progress
+- **Processing...** (purple, pulsing) — file operation in progress (upload or delete)
 - **Failed** (red) — last sync failed with an error
-- **Idle** (gray) — source has not been synced yet
-
-### Freshness Indicators
-
-Sources with stale data display a freshness badge based on how long since the last successful sync relative to the configured schedule.
+- **No Data** (yellow) — sync succeeded but loaded no rows
+- **Never Synced** (gray) — source has not been synced yet
 
 ## Schema Drift Attention
 
@@ -116,7 +116,7 @@ A list of files associated with the source, showing:
 Files are saved to the source's configured directory. Maximum file size is **100 MB**. Duplicate filenames are rejected — delete the existing file first if you need to replace it.
 
 !!! info "Auto-sync after upload"
-    After uploading, click **Sync Now** in the modal to immediately process the new files. The sync uses the source's configured deduplication strategy.
+    After uploading, click **Sync Now** in the modal to immediately process the new files into the database.
 
 ## Date Range Sync
 

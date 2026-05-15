@@ -6,7 +6,7 @@ View schedule configurations, execution history, and notification settings.
 
 ## Overview
 
-The Schedules page (`/schedules`) shows all configured sync and dbt schedules with their execution status and history. Schedules are read-only in the web UI — configuration is managed via the CLI.
+The Schedules page (`/schedules`) shows all configured sync and dbt schedules with their execution status and history. You can view status, browse history, and manually trigger runs, but schedule configuration (adding, editing, removing schedules) is managed via the CLI.
 
 Navigate to **Schedules** in the top navigation bar.
 

@@ -30,7 +30,7 @@ The banner turns green on completion, red on failure, and yellow if cancelled. C
 
 If any OAuth tokens are expiring soon, a yellow banner appears below the header:
 
-> **OAuth tokens expiring soon** — [Manage credentials ->](/settings/secrets)
+> **OAuth tokens expiring soon** — Manage credentials ->
 
 Click the link to navigate to [Secrets & Credentials](secrets-admin.md) to reconnect expiring sources.
 

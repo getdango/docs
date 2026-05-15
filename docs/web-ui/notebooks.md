@@ -63,7 +63,7 @@ The notebook appears in the table and is ready to open.
 2. Dango acquires a lock, creates a DuckDB snapshot, and starts the Marimo server.
 3. Marimo opens in a new browser tab.
 
-While editing, a heartbeat signal is sent every 60 seconds to keep the lock active. If you close the tab without releasing the lock, it expires after the heartbeat stops.
+While editing, a heartbeat signal is sent every 60 seconds to keep the lock active. Locks expire 15 minutes after the last heartbeat, so if you close the tab without releasing the lock, it becomes available to other users within 15 minutes.
 
 !!! tip "DuckDB snapshot"
     Notebooks work against a read-only snapshot of your warehouse, not the live database. This means your notebook queries never block syncs or dbt runs. The snapshot is created when you open the notebook.

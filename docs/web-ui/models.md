@@ -28,8 +28,9 @@ The table shows all models from your dbt project:
 
 - **Success** (green) — model ran successfully on its last execution
 - **Error** (red) — model failed on its last run
-- **Running** (blue, pulsing) — model is currently being executed
-- **Stale** (gray) — model has not been run yet or status is unknown
+- **Running** (yellow, pulsing) — model is currently being executed via the UI
+- **Skipped** (gray) — model was skipped in the last run
+- **Not Run** (gray) — model has not been run yet
 
 ## Running a Model
 
@@ -38,7 +39,10 @@ The table shows all models from your dbt project:
 3. A toast notification confirms the run has started.
 4. The status updates in real time via WebSocket as the run progresses.
 
-By default, running a model uses **cascade mode** — the model and all its downstream dependents run together (equivalent to `dbt run --select model_name+`). This ensures dependent models stay in sync.
+The table provides two run actions:
+
+- **Run** — runs just the selected model (`dbt run --select model_name`)
+- **Run+** — runs the model and all its downstream dependents (`dbt run --select model_name+`), keeping dependent models in sync
 
 !!! info "DuckDB write lock"
     dbt runs acquire the DuckDB write lock. If a sync is already running, the model run waits for the lock to be released. Only one write operation can run at a time.
