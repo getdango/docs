@@ -106,8 +106,8 @@ sources:
     type: google_sheets
     enabled: true
     google_sheets:
-      spreadsheet_url: "https://docs.google.com/spreadsheets/d/1ABC..."
-      get_sheets:
+      spreadsheet_url_or_id: "https://docs.google.com/spreadsheets/d/1ABC..."
+      range_names:
         - "Sheet1"
         - "Sales Data"
 ```
@@ -151,8 +151,8 @@ See the [Google Sheets Guide](google-sheets.md) for the full setup walkthrough.
       - deviceCategory
     metrics:
       - sessions
-      - pageviews
-      - conversions
+      - totalUsers
+      - bounceRate
 ```
 
 **Setup**:
@@ -172,10 +172,9 @@ See the [Google Analytics Guide](google-analytics.md) for the full setup walkthr
   type: facebook_ads
   enabled: true
   facebook_ads:
-    account_id: "act_123456789"
-    start_date: "2024-01-01"
-    include_deleted: false
-    access_token_env: "FACEBOOK_ACCESS_TOKEN"
+    account_id: "123456789"
+    access_token_env: "FB_ACCESS_TOKEN"
+    initial_load_past_days: 30
 ```
 
 **Setup**:
