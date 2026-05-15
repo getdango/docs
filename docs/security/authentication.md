@@ -68,7 +68,7 @@ For programmatic access, use API keys instead of sessions:
 
 ```bash
 curl -H "Authorization: Bearer dango_ak_xxxxx" \
-  http://localhost:5757/api/sources
+  http://localhost:8800/api/sources
 ```
 
 See [API Keys](#api-keys) below for creating and managing keys.
@@ -148,7 +148,7 @@ API keys provide stateless authentication for scripts and automation.
 === "API"
 
     ```bash
-    curl -X POST http://localhost:5757/api/auth/api-keys \
+    curl -X POST http://localhost:8800/api/auth/api-keys \
       -H "Cookie: dango_session=..." \
       -H "X-Requested-With: XMLHttpRequest" \
       -H "Content-Type: application/json" \
@@ -161,7 +161,7 @@ Include the key in the `Authorization` header:
 
 ```bash
 curl -H "Authorization: Bearer dango_ak_xxxxx" \
-  http://localhost:5757/api/sources
+  http://localhost:8800/api/sources
 ```
 
 API keys carry the same role and permissions as the user who created them.

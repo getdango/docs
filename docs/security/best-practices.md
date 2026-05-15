@@ -120,7 +120,7 @@ Create a template for team onboarding:
 stripe_secret_key = "YOUR_STRIPE_KEY_HERE"
 
 [sources.google_sheets]
-# Use: dango auth google_sheets
+# Use: dango oauth google_sheets
 ```
 
 ### Use Test Credentials

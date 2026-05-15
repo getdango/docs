@@ -187,7 +187,7 @@ Admins can create new users via CLI or web UI. New users receive an invite link 
     ```
     User created successfully.
     Invite link (expires in 72 hours):
-    http://localhost:5757/invite/abc123def456...
+    http://localhost:8800/invite/abc123def456...
     ```
 
 === "Web UI"

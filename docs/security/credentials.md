@@ -61,7 +61,7 @@ For Google, Facebook, etc.:
 
 ```bash
 # Authenticate via browser
-dango auth google_sheets
+dango oauth google_sheets
 ```
 
 OAuth tokens are stored in `.dlt/secrets.toml` under the source's credentials section:
@@ -157,14 +157,14 @@ dango config show
 
 To verify OAuth credentials exist:
 ```bash
-dango auth status
+dango oauth status
 ```
 
 ### Updating Credentials
 
 ```bash
 # Re-run auth for OAuth
-dango auth google_sheets
+dango oauth google_sheets
 
 # Edit secrets.toml for API keys
 nano .dlt/secrets.toml
@@ -174,7 +174,7 @@ nano .dlt/secrets.toml
 
 ```bash
 # Remove OAuth token
-dango auth remove google_sheets
+dango oauth remove google_sheets
 
 # Remove from secrets.toml manually
 nano .dlt/secrets.toml

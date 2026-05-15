@@ -20,7 +20,7 @@ Dango uses OAuth for sources that require user authorization:
 ### Authentication Flow
 
 ```
-1. You run: dango auth google_sheets
+1. You run: dango oauth google_sheets
 
 2. Browser opens to Google login
 
@@ -75,7 +75,7 @@ The `secrets.toml` file contains:
 
 ```bash
 # Authenticate with Google Sheets
-dango auth google_sheets
+dango oauth google_sheets
 ```
 
 1. Opens browser to Google consent screen
@@ -111,7 +111,7 @@ No manual intervention needed for routine refresh.
 **When refresh token expires**:
 ```bash
 # Re-authenticate
-dango auth google_sheets
+dango oauth google_sheets
 ```
 
 ---
@@ -122,10 +122,10 @@ dango auth google_sheets
 
 ```bash
 # List all authenticated providers
-dango auth list
+dango oauth list
 
 # Check OAuth credential status (shows all credentials)
-dango auth status
+dango oauth status
 ```
 
 Example output:
@@ -141,19 +141,19 @@ OAuth Credentials Status:
 
 ```bash
 # Force token refresh (use credential name from auth list)
-dango auth refresh google_sheets_123456789
+dango oauth refresh google_sheets_123456789
 ```
 
 ### Remove Authorization
 
 ```bash
 # Remove stored tokens (use source type)
-dango auth remove google_sheets
+dango oauth remove google_sheets
 ```
 
 This removes local tokens but doesn't revoke access at the provider. To fully revoke:
 
-1. Remove from Dango: `dango auth remove <source_type>`
+1. Remove from Dango: `dango oauth remove <source_type>`
 2. Revoke in provider settings (see below)
 
 ---
@@ -229,7 +229,7 @@ sources:
 
 Authenticate once for all Google Sheets sources:
 ```bash
-dango auth google_sheets
+dango oauth google_sheets
 ```
 
 Both sources will use the same OAuth credentials.
@@ -238,10 +238,10 @@ Both sources will use the same OAuth credentials.
 
 ```bash
 # Remove current auth
-dango auth remove google_sheets
+dango oauth remove google_sheets
 
 # Re-authenticate with different account
-dango auth google_sheets
+dango oauth google_sheets
 # Login with different Google account when browser opens
 ```
 
@@ -286,8 +286,8 @@ Dango's OAuth clients:
 
 **Solution**:
 ```bash
-dango auth remove google_sheets
-dango auth google_sheets
+dango oauth remove google_sheets
+dango oauth google_sheets
 ```
 
 ### "Access Denied" Error
@@ -306,7 +306,7 @@ dango auth google_sheets
 
 **Manual auth**:
 ```bash
-dango auth google_sheets
+dango oauth google_sheets
 # If browser doesn't open, copy the URL from terminal
 # Paste in browser manually
 ```
