@@ -88,8 +88,8 @@ dango source add
       - deviceCategory
     metrics:
       - sessions
-      - pageviews
-      - conversions
+      - totalUsers
+      - bounceRate
 ```
 
 **Setup**:
