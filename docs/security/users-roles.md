@@ -257,7 +257,7 @@ dango auth delete-user user@example.com
 dango auth list-users
 ```
 
-Shows all users with their role, status (active, locked, invited, invite expired), and last login.
+Shows all users with their role, status (active, inactive, locked, invited, invite expired), and last login.
 
 ---
 

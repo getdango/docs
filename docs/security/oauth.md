@@ -134,7 +134,7 @@ OAuth Credentials Status:
 
   google_sheets_123456789
     Status: Valid
-    Expires: 2024-01-15 10:30:00
+    Expires: 2026-06-15 10:30:00
 ```
 
 ### Refresh Manually

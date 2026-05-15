@@ -86,7 +86,7 @@ After successful login, Dango creates a session and sets a cookie.
     | Parameter | Value |
     |-----------|-------|
     | Absolute expiry | 365 days |
-    | Idle timeout | 7 days (10,080 minutes) |
+    | Idle timeout | 24 hours (1,440 minutes) |
 
     Local sessions use generous timeouts since the server runs on your own machine.
 
@@ -212,9 +212,9 @@ Dango protects against credential stuffing and brute-force attacks.
 |-----------|-------|
 | Failed attempts before lockout | 5 |
 | Lockout duration | 15 minutes |
-| Tracking | IP-based (identity-blind) |
+| Tracking | Per (IP, email) pair |
 
-After 5 failed login attempts from the same IP address, all login attempts from that IP are blocked for 15 minutes — regardless of which email was targeted. This prevents attackers from enumerating valid usernames through lockout timing.
+After 5 failed login attempts to the same email from the same IP address, further attempts to that email from that IP are blocked for 15 minutes. Both existing and non-existing emails receive identical lockout behavior, preventing username enumeration through lockout timing.
 
 ### Unlocking Accounts
 

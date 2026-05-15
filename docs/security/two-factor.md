@@ -130,7 +130,7 @@ This command:
 
 1. Creates a new emergency admin account with a temporary password
 2. The temporary password is displayed in the terminal
-3. The emergency admin bypasses 2FA for the initial login
+3. The emergency admin account is created without 2FA, so only the temporary password is needed to log in
 4. After logging in, you can reset other accounts or disable their 2FA
 
 !!! warning "Physical Server Access Required"

@@ -102,7 +102,7 @@ auth:
 
 ### Use API Keys for Automation
 
-For scripts and CI/CD pipelines, use [API keys](authentication.md#api-keys) instead of session cookies. API keys can be scoped to specific users and revoked independently.
+For scripts and CI/CD pipelines, use [API keys](authentication.md#api-keys) instead of session cookies. Each API key is tied to a specific user (inheriting their role permissions) and can be revoked independently.
 
 ---
 

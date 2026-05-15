@@ -123,18 +123,20 @@ Each line is a JSON object with the following fields:
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `timestamp` | string | ISO-8601 UTC timestamp |
-| `event` | string | Event type (e.g., `login_success`) |
-| `user_id` | string | UUID of the user (if applicable) |
-| `email` | string | Email of the user (if applicable) |
-| `ip` | string | Client IP address |
-| `details` | object | Event-specific additional data |
+| `timestamp` | string | ISO-8601 UTC timestamp (always present) |
+| `event` | string | Event type (always present) |
+| `user_id` | string | UUID of the user (omitted when unknown) |
+| `email` | string | Email of the user (omitted when unknown) |
+| `ip` | string | Client IP address (omitted when unavailable) |
+| `details` | object | Event-specific additional data (omitted when empty) |
+
+Fields with unknown or unavailable values are omitted entirely (not set to `null`).
 
 ### Example Entries
 
 ```json
 {"timestamp": "2026-05-15T10:30:00.123456+00:00", "event": "login_success", "user_id": "a1b2c3d4", "email": "admin@example.com", "ip": "192.168.1.10", "details": {"method": "password"}}
-{"timestamp": "2026-05-15T10:31:15.789012+00:00", "event": "login_failure", "user_id": null, "email": "unknown@example.com", "ip": "203.0.113.50", "details": {"reason": "invalid_credentials"}}
+{"timestamp": "2026-05-15T10:31:15.789012+00:00", "event": "login_failure", "email": "unknown@example.com", "ip": "203.0.113.50", "details": {"reason": "invalid_credentials"}}
 {"timestamp": "2026-05-15T10:35:00.456789+00:00", "event": "role_changed", "user_id": "e5f6g7h8", "email": "editor@example.com", "ip": "192.168.1.10", "details": {"old_role": "viewer", "new_role": "editor", "changed_by": "admin@example.com"}}
 ```
 

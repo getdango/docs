@@ -222,7 +222,7 @@ Session timeouts differ between local and cloud deployments:
     | Parameter | Default |
     |-----------|---------|
     | Absolute expiry | 365 days |
-    | Idle timeout | 7 days |
+    | Idle timeout | 24 hours |
 
     Local defaults are generous since the server runs on your own machine.
 
