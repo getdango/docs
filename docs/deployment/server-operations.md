@@ -153,13 +153,31 @@ Change the server's CPU, RAM, and disk allocation.
 
 === "BYOS"
 
-    Resize is not available for BYOS deployments. To change your server's resources, resize through your hosting provider's console and then regenerate the dbt profile:
+    Resize is not available for BYOS deployments. To change your server's resources, resize through your hosting provider's console, then update the dbt profile via SSH:
 
     ```bash
     dango remote ssh
     ```
 
-    Then update `dbt/profiles.yml` to match your new hardware specifications.
+    Then edit `/srv/dango/project/dbt/profiles.yml` to match your new hardware:
+
+    - Set `threads` to the number of vCPUs
+    - Set `memory_limit` to RAM &divide; 4 (e.g., 8 GB RAM &rarr; `2GB`)
+
+    ```yaml
+    # Example for a 4 vCPU / 8 GB RAM server
+    my_project:
+      target: dev
+      outputs:
+        dev:
+          type: duckdb
+          path: /srv/dango/project/data/warehouse.duckdb
+          schema: main
+          threads: 4
+          settings:
+            memory_limit: 2GB
+            threads: 4
+    ```
 
 ---
 

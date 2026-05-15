@@ -5,7 +5,7 @@ Safely tear down a cloud deployment.
 ---
 
 !!! danger "Irreversible Operation"
-    Destroying a deployment permanently deletes cloud resources. For DigitalOcean, this includes the droplet, firewall, SSH key, and Spaces bucket. **This cannot be undone.** Download a backup before proceeding.
+    Destroying a deployment permanently deletes cloud resources. For DigitalOcean, this includes the droplet, firewall, SSH key, and DigitalOcean Spaces bucket. **This cannot be undone.** Download a backup before proceeding.
 
 ---
 
