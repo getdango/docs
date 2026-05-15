@@ -14,6 +14,9 @@ By the end of this tutorial, you'll have:
 
 **Duration**: ~30 minutes
 
+!!! note "Authentication"
+    Dango v1 enables authentication by default. All web UI access requires login with the admin credentials you set during `dango init`. See [Authentication](../security/authentication.md) for details.
+
 ---
 
 ## Prerequisites
@@ -75,7 +78,7 @@ MY_API_TOKEN = "your-api-token-here"
 ### Step 3: Sync
 
 ```bash
-dango sync --source my_api
+dango sync my_api
 ```
 
 ### Pagination Support
@@ -183,7 +186,7 @@ sources:
     enabled: true
     dlt_native:
       source_module: "custom_sources.my_api"
-      source_name: "my_api_source"
+      source_function: "my_api_source"
 ```
 
 ### Step 3: Add Credentials
@@ -197,7 +200,7 @@ api_key = "your-api-key-here"
 ### Step 4: Sync
 
 ```bash
-dango sync --source my_custom_api
+dango sync my_custom_api
 ```
 
 ---
@@ -285,7 +288,7 @@ sources:
     enabled: true
     dlt_native:
       source_module: "custom_sources.hubspot_contacts"
-      source_name: "hubspot_contacts_source"
+      source_function: "hubspot_contacts_source"
 ```
 
 ```toml
@@ -450,7 +453,7 @@ my-project/
 
 ```bash
 export RUNTIME__LOG_LEVEL=DEBUG
-dango sync --source my_custom_api
+dango sync my_custom_api
 ```
 
 ### Check dlt State
