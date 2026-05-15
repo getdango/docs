@@ -22,6 +22,9 @@ By the end of this tutorial, you'll have:
 - Understanding of dbt refs and joins
 - Basic data modeling knowledge
 
+!!! note "Authentication"
+    Dango v1 enables authentication by default. All web UI access requires login with the admin credentials you set during `dango init`. See [Authentication](../security/authentication.md) for details.
+
 ---
 
 ## Step 1: Plan Your Sources
@@ -59,10 +62,10 @@ Before integrating sources, plan how they'll connect:
 sources:
   # Order data from CSV
   - name: order_data
-    type: csv
+    type: local_files
     enabled: true
-    csv:
-      base_path: data/uploads/orders
+    local_files:
+      directory: data/uploads/orders
       file_pattern: "*.csv"
 
   # Customer enrichment from Google Sheets
@@ -71,14 +74,13 @@ sources:
     enabled: true
     google_sheets:
       spreadsheet_url_or_id: "1ABC..."
-      credentials_path: "~/.config/gcloud/credentials.json"
 ```
 
 ### Authenticate and Sync
 
 ```bash
-# OAuth for Google Sheets
-dango auth google_sheets
+# OAuth for Google Sheets (opens browser for Google sign-in)
+dango oauth google_sheets
 
 # Sync all sources
 dango sync
@@ -231,7 +233,7 @@ models:
 
 Run tests:
 ```bash
-cd dbt && dbt test
+dango run
 ```
 
 ---
@@ -298,16 +300,18 @@ order by 1, 2
 ## Step 7: Run All Models
 
 ```bash
-# Run full pipeline
+# Run full pipeline (models + tests)
 dango run
-
-# Check lineage in dbt docs
-# Open http://localhost:8800/dbt-docs and view the DAG
 ```
+
+!!! tip
+    `dango run` executes `dbt build`, which runs both models and tests in dependency order. Check lineage in dbt docs by opening `http://localhost:8800` and navigating to the dbt docs page.
 
 ---
 
 ## Step 8: Create Unified Dashboard
+
+Open the Dango web UI at [http://localhost:8800](http://localhost:8800) and log in with your admin credentials. Navigate to **Metabase** via the sidebar.
 
 ### Cross-Source Questions
 

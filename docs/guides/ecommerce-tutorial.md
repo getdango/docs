@@ -36,6 +36,9 @@ cd ecommerce-analytics
 dango start
 ```
 
+!!! note "Authentication"
+    `dango init` prompts you to set an admin password. This password is used to log into the Dango web UI where you access Metabase, view sync status, and manage your project. See [Authentication](../security/authentication.md) for details.
+
 Verify services are running:
 ```bash
 dango status
@@ -82,25 +85,28 @@ CUST005,Eve Davis,eve@example.com,2024-01-10,US
 
 ## Step 3: Add CSV Source
 
+Run the interactive source wizard:
+
 ```bash
-# Add CSV source via wizard
-dango source add csv
+dango source add
 ```
 
 When prompted:
-- **Source name**: `ecommerce_orders`
-- **Directory**: `data/uploads/orders`
-- **File pattern**: `*.csv`
+
+1. Select **File Import** from the source categories
+2. **Source name**: `ecommerce_orders`
+3. **Directory**: `data/uploads/orders`
+4. **File pattern**: `*.csv`
 
 Or manually edit `.dango/sources.yml`:
 
 ```yaml
 sources:
   - name: ecommerce_orders
-    type: csv
+    type: local_files
     enabled: true
-    csv:
-      base_path: data/uploads/orders
+    local_files:
+      directory: data/uploads/orders
       file_pattern: "*.csv"
 ```
 
@@ -224,9 +230,12 @@ left join customer_orders co using (customer_id)
 ## Step 7: Run Transformations
 
 ```bash
-# Run all dbt models
+# Run all dbt models and tests
 dango run
 ```
+
+!!! tip
+    `dango run` executes `dbt build`, which runs both models and tests in dependency order. To run specific models, use `dango run --select fct_daily_revenue dim_customers`.
 
 Verify marts created:
 ```bash
@@ -237,14 +246,7 @@ duckdb data/warehouse.duckdb "SELECT * FROM main.fct_daily_revenue"
 
 ## Step 8: Create Dashboard
 
-Open Metabase:
-```bash
-open http://localhost:3000
-```
-
-Login with:
-- Email: `admin@dango.local`
-- Password: `dangolocal123`
+Open the Dango web UI at [http://localhost:8800](http://localhost:8800) and log in with the admin credentials you set during `dango init`. Navigate to **Metabase** via the sidebar to create visualizations.
 
 ### Create Questions
 
@@ -309,15 +311,15 @@ FROM fct_daily_revenue
 If you have Stripe access:
 
 ```bash
-# Add Stripe source
-dango source add stripe
+# Launch the interactive source wizard and select Stripe
+dango source add
 ```
 
 Configure with your API key, then:
 
 ```bash
 # Sync Stripe data
-dango sync --source stripe
+dango sync stripe
 
 # Run to include new staging models
 dango run
@@ -364,10 +366,10 @@ select * from stripe_revenue
 
 ## Step 10: Export Dashboard
 
-Save your work:
+Save your Metabase work to version-controlled YAML files:
 
 ```bash
-# Export Metabase dashboard
+# Export Metabase dashboards and questions
 dango metabase save
 
 # Commit to git
@@ -397,7 +399,9 @@ ecommerce-analytics/
 │   └── marts/
 │       ├── fct_daily_revenue.sql
 │       └── dim_customers.sql
-└── metabase_export.json         # Dashboard export
+└── metabase/
+    ├── dashboards/*.yml         # Dashboard exports
+    └── questions/*.yml          # Question exports
 ```
 
 ---

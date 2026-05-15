@@ -33,8 +33,10 @@ By the end of this tutorial, you'll have:
 
 ### Add Source
 
+Run the interactive source wizard and select **Stripe**:
+
 ```bash
-dango source add stripe
+dango source add
 ```
 
 When prompted:
@@ -73,7 +75,7 @@ stripe_secret_key = "sk_test_xxx"
 
 ```bash
 # Sync Stripe data
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # Check what was loaded
 dango db status
@@ -259,12 +261,12 @@ models:
 ## Step 5: Run Transformations
 
 ```bash
-# Run all models
+# Run all models and tests
 dango run
-
-# Or run specific models
-cd dbt && dbt run --select fct_monthly_revenue fct_customer_revenue fct_daily_metrics
 ```
+
+!!! tip
+    `dango run` executes `dbt build`, which runs models and tests in dependency order. To run specific models, use `dango run --select fct_monthly_revenue fct_customer_revenue fct_daily_metrics`.
 
 Verify:
 ```bash
@@ -275,10 +277,7 @@ duckdb data/warehouse.duckdb "SELECT * FROM main.fct_monthly_revenue ORDER BY mo
 
 ## Step 6: Create Financial Dashboard
 
-Open Metabase:
-```bash
-open http://localhost:3000
-```
+Open the Dango web UI at [http://localhost:8800](http://localhost:8800) and log in with your admin credentials. Navigate to **Metabase** via the sidebar.
 
 ### Key Metrics Cards
 
@@ -385,14 +384,17 @@ Make your dashboard interactive:
 
 ## Step 9: Schedule Updates
 
-### Auto-Sync
-
-Ensure Stripe syncs regularly:
+Set up automated syncs so your dashboard stays current:
 
 ```bash
-# File watcher handles this automatically
-dango status
+# Add a daily sync schedule
+dango schedule add
 ```
+
+The interactive wizard walks you through setting a name, frequency, and schedule type. For example, schedule a daily Stripe sync at 6 AM.
+
+!!! tip
+    See [Scheduled Syncs](../scheduling-monitoring/scheduled-syncs.md) for details on cron expressions and schedule types.
 
 ### Dashboard Subscriptions
 
@@ -405,14 +407,18 @@ In Metabase:
 
 ## Step 10: Export and Save
 
+Save your Metabase work to version-controlled YAML files:
+
 ```bash
-# Export dashboard
+# Export dashboards and questions
 dango metabase save
 
 # Commit work
 git add .
 git commit -m "feat: financial reporting dashboard"
 ```
+
+The export creates structured YAML files under `metabase/dashboards/` and `metabase/questions/`.
 
 ---
 
