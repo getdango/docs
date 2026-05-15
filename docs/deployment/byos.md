@@ -239,8 +239,13 @@ Unlike DigitalOcean deployments, BYOS does **not** automatically clean up on fai
 ### Services not starting
 
 ```bash
-# Check service status
 dango remote ssh
+```
+
+Then on the server:
+
+```bash
+# Check service status
 sudo systemctl status dango
 sudo systemctl status caddy
 sudo docker ps

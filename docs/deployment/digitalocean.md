@@ -390,6 +390,11 @@ SSH into the server to diagnose:
 
 ```bash
 dango remote ssh
+```
+
+Then on the server:
+
+```bash
 sudo systemctl status dango
 sudo journalctl -u dango --no-pager -n 50
 ```

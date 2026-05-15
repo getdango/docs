@@ -309,6 +309,9 @@ Error: Deploy lock is held by another process
 
 If no other push is running, the lock may be stale:
 
+!!! warning
+    Only delete the lock file if you are certain no push is in progress. Deleting it during an active push could leave the server in an inconsistent state.
+
 ```bash
 dango remote ssh
 rm /srv/dango/.dango/state/deploy.lock
