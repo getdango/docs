@@ -334,21 +334,7 @@ dango serve --host 0.0.0.0 --port 8800 --workers 2
 
 Unlike `dango start`, `serve` binds to all interfaces, runs in the foreground (for systemd), and skips browser/file-watcher.
 
-**Background output**:
-
-```
-Starting Dango platform in background...
-✓ Platform started (PID: 12345)
-
-View logs: dango logs
-Stop: dango stop
-Status: dango status
-```
-
-**View logs** (using Docker):
-
-!!! note "No Logs Command"
-    Dango does not have a dedicated `logs` command. View logs using Docker:
+**View logs** using Docker:
 
 ```bash
 # Tail all platform logs
@@ -359,10 +345,9 @@ docker compose logs -f metabase
 
 # Last 100 lines
 docker compose logs --tail 100
-
-# Logs since timestamp
-docker compose logs --since "2024-12-09 12:00"
 ```
+
+For remote servers, use `dango remote logs` instead.
 
 ---
 
@@ -577,12 +562,6 @@ cd ~/projects/marketing-data
 
 # Start new project
 dango start
-```
-
-**Or use `--project-dir`**:
-
-```bash
-dango --project-dir ~/projects/marketing-data start
 ```
 
 ---
