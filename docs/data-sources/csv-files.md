@@ -2,6 +2,12 @@
 
 Upload and sync CSV files into your data warehouse.
 
+!!! warning "Use Local Files for new projects"
+    The `csv` source type still works but is no longer shown in `dango source add`.
+    For new projects, use [Local Files](local-files/index.md) instead — it supports
+    CSV, JSON, JSONL, and Parquet with file tracking.
+    Existing `type: csv` sources continue to work.
+
 ---
 
 ## Overview
@@ -553,7 +559,8 @@ data/
 
 ## Next Steps
 
-- **[OAuth Sources](oauth-sources.md)** - Connect to cloud services
+- **[Local Files](local-files/index.md)** - CSV, JSON, JSONL, and Parquet with file tracking (recommended for new projects)
+- **[Adding Sources](adding-sources.md)** - How to add and configure data sources
 - **[Custom Sources](custom-sources.md)** - Build your own integrations
 - **[Transformations](../transformations/index.md)** - Clean and model your CSV data
 - **[Dashboards](../dashboards/index.md)** - Visualize CSV data in Metabase
