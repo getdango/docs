@@ -1,6 +1,6 @@
 # Backup & Restore
 
-Complete backup strategies for all Dango components.
+Complete backup strategies for all Dango components — local and cloud.
 
 ---
 
@@ -12,15 +12,20 @@ A Dango project has several components that need backup:
 |-----------|----------|----------|----------|
 | **DuckDB Database** | `data/warehouse.duckdb` | All synced data | High |
 | **Configuration** | `.dango/`, `.dlt/` | Source configs, credentials | High |
-| **dbt Models** | `dbt/` | Transformations, tests | High |
+| **dbt Models** | `dbt/` | Transformations, tests, snapshots | High |
+| **Auth Database** | `.dango/auth.db` | Users, sessions, audit log | High |
 | **Metabase** | `metabase-data/` | Dashboards, settings | Medium |
 | **Raw Files** | `data/uploads/` | CSV source files | Medium |
 
+Dango provides different backup mechanisms for local and cloud deployments.
+
 ---
 
-## Quick Backup Script
+## Local Backups
 
-Create a complete backup with one script:
+### Quick Backup Script
+
+Create a complete local backup with one script:
 
 ```bash
 #!/bin/bash
@@ -41,7 +46,7 @@ cp data/warehouse.duckdb "$BACKUP_DIR/"
 cp -r .dango "$BACKUP_DIR/"
 cp -r .dlt "$BACKUP_DIR/"
 
-# 4. dbt models
+# 4. dbt models and snapshots
 cp -r dbt "$BACKUP_DIR/"
 
 # 5. Metabase dashboards
@@ -61,13 +66,9 @@ dango start
 echo "Backup complete: $BACKUP_DIR"
 ```
 
----
+### Component-Specific Backups
 
-## Component-Specific Backups
-
-### DuckDB Database
-
-The DuckDB database contains all your synced and transformed data:
+#### DuckDB Database
 
 ```bash
 # Simple copy (while services stopped)
@@ -89,9 +90,7 @@ cp data/warehouse.duckdb "backups/warehouse_$(date +%Y%m%d).duckdb"
 EXPORT DATABASE 'backups/export' (FORMAT PARQUET);
 ```
 
-### Configuration Files
-
-Back up your source configurations and project settings:
+#### Configuration Files
 
 ```bash
 # Configuration files
@@ -107,7 +106,7 @@ cp .dlt/config.toml backups/dlt_config.toml.backup
 !!! danger "Protect Secrets"
     Never commit or backup `.dlt/secrets.toml` to shared or cloud storage. Recreate credentials manually on restore.
 
-### dbt Models
+#### dbt Models
 
 Your transformation logic should be version controlled:
 
@@ -119,9 +118,7 @@ cd dbt && git add . && git commit -m "Backup dbt models"
 cp -r dbt backups/dbt_backup/
 ```
 
-### Metabase Dashboards
-
-Export dashboard definitions for backup:
+#### Metabase Dashboards
 
 ```bash
 # Export dashboards
@@ -131,21 +128,110 @@ dango metabase save --output backups/metabase/
 cp -r metabase-data backups/metabase_backup/
 ```
 
-### CSV Source Files
+### Automated Local Backups
+
+#### Cron Job (Linux/macOS)
 
 ```bash
-# Back up uploaded CSV files
-cp -r data/uploads backups/csv_files/
+# Edit crontab
+crontab -e
 
-# Compressed backup for large files
-tar -czf backups/csv_files.tar.gz data/uploads/
+# Add daily backup at 2 AM
+0 2 * * * cd /path/to/project && ./backup_dango.sh >> /var/log/dango_backup.log 2>&1
 ```
+
+#### Backup Rotation
+
+Keep recent backups, delete old ones:
+
+```bash
+#!/bin/bash
+# rotate_backups.sh
+
+BACKUP_DIR="backups"
+KEEP_DAYS=7
+
+# Delete backups older than 7 days
+find "$BACKUP_DIR" -type d -mtime +$KEEP_DAYS -exec rm -rf {} +
+
+echo "Old backups cleaned up"
+```
+
+---
+
+## Cloud Backups
+
+When deployed to the cloud, Dango provides built-in backup management with DigitalOcean Spaces (S3-compatible object storage).
+
+### Automatic Pre-Deploy Backup
+
+Every `dango remote push` automatically creates a backup on the server before deploying. This ensures you can roll back if a deploy causes issues.
+
+Skip the backup with `--force` (not recommended):
+
+```bash
+# Normal deploy (backup runs automatically)
+dango remote push
+
+# Skip backup (data loss risk if deploy fails)
+dango remote push --force
+```
+
+!!! warning "Use `--force` With Caution"
+    Skipping the pre-deploy backup means there is no rollback point if the deployment introduces data corruption or configuration errors.
+
+### Cloud Backup Commands
+
+```bash
+# List backups on the server
+dango remote backup list
+
+# Enable scheduled backups to DigitalOcean Spaces
+dango remote backup enable
+
+# Disable scheduled backups
+dango remote backup disable
+
+# Download a backup from the server
+dango remote backup download
+
+# Restore from a backup
+dango remote backup restore
+```
+
+### Retention Policy
+
+=== "Pre-Deploy Backups (Server Disk)"
+
+    Stored on the server's local disk. Dango keeps the **5 most recent** pre-deploy backups and deletes older ones automatically.
+
+=== "Scheduled Backups (DigitalOcean Spaces)"
+
+    Stored in S3-compatible object storage with tiered retention:
+
+    - **Daily**: Keep all backups from the last **7 days**
+    - **Weekly**: Keep **1 backup per week** for up to **4 weeks** older than 7 days
+
+    Older backups are pruned automatically.
+
+### What Cloud Backups Include
+
+Cloud backups are tar.gz archives containing:
+
+- `data/warehouse.duckdb` — full database
+- `.dango/auth.db` — authentication database
+- `.dango/project.yml`, `.dango/sources.yml`, `.dango/cloud.yml` — configuration
+- `.dango/metabase.yml` — Metabase config
+- `.dango/logs/audit.jsonl` — audit log
+- `.dlt/secrets.toml` — credentials
+- `.dlt/pipelines/` — dlt pipeline state
+- `dbt/profiles.yml` — dbt connection profile
 
 ---
 
 ## Restore Procedures
 
-### Full Restore
+### Local Full Restore
 
 ```bash
 # 1. Create fresh project
@@ -171,6 +257,16 @@ dango metabase load --input /path/to/backup/metabase/
 
 # 7. Re-enter credentials (secrets.toml)
 # Edit .dlt/secrets.toml with your credentials
+```
+
+### Cloud Restore
+
+```bash
+# Restore from the most recent cloud backup
+dango remote backup restore
+
+# Or restore from a specific backup
+dango remote backup download  # Download first, then restore manually
 ```
 
 ### Restore Individual Components
@@ -201,50 +297,7 @@ cp -r /path/to/backup/dbt/models/marts dbt/models/
 dango run
 ```
 
----
-
-## Automated Backups
-
-### Cron Job (Linux/macOS)
-
-```bash
-# Edit crontab
-crontab -e
-
-# Add daily backup at 2 AM
-0 2 * * * cd /path/to/project && ./backup_dango.sh >> /var/log/dango_backup.log 2>&1
-```
-
-### Backup Rotation
-
-Keep recent backups, delete old ones:
-
-```bash
-#!/bin/bash
-# rotate_backups.sh
-
-BACKUP_DIR="backups"
-KEEP_DAYS=7
-
-# Delete backups older than 7 days
-find "$BACKUP_DIR" -type d -mtime +$KEEP_DAYS -exec rm -rf {} +
-
-echo "Old backups cleaned up"
-```
-
-### Cloud Backup
-
-**To AWS S3**:
-```bash
-# Install AWS CLI first
-aws s3 sync backups/ s3://my-bucket/dango-backups/
-```
-
-**To Google Cloud Storage**:
-```bash
-# Install gsutil first
-gsutil -m rsync -r backups/ gs://my-bucket/dango-backups/
-```
+For full cloud backup details, see [Cloud Backups](../deployment/backups.md).
 
 ---
 
@@ -252,22 +305,23 @@ gsutil -m rsync -r backups/ gs://my-bucket/dango-backups/
 
 ### Recovery Checklist
 
-1. ✅ Install Dango: `pip install getdango`
-2. ✅ Initialize project: `dango init project-name`
-3. ✅ Restore configuration files
-4. ✅ Recreate credentials in `.dlt/secrets.toml`
-5. ✅ Restore database or re-sync: `dango sync`
-6. ✅ Restore or regenerate dbt models: `dango run`
-7. ✅ Restore Metabase dashboards
-8. ✅ Verify data integrity
+1. Install Dango: `pip install getdango`
+2. Initialize project: `dango init project-name`
+3. Restore configuration files
+4. Recreate credentials in `.dlt/secrets.toml`
+5. Restore database or re-sync: `dango sync`
+6. Restore or regenerate dbt models: `dango run`
+7. Restore Metabase dashboards
+8. Verify data integrity
 
-### Recovery Time Estimates
+### Cloud Disaster Recovery
 
-| Scenario | Method | Time |
-|----------|--------|------|
-| **Quick recovery** | Restore from backup | 5-10 min |
-| **Full re-sync** | Re-fetch all data | Hours (depends on data volume) |
-| **Partial recovery** | Restore DB + re-sync recent | 30-60 min |
+If the cloud server is lost:
+
+1. Provision a new server: `dango remote setup`
+2. Restore from the latest Spaces backup: `dango remote backup restore`
+3. Verify services are healthy: `dango remote status`
+4. Check data: `dango remote logs`
 
 ---
 
@@ -283,6 +337,8 @@ __pycache__/
 .dlt/pipelines/        # Can be regenerated
 dbt/target/            # Compiled artifacts
 dbt/logs/              # dbt logs
+.dango/state/          # Runtime state (locks, sync status)
+.dango/dev/            # Dev mode artifacts
 ```
 
 ---
@@ -307,5 +363,6 @@ ls -la backups/
 ## Next Steps
 
 - [Git Workflows](git-workflows.md) - Version control for configs and models
+- [Cloud Backups](../deployment/backups.md) - Full cloud backup documentation
 - [Troubleshooting](troubleshooting.md) - Recovery from common issues
 - [Performance](performance.md) - Optimize large database backups
