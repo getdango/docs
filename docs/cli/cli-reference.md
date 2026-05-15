@@ -1250,6 +1250,26 @@ dango migrate run [OPTIONS]
 
 ---
 
+## Web
+
+### dango web
+
+Start the Web UI backend server only (without Metabase, file watcher, or dbt-docs).
+
+```bash
+dango web [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--host TEXT` | Host to bind to |
+| `--port INTEGER` | Port to bind to |
+| `--reload` | Enable auto-reload (development) |
+
+[:octicons-arrow-right-24: Full guide](other-commands.md#dango-web)
+
+---
+
 ## Exit Codes
 
 | Code | Meaning |

@@ -277,3 +277,4 @@ See [Deploy & Remote](deploy-remote.md#remote-user-management) for details.
 - [CLI Reference](cli-reference.md) — Quick reference for all commands
 - [OAuth Commands](oauth-commands.md) — OAuth provider connections (separate from user auth)
 - [Deploy & Remote](deploy-remote.md) — Remote server user management
+- [Authentication Guide](../security/authentication.md) — How authentication works in Dango

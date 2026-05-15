@@ -141,27 +141,6 @@ Dango will create:
 Proceed? (y/N): y
 ```
 
-### Template-Based Initialization
-
-Use pre-configured templates:
-
-```bash
-# Analytics template (Stripe + GA4 + dbt)
-dango init my-analytics --template analytics
-
-# ETL template (databases + custom sources)
-dango init my-etl --template etl
-
-# Minimal template (bare bones)
-dango init my-project --template minimal
-```
-
-**Templates include**:
-
-- **analytics**: Stripe, Google Analytics 4, example dashboards
-- **etl**: PostgreSQL, MySQL connectors, scheduling config
-- **minimal**: Blank project, no pre-configured sources
-
 ### Force Reinitialize
 
 Reinitialize an existing project:
@@ -426,65 +405,6 @@ All services are stopped.
 Run 'dango start' to start the platform.
 ```
 
-### JSON Output
-
-For scripting:
-
-```bash
-dango status --json
-```
-
-**Response**:
-
-```json
-{
-  "project": "my-analytics",
-  "port": 8800,
-  "running": true,
-  "services": {
-    "web_ui": {
-      "status": "running",
-      "url": "http://localhost:8800",
-      "pid": 12345
-    },
-    "file_watcher": {
-      "status": "running",
-      "auto_sync": true,
-      "pid": 12346
-    },
-    "metabase": {
-      "status": "running",
-      "url": "http://localhost:3000",
-      "container_id": "abc123..."
-    },
-    "dbt_docs": {
-      "status": "running",
-      "url": "http://localhost:8081",
-      "container_id": "def456..."
-    }
-  },
-  "database": {
-    "path": "data/warehouse.duckdb",
-    "size_mb": 42.3
-  },
-  "uptime_seconds": 12240
-}
-```
-
-### Status Checks
-
-Exit code check for scripts:
-
-```bash
-dango status --check
-if [ $? -eq 0 ]; then
-  echo "Platform is running"
-else
-  echo "Platform is stopped"
-  dango start
-fi
-```
-
 ---
 
 ## Stopping the Platform
@@ -692,16 +612,17 @@ kill 12345
 dango start
 ```
 
-**Solution 2: Change port**:
+**Solution 2: Change port** in `.dango/project.yml`:
+
+```yaml
+platform:
+  port: 8888
+```
+
+Then restart:
 
 ```bash
-# Temporary
-dango start --port 8888
-
-# Permanent
-vim .dango/project.yml
-# Change port: 8888
-dango start
+dango stop && dango start
 ```
 
 ### Docker Not Running

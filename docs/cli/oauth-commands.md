@@ -224,3 +224,4 @@ dango oauth refresh facebook_ads_123456789
 - [CLI Reference](cli-reference.md) — Quick reference for all commands
 - [Auth Commands](auth-commands.md) — User authentication (separate from OAuth)
 - [Source & Sync](source-sync.md) — Sync data from OAuth-authenticated sources
+- [OAuth & Credentials Guide](../security/credentials.md) — How OAuth credentials are stored and managed

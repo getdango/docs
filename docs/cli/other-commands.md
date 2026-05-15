@@ -491,6 +491,31 @@ dango serve [OPTIONS]
 
 ---
 
+### dango web
+
+Start the Web UI backend server only (without Metabase, file watcher, or dbt-docs). Primarily used for development.
+
+```bash
+dango web [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--host TEXT` | Host to bind to |
+| `--port INTEGER` | Port to bind to |
+| `--reload` | Enable auto-reload (development) |
+
+```bash
+dango web                   # Start on default port
+dango web --port 3001       # Custom port
+dango web --reload          # Auto-reload on code changes
+```
+
+!!! info
+    Most users should use `dango start` (starts all services) or `dango serve` (production mode). `dango web` is for running the API server in isolation.
+
+---
+
 ## Troubleshooting
 
 ??? info "Validate shows Docker not running"
