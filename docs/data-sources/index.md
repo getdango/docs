@@ -1,32 +1,28 @@
 # Data Sources
 
-Connect to CSV files, APIs, and databases through Dango's unified configuration.
+Connect to APIs, databases, and local files through Dango's unified data ingestion layer.
 
 ---
 
 ## Overview
 
-Dango supports multiple types of data sources through dlt (data load tool). Whether you're working with local CSV files, cloud APIs, or existing databases, Dango provides a unified configuration interface.
+Dango supports **33 data sources** through [dlt (data load tool)](https://dlthub.com/docs). Whether you're working with local CSV files, cloud APIs, or existing databases, Dango provides a unified configuration interface.
 
 !!! info "Wizard vs Manual Sources"
-    **Wizard-supported sources** (7 sources): Can be added via `dango source add` interactive wizard:
+    **Wizard-enabled sources** (25 sources): Add via `dango source add` interactive wizard — handles authentication, configuration, and validation automatically.
 
-    - CSV, Stripe, Google Sheets, Facebook Ads, Google Analytics 4, Google Ads, dlt Native (advanced)
+    **Manual sources**: Configure directly in `sources.yml` using `dlt_native` for any [dlt verified source](https://dlthub.com/docs/dlt-ecosystem/verified-sources/).
 
-    **Manual sources**: Require dlt_native configuration in sources.yml:
+    See the [Source Catalog](source-catalog.md) for the complete list of all 33 sources.
 
-    - HubSpot, Notion, Asana, databases, and other dlt sources
-    - See [Custom Sources](custom-sources.md) for manual setup guide
+**Source categories at a glance:**
 
-    **60+ additional sources** available via dlt_native for advanced users.
-
-**Available Source Types**:
-
-- **CSV Files** - Upload and auto-sync flat files (wizard-supported)
-- **OAuth Sources** - Google Sheets, Facebook Ads, GA4, Google Ads (wizard-supported)
-- **Stripe** - Payment data (wizard-supported)
-- **Database Sources** - PostgreSQL, MySQL, etc. via dlt_native (experimental)
-- **Custom Sources** - Build your own or use any dlt verified source via dlt_native
+- **Local Files** — CSV, JSON, JSONL, Parquet from your filesystem
+- **OAuth Sources** — Google Sheets, GA4, Google Ads, Facebook Ads (browser-based auth)
+- **API Key Sources** — Stripe, HubSpot, Salesforce, GitHub, Slack, and more
+- **Database Sources** — PostgreSQL, MongoDB, and others via dlt
+- **REST API** — Connect to any API with JSON responses
+- **Custom Sources** — Build integrations with Python and dlt
 
 ---
 
@@ -57,9 +53,9 @@ If you're already familiar with [dlt (data load tool)](https://dlthub.com/docs),
 
 **Learn more**:
 
-- [Custom Sources](custom-sources.md) - "dlt vs. Dango Workflow" comparison
-- [Database Sources](database-sources.md) - "How This Differs from Standard dlt" table
-- [dlt Documentation](https://dlthub.com/docs) - Official dlt docs for advanced topics
+- [Custom Sources](custom-sources.md) — "dlt vs. Dango Workflow" comparison
+- [Database Sources](database-sources.md) — "How This Differs from Standard dlt" table
+- [dlt Documentation](https://dlthub.com/docs) — Official dlt docs for advanced topics
 
 ---
 
@@ -69,12 +65,12 @@ If you're already familiar with [dlt (data load tool)](https://dlthub.com/docs),
 
 Choose your source type and follow the guide:
 
-=== "CSV File"
+=== "Local Files"
 
     ```bash
     # Recommended: Use the wizard
     dango source add
-    # Select "CSV Files" and follow prompts
+    # Select "File Import (CSV, JSON, Parquet)" and follow prompts
     ```
 
     Or configure manually in `.dango/sources.yml`:
@@ -82,9 +78,9 @@ Choose your source type and follow the guide:
     ```yaml
     sources:
       - name: sales_data
-        type: csv
+        type: local_files
         enabled: true
-        csv:
+        local_files:
           directory: data/uploads/sales_data
           file_pattern: "*.csv"
     ```
@@ -93,10 +89,10 @@ Choose your source type and follow the guide:
 
     ```bash
     cp my_sales.csv data/uploads/sales_data/
-    dango sync --source sales_data
+    dango sync sales_data
     ```
 
-    [Learn more →](csv-files.md)
+    [Learn more →](local-files/index.md)
 
 === "OAuth (Google Sheets)"
 
@@ -107,7 +103,7 @@ Choose your source type and follow the guide:
     # Follow OAuth flow in browser
 
     # Sync
-    dango sync --source my_sheets
+    dango sync my_sheets
     ```
 
     [Learn more →](oauth-sources.md)
@@ -130,7 +126,7 @@ Choose your source type and follow the guide:
             schema: "public"
 
     # Sync
-    dango sync --source my_postgres
+    dango sync my_postgres
     ```
 
     [Learn more →](database-sources.md)
@@ -168,17 +164,17 @@ Choose your source type and follow the guide:
 
 <div class="grid cards" markdown>
 
--   :material-file-delimited-outline: **CSV Files**
+-   :material-file-delimited-outline: **Local Files**
 
     ---
 
-    Upload and sync CSV files with automatic schema detection and file watching.
+    Load CSV, JSON, JSONL, and Parquet files with automatic schema detection and incremental sync.
 
-    - Simple file-based data loading
-    - Auto-sync on file changes
-    - Multiple delimiters supported
+    - 5 supported formats
+    - File change tracking
+    - Schema evolution support
 
-    [:octicons-arrow-right-24: CSV Files Guide](csv-files.md)
+    [:octicons-arrow-right-24: Local Files Guide](local-files/index.md)
 
 -   :material-cloud-lock-outline: **OAuth Sources**
 
@@ -186,7 +182,7 @@ Choose your source type and follow the guide:
 
     Connect to cloud services using OAuth 2.0 authentication.
 
-    - Google Sheets, GA4, Facebook Ads
+    - Google Sheets, GA4, Google Ads, Facebook Ads
     - Automatic token management
     - Browser-based authentication
 
@@ -196,11 +192,10 @@ Choose your source type and follow the guide:
 
     ---
 
-    Connect to PostgreSQL, MySQL, SQL Server via dlt_native.
+    Connect to PostgreSQL, MySQL, SQL Server via dlt.
 
     - Full table or incremental loading
     - SSL/TLS support
-    - Experimental (not fully tested)
 
     [:octicons-arrow-right-24: Database Sources Guide](database-sources.md)
 
@@ -232,7 +227,7 @@ Choose your source type and follow the guide:
 
     ---
 
-    Step-by-step guide to adding and configuring data sources.
+    Step-by-step wizard walkthrough and manual YAML configuration.
 
     [:octicons-arrow-right-24: Adding Sources](adding-sources.md)
 
@@ -261,10 +256,10 @@ Choose your source type and follow the guide:
 ### Adding a New Source
 
 1. **Choose source type** based on your data
-2. **Configure credentials** (if needed)
-3. **Add to sources.yml** or use `dango source add`
-4. **Sync** with `dango sync --source <name>`
-5. **Verify** in Metabase or with SQL
+2. **Run the wizard** with `dango source add` (or edit `sources.yml` manually)
+3. **Configure credentials** (OAuth flow, API key in `.env`, or connection string)
+4. **Sync** with `dango sync <name>`
+5. **Verify** in Metabase or with `dango db query`
 
 ### Managing Multiple Sources
 
@@ -277,7 +272,7 @@ sources:
     type: stripe
     enabled: true
     stripe:
-      stripe_secret_key_env: STRIPE_PROD_KEY
+      stripe_secret_key_env: STRIPE_PROD_API_KEY
 
   # Google Sheets for manual data
   - name: manual_overrides
@@ -292,13 +287,13 @@ sources:
       source_module: sql_database
       source_function: sql_database
 
-  # Custom internal API
-  - name: internal_api
-    type: dlt_native
+  # Local CSV exports
+  - name: finance_reports
+    type: local_files
     enabled: true
-    dlt_native:
-      source_module: internal_api
-      source_function: internal_api
+    local_files:
+      directory: data/uploads/finance_reports
+      file_pattern: "*.csv"
 ```
 
 ### Sync All Sources
@@ -308,7 +303,7 @@ sources:
 dango sync
 
 # Sync specific source
-dango sync --source stripe_prod
+dango sync stripe_prod
 
 # List all sources
 dango source list
@@ -338,12 +333,12 @@ graph LR
     style G fill:#e0f2f1
 ```
 
-1. **Source** - External API, database, or file
-2. **dlt** - Fetches and normalizes data
-3. **Raw Layer** - Source data as-loaded in DuckDB
-4. **Staging** - Clean starting point (auto-generated by Dango)
-5. **Marts** - Business logic (custom SQL models you write)
-6. **Metabase** - Dashboards and queries
+1. **Source** — External API, database, or file
+2. **dlt** — Fetches and normalizes data
+3. **Raw Layer** — Source data as-loaded in DuckDB
+4. **Staging** — Clean starting point (auto-generated by Dango)
+5. **Marts** — Business logic (custom SQL models you write)
+6. **Metabase** — Dashboards and queries
 
 [Learn more about data layers →](../core-concepts/data-layers.md)
 
@@ -356,11 +351,11 @@ graph LR
 ```yaml
 version: '1.0'
 sources:
-  - name: unique_source_name      # Identifier
-    type: csv                      # Source type
+  - name: unique_source_name      # Identifier (lowercase, underscores)
+    type: local_files              # Source type
     enabled: true                  # Toggle sync
     description: "Optional description"
-    csv:                           # Type-specific config
+    local_files:                   # Type-specific config
       directory: data/uploads/unique_source_name
       file_pattern: "*.csv"
 ```
@@ -370,9 +365,10 @@ sources:
 | Parameter | Required | Description |
 |-----------|----------|-------------|
 | `name` | Yes | Unique identifier for this source |
-| `type` | Yes | Source type: `csv`, `stripe`, `dlt_native`, etc. |
+| `type` | Yes | Source type from the [catalog](source-catalog.md) |
 | `enabled` | No | Whether to include in sync (default: `true`) |
 | `description` | No | Human-readable description |
+| `deduplication` | No | Strategy: `none`, `latest_only`, `append_only`, `scd_type2` |
 
 ### Credentials Management
 
@@ -401,15 +397,20 @@ export MY_API_KEY="your-key-here"
 
 | Source Type | Status | Notes |
 |-------------|--------|-------|
-| CSV | ✅ Tested | Production-ready |
-| Stripe | ✅ Tested | All resources supported |
-| Google Sheets | ✅ Tested | OAuth flow verified |
-| Google Analytics 4 | ✅ Tested | OAuth flow verified |
-| Facebook Ads | ✅ Tested | OAuth flow verified |
-| Google Ads | 🔄 In Progress | Wizard-supported, testing ongoing |
-| dlt_native | ✅ Works | Registry bypass verified |
-| Database sources | ⚠️ Experimental | Uses dlt sql_database, not fully tested |
-| Other dlt sources | ⚠️ Experimental | Available via dlt_native, see [Source Catalog](source-catalog.md) |
+| Local Files | Tested | CSV, JSON, JSONL, Parquet — production-ready |
+| Stripe | Tested | All resources supported |
+| Google Sheets | Tested | OAuth flow verified |
+| Google Analytics 4 | Tested | OAuth flow verified |
+| Facebook Ads | Tested | OAuth flow verified |
+| Google Ads | Tested | OAuth flow verified |
+| HubSpot | Tested | Contacts, companies, deals, tickets |
+| GitHub | Tested | Issues, PRs, commits |
+| Salesforce | Tested | Service account auth |
+| Slack | Tested | Channels, messages, users |
+| PostgreSQL | Tested | Full table and incremental |
+| MongoDB | Tested | Collections with filtering |
+| REST API | Tested | Generic API connector |
+| dlt_native | Tested | Registry bypass for any dlt source |
 
 ---
 
@@ -441,29 +442,16 @@ Disable unused sources to speed up sync:
 
 ```yaml
 - name: crm_export
-  type: csv
+  type: local_files
   description: "Weekly CRM export from sales team, updated every Monday"
-  csv:
+  local_files:
     directory: data/uploads/crm_export
     file_pattern: "*.csv"
-    notes: "Export from Salesforce > Reports > Weekly CRM"
 ```
 
 ### 4. Use Incremental When Possible
 
-For large datasets, configure incremental loading:
-
-```yaml
-- name: large_table
-  type: dlt_native
-  dlt_native:
-    source_module: sql_database
-    source_function: sql_database
-    function_kwargs:
-      incremental:
-        cursor_column: "updated_at"
-        initial_value: "2024-01-01"
-```
+Incremental sync is the default — it loads only new and changed data. See [Sync Modes](sync-modes.md) for details on when to use full refresh instead.
 
 ### 5. Monitor Source Health
 
@@ -482,14 +470,14 @@ dango source list
 ### Source Not Syncing
 
 1. Check `enabled: true` in sources.yml
-2. Verify credentials in `.dlt/secrets.toml` or environment
+2. Verify credentials in `.env` or `.dlt/secrets.toml`
 3. Run `dango validate` to see errors
 4. Check network connectivity
 
 ### Authentication Failures
 
 - **API keys**: Verify not expired, check permissions
-- **OAuth**: Re-authenticate with `dango source add`
+- **OAuth**: Re-authenticate with `dango oauth refresh <source_type>`
 - **Database**: Test connection outside Dango
 
 ### Schema Mismatches
@@ -498,15 +486,15 @@ When APIs change:
 1. Run `dango sync` (schema auto-updates for API sources, staging models regenerated)
 2. Update custom dbt models if needed
 
-!!! note "CSV schema changes"
-    For CSV sources, schema is fixed on first load. If your CSV schema changes, remove and re-add the source.
+!!! note "File schema changes"
+    For local file sources, schema is fixed on first load. Use `--allow-schema-changes` to add new columns, or `--full-refresh` to reload with a new schema. See [Local Files](local-files/index.md).
 
 ### Performance Issues
 
-- Use incremental loading for large tables
+- Use incremental loading for large datasets (default behavior)
 - Sync sources individually rather than all at once
 - Check API rate limits
-- Consider upgrading to paid API tiers
+- Use `--limit N` during development to cap row counts
 
 ---
 
@@ -514,19 +502,19 @@ When APIs change:
 
 <div class="grid cards" markdown>
 
--   :material-file-delimited-outline: **CSV Files**
+-   :material-plus-circle-outline: **Adding Sources**
 
     ---
 
-    Start with the simplest source type - local CSV files.
+    Step-by-step wizard walkthrough for your first source.
 
-    [:octicons-arrow-right-24: CSV Files Guide](csv-files.md)
+    [:octicons-arrow-right-24: Adding Sources](adding-sources.md)
 
 -   :material-store-outline: **Source Catalog**
 
     ---
 
-    Explore all supported data source types.
+    Explore all 33 supported data source types.
 
     [:octicons-arrow-right-24: Source Catalog](source-catalog.md)
 
