@@ -326,28 +326,44 @@ pip install keyrings.alt
 
 ---
 
-## Provider-Specific Notes
+## Provider Token Details
+
+### Token Expiry by Provider
+
+| Provider | Access Token | Refresh Token | Auto-Refresh | Re-auth Trigger |
+|----------|-------------|---------------|:------------:|-----------------|
+| **Google** (Sheets, GA4, Ads) | 1 hour | No expiry (revocable) | Yes (dlt) | Revocation, password change, 6 months unused |
+| **Facebook Ads** | 1 hour | 60 days (long-lived) | No | Must re-auth before 60-day expiry |
+| **GitHub** | No expiry (PAT) | N/A | N/A | Manual revocation only |
 
 ### Google
 
-- Tokens valid for 6 months if unused
-- Re-auth required after password change
-- Workspace accounts may need admin approval
+- Refresh tokens have no fixed expiry but can be revoked
+- Tokens become invalid after 6 months of inactivity
+- Re-auth required after Google password change
+- Google Workspace accounts may need admin approval for the OAuth app
 
 ### Facebook
 
-- Tokens have 60-day expiry for long-lived tokens
+- Long-lived tokens expire after **60 days** — set a calendar reminder
 - Business accounts require Business Manager access
-- App must have ads_management permission
+- App must have `ads_read` permission
 
-### Best Practice
+### GitHub
 
-Set up calendar reminders to re-authenticate OAuth sources every 3-6 months to prevent sync failures.
+- Uses personal access tokens (PATs), not OAuth refresh tokens
+- PATs have no automatic expiry (unless configured in GitHub settings)
+- Revocation is manual via GitHub Settings → Developer Settings → Personal Access Tokens
+
+!!! tip "Prevent Sync Failures"
+    Set calendar reminders to re-authenticate Facebook OAuth sources every 45 days (before the 60-day expiry). Google sources with dlt auto-refresh rarely need manual re-auth.
 
 ---
 
 ## Next Steps
 
-- [Credential Management](credentials.md) - API key security
-- [Best Practices](best-practices.md) - Security recommendations
-- [Troubleshooting](../workflows/troubleshooting.md) - Auth issues
+- [Authentication](authentication.md) — login flows and session management
+- [Two-Factor Auth](two-factor.md) — enable 2FA for user accounts
+- [Credential Management](credentials.md) — API key security
+- [Best Practices](best-practices.md) — security recommendations
+- [Troubleshooting](../workflows/troubleshooting.md) — auth issues
