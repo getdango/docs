@@ -153,6 +153,9 @@ dango run
 
 No additional steps needed - Metabase queries live data.
 
+!!! tip "Instant Monitoring Dashboard"
+    Run `dango dashboard provision` to auto-create a "Data Pipeline Health" dashboard with sync status, test results, data freshness, and row count trends. See [Dashboard Provisioning](provisioning.md).
+
 ---
 
 ## Best Practices
@@ -186,6 +189,10 @@ Then query the mart in Metabase - much faster.
 
 Good: "Monthly Revenue by Product Category"
 Bad: "Analysis 1" or "test query"
+
+### 4. Version Control Your Dashboards
+
+Use `dango metabase save` to export dashboards as YAML for version control. See [Save & Load](save-load.md).
 
 ---
 
@@ -227,6 +234,22 @@ Sync the database schema:
 
     [:octicons-arrow-right-24: SQL Queries Guide](sql-queries.md)
 
+-   :material-chart-box: **Dashboard Provisioning**
+
+    ---
+
+    Auto-create a pipeline health dashboard.
+
+    [:octicons-arrow-right-24: Provisioning](provisioning.md)
+
+-   :material-content-save: **Save & Load**
+
+    ---
+
+    Version-control dashboards as YAML.
+
+    [:octicons-arrow-right-24: Save & Load](save-load.md)
+
 -   :material-chart-box-outline: **Metabase Overview**
 
     ---
@@ -234,21 +257,5 @@ Sync the database schema:
     Metabase configuration in Dango.
 
     [:octicons-arrow-right-24: Metabase Overview](metabase-overview.md)
-
--   :material-table-sync: **Transformations**
-
-    ---
-
-    Create analytics-ready tables with dbt.
-
-    [:octicons-arrow-right-24: Transformations](../transformations/index.md)
-
--   :material-book-open-outline: **Metabase Documentation**
-
-    ---
-
-    Full dashboard features: sharing, parameters, embedding.
-
-    [:octicons-arrow-right-24: Metabase Docs](https://www.metabase.com/docs/latest/dashboards/introduction)
 
 </div>

@@ -425,13 +425,21 @@ FROM marts.revenue_by_month;
 
     [:octicons-arrow-right-24: Creating Dashboards](creating-dashboards.md)
 
--   :material-table-sync: **Transformations**
+-   :material-table-sync: **Dev Workflow**
 
     ---
 
-    Create marts tables with dbt for better query performance.
+    Test SQL queries safely against a dev copy of your database.
 
-    [:octicons-arrow-right-24: Transformations](../transformations/index.md)
+    [:octicons-arrow-right-24: Dev Workflow](../transformations/dev-workflow.md)
+
+-   :material-chart-box: **Dashboard Provisioning**
+
+    ---
+
+    Auto-create a pipeline health dashboard.
+
+    [:octicons-arrow-right-24: Provisioning](provisioning.md)
 
 -   :material-book-open-outline: **DuckDB Documentation**
 
@@ -440,13 +448,5 @@ FROM marts.revenue_by_month;
     Complete SQL reference: window functions, JSON, regex, arrays.
 
     [:octicons-arrow-right-24: DuckDB Docs](https://duckdb.org/docs/sql/introduction)
-
--   :material-book-open-outline: **Metabase SQL Guide**
-
-    ---
-
-    SQL editor features, variables, and native queries.
-
-    [:octicons-arrow-right-24: Metabase Docs](https://www.metabase.com/docs/latest/questions/native-editor/writing-sql)
 
 </div>

@@ -124,6 +124,9 @@ ORDER BY lifetime_value DESC
 LIMIT 10
 ```
 
+!!! info "Auto-Configured DuckDB Profile"
+    Dango auto-generates `profiles.yml` with `type: duckdb`, 4 threads, and `httpfs` + `parquet` extensions loaded. You don't need to configure the connection manually. The `dango dev` command generates a separate dev profile pointing at a copy of the database — see [Dev Workflow](dev-workflow.md).
+
 ---
 
 ## dbt Project Structure
@@ -134,6 +137,7 @@ Dango creates a standard dbt project:
 dbt/
 ├── dbt_project.yml           # Project configuration
 ├── profiles.yml              # DuckDB connection (auto-configured)
+├── snapshots/                # SCD Type 2 snapshots (dango snapshot add)
 ├── models/
 │   ├── staging/              # Auto-generated from raw tables
 │   │   ├── stg_<source>_<table>.sql
@@ -142,8 +146,7 @@ dbt/
 │   ├── intermediate/         # Reusable business logic (your code)
 │   └── marts/                # Final tables for BI (your code)
 ├── tests/                    # Custom data tests
-├── macros/                   # Reusable SQL snippets
-└── snapshots/                # Slowly changing dimensions
+└── macros/                   # Reusable SQL snippets
 ```
 
 ---
@@ -466,7 +469,7 @@ models:
 
 ### Deduplication
 
-Add to staging models if needed:
+Dango supports 4 named deduplication strategies (`last_modified`, `first_seen`, `composite_key`, `row_number`). The generator auto-detects `last_modified` when `updated_at`/`modified_at` columns exist. See [Staging Models — Deduplication Strategies](staging-models.md#deduplication-strategies) for full details.
 
 ```sql
 {{ config(materialized='table', schema='staging') }}
@@ -475,7 +478,7 @@ WITH deduped AS (
     SELECT *,
         ROW_NUMBER() OVER (
             PARTITION BY id
-            ORDER BY _dlt_extracted_at DESC
+            ORDER BY updated_at DESC
         ) as rn
     FROM {{ source('stripe', 'customers') }}
 )
@@ -526,6 +529,9 @@ dbt compile --profiles-dir dbt --project-dir dbt --select customer_metrics
 ```
 
 Check `dbt/target/compiled/` for rendered SQL.
+
+!!! tip "Use dango dev for Safe Debugging"
+    Run `dango dev` to test against a copy of your database. This prevents accidental modifications to production data during debugging. See [Dev Workflow](dev-workflow.md).
 
 ### Run with Debug Logging
 
@@ -620,4 +626,6 @@ tests:
 - **[Staging Models](staging-models.md)** - Deep dive into auto-generated staging
 - **[Custom Models](custom-models.md)** - Build marts and intermediate models
 - **[Testing](testing.md)** - Comprehensive data quality testing
+- **[Snapshots](snapshots.md)** - Track historical changes with SCD Type 2
+- **[Dev Workflow](dev-workflow.md)** - Test model changes safely against a dev copy
 - **[dbt Documentation](https://docs.getdbt.com/)** - Official dbt docs
