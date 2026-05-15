@@ -10,9 +10,11 @@ When multiple users have access to the same Dango project, two people could try 
 
 Locks are:
 
-- **Automatic** — acquired when you open a notebook, released when you close it
+- **Automatic** — acquired when you open a notebook, released when you close it (see [Getting Started](getting-started.md#step-2-open-a-notebook))
 - **Time-limited** — expire after 15 minutes without a heartbeat
 - **Per-notebook** — each notebook has its own independent lock
+
+Locking works alongside [DuckDB snapshots](duckdb-snapshots.md) — snapshots handle database isolation, while locks handle file editing isolation.
 
 ## How Locking Works
 

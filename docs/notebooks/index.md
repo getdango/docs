@@ -11,7 +11,7 @@ Dashboards show you what's happening — notebooks let you ask *why*. Dango inte
 Key features:
 
 - **Reactive Python notebooks** — Marimo cells re-execute automatically when dependencies change
-- **DuckDB snapshots** — notebooks query a read-only copy of your warehouse, so syncs and transforms are never blocked
+- **DuckDB snapshots** — notebooks query a read-only copy of your warehouse, so syncs and transforms are never blocked (see [DuckDB core concepts](../core-concepts/duckdb.md))
 - **File locking** — time-limited locks with heartbeat prevent conflicts when multiple users edit notebooks
 - **Starter templates** — pre-built notebooks for data exploration and quality checks
 

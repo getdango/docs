@@ -24,7 +24,7 @@ When you open a notebook (and Marimo isn't already running), Dango:
 2. **Cleans up** old snapshots for the same user (keeps the 3 most recent)
 3. **Sets** the `DANGO_NOTEBOOK_DB_PATH` environment variable to point Marimo at the snapshot
 4. **Starts** Marimo with the snapshot path in its environment
-5. **Connects** — the notebook's `setup` cell reads `DANGO_NOTEBOOK_DB_PATH` and opens the snapshot in read-only mode
+5. **Connects** — the notebook's `setup` cell reads `DANGO_NOTEBOOK_DB_PATH` and opens the snapshot in read-only mode (see [Templates — DuckDB Connection Pattern](templates.md#duckdb-connection-pattern))
 
 ```
 data/warehouse.duckdb ──copy──> .dango/snapshots/warehouse_admin_20260515_143022.duckdb
@@ -135,9 +135,9 @@ Snapshots are created when Marimo starts. If Marimo is already running when you 
 
 To get fresh data:
 
-1. Release all notebook locks
+1. Release all notebook locks (see [File Locking](file-locking.md))
 2. Stop Marimo: `dango stop`
-3. Re-open your notebook: `dango notebook open my_analysis`
+3. Re-open your notebook: `dango notebook open my_analysis` (see [Getting Started](getting-started.md#step-2-open-a-notebook))
 
 This creates a new snapshot from the current warehouse state.
 
@@ -147,4 +147,4 @@ If snapshots are consuming too much disk, you can:
 
 1. Reduce the number of active users (fewer users = fewer snapshots)
 2. Manually delete old snapshots: `rm .dango/snapshots/warehouse_*.duckdb`
-3. Consider running `dango cleanup` to remove other temporary files and free disk space
+3. Run `dango cleanup` to free disk space from logs and cache (note: `cleanup` does not remove snapshots — use option 2 for that)
