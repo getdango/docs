@@ -42,10 +42,10 @@ dango source add
 
 ```
 ? Select a data source: REST API
-? Source name: orders_api
+? Source name: acme
 ? Base URL (e.g., https://api.example.com): https://api.example.com/v2
 ? Authentication method: Bearer Token
-? Environment variable for bearer token [ORDERS_API_API_TOKEN]: ORDERS_API_API_TOKEN
+? Environment variable for bearer token [ACME_API_TOKEN]: ACME_API_TOKEN
 ? Add custom headers? No
 ? Endpoint path (e.g., /orders): /orders
 ? Resource name (table name in DuckDB) [orders]: orders
@@ -68,14 +68,14 @@ Edit `.dango/sources.yml`:
 ```yaml
 version: '1.0'
 sources:
-  - name: orders_api
+  - name: acme
     type: rest_api
     enabled: true
     description: My REST API data
     rest_api:
       base_url: https://api.example.com/v2
       auth_type: bearer
-      auth_token_env: ORDERS_API_API_TOKEN
+      auth_token_env: ACME_API_TOKEN
       endpoints:
         - path: /orders
           name: orders
@@ -90,20 +90,20 @@ sources:
     Store credentials in `.env`:
     ```bash
     # .env (gitignored)
-    ORDERS_API_API_TOKEN=your_token_here
+    ACME_API_TOKEN=your_token_here
     ```
 
 === "Cloud"
 
     Set credentials on the remote server:
     ```bash
-    dango remote env set ORDERS_API_API_TOKEN your_token_here
+    dango remote env set ACME_API_TOKEN your_token_here
     ```
 
 ### First Sync
 
 ```bash
-dango sync --source orders_api
+dango sync --source acme
 ```
 
 ---
