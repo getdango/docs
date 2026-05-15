@@ -55,6 +55,22 @@ sequenceDiagram
 - **Auto-refresh**: Dango automatically refreshes expired tokens
 - **Token expiry warnings**: Web UI shows when tokens need renewal
 
+### Token Expiry by Provider
+
+| Provider | Token Type | Lifetime | Refresh |
+|----------|-----------|----------|---------|
+| **Google** (Sheets, GA4, Ads) | Access token | 1 hour | Auto-refresh via refresh token |
+| | Refresh token | Indefinite | No expiry — stored permanently |
+| **Facebook Ads** | Short-lived token | ~1 hour | Exchanged for long-lived at setup |
+| | Long-lived token | **60 days** | **Manual re-auth required** |
+| **GitHub** | Personal Access Token | Indefinite | Not OAuth — no refresh needed |
+
+!!! warning "Facebook tokens expire every 60 days"
+    Facebook does **not** support automatic token refresh. You must re-authenticate every 60 days by running `dango oauth facebook_ads`. Set a **45-day calendar reminder** to avoid sync failures. If you stored your App ID and App Secret during setup, Dango can extend the token without a full re-auth flow.
+
+!!! tip "Google testing-mode tokens expire in 7 days"
+    If your Google Cloud OAuth app is in **"Testing"** status (not published), refresh tokens expire after 7 days. To avoid this, publish your OAuth app or move it to **"In production"** status in the Google Cloud Console. Published apps with limited scopes (like Sheets read-only) do not require Google verification.
+
 ---
 
 ## Quick Start: Google Sheets
@@ -114,6 +130,8 @@ dango sync --source my_google_sheets
 
 Data loads into `raw_my_google_sheets` schema in DuckDB.
 
+See the [Google Sheets Guide](google-sheets.md) for the full setup walkthrough.
+
 ---
 
 ## Common OAuth Sources
@@ -145,6 +163,8 @@ dango source add
 # Enter GA4 property ID when prompted
 ```
 
+See the [Google Analytics Guide](google-analytics.md) for the full setup walkthrough.
+
 ### Facebook Ads
 
 ```yaml
@@ -165,6 +185,8 @@ dango source add
 # Follow OAuth flow (requires Facebook Business account)
 # Select Ad Account when prompted
 ```
+
+See the [Facebook Ads Guide](facebook-ads.md) for the full setup walkthrough.
 
 ### HubSpot (via dlt_native)
 
@@ -495,6 +517,16 @@ For security:
 ---
 
 ## Next Steps
+
+**Individual Source Guides:**
+
+- **[Google Sheets](google-sheets.md)** - Spreadsheet data with OAuth
+- **[Google Analytics](google-analytics.md)** - GA4 traffic and engagement data
+- **[Google Ads](google-ads.md)** - Campaign performance with GAQL queries
+- **[Facebook Ads](facebook-ads.md)** - Ad performance with 60-day token lifecycle
+- **[GitHub](github.md)** - Repository data with Personal Access Token
+
+**General:**
 
 - **[Source Catalog](source-catalog.md)** - See all available dlt sources
 - **[Custom Sources](custom-sources.md)** - Build OAuth sources for custom APIs
