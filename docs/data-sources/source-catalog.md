@@ -162,7 +162,7 @@ Utility and niche sources.
 |----------|-------|--------|-------------|
 | Local & Custom | 5 | 3 | 0 |
 | Marketing & Analytics | 7 | 6 | 1 |
-| Business & CRM | 8 | 5 | 3 |
+| Business & CRM | 8 | 6 | 2 |
 | E-commerce & Payment | 2 | 1 | 1 |
 | Development | 1 | 1 | 0 |
 | Communication | 1 | 1 | 0 |
