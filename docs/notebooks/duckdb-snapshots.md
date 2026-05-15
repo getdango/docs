@@ -24,7 +24,7 @@ When you open a notebook (and Marimo isn't already running), Dango:
 2. **Cleans up** old snapshots for the same user (keeps the 3 most recent)
 3. **Sets** the `DANGO_NOTEBOOK_DB_PATH` environment variable to point Marimo at the snapshot
 4. **Starts** Marimo with the snapshot path in its environment
-5. **Connects** the notebook's `setup` cell reads `DANGO_NOTEBOOK_DB_PATH` and opens the snapshot in read-only mode
+5. **Connects** — the notebook's `setup` cell reads `DANGO_NOTEBOOK_DB_PATH` and opens the snapshot in read-only mode
 
 ```
 data/warehouse.duckdb ──copy──> .dango/snapshots/warehouse_admin_20260515_143022.duckdb
@@ -53,7 +53,7 @@ Snapshots are stored in `.dango/snapshots/` inside your project directory:
 warehouse_{username}_{YYYYMMDD_HHMMSS}.duckdb
 ```
 
-- **username** — the user who created the snapshot (`cli` for CLI sessions, email prefix for web UI)
+- **username** — the user who created the snapshot (`cli` for CLI sessions, email address for web UI)
 - **timestamp** — when the snapshot was created
 
 ### Retention

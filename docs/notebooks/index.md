@@ -12,7 +12,7 @@ Key features:
 
 - **Reactive Python notebooks** — Marimo cells re-execute automatically when dependencies change
 - **DuckDB snapshots** — notebooks query a read-only copy of your warehouse, so syncs and transforms are never blocked
-- **File locking** — time-limited locks with heartbeat keep prevent conflicts when multiple users edit notebooks
+- **File locking** — time-limited locks with heartbeat prevent conflicts when multiple users edit notebooks
 - **Starter templates** — pre-built notebooks for data exploration and quality checks
 
 ## How It Works

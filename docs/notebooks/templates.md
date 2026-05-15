@@ -29,7 +29,7 @@ dango notebook new --template quality --name quality_check
 dango notebook new --template blank --name custom_analysis
 ```
 
-If you omit `--template`, the `explore` template is used by default.
+If you omit `--template`, the `explore` template is used by default. See [Getting Started](getting-started.md) for a full walkthrough of creating and opening notebooks.
 
 ## Explore Template
 

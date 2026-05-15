@@ -103,7 +103,7 @@ Notebook operations require specific permissions:
 |------------|---------|---------------|
 | `notebooks.view` | List notebooks, view metadata | All roles |
 | `notebooks.execute` | Create, open, edit, delete (own), lock/unlock | Editor, Admin |
-| `notebooks.manage` | Force unlock, delete others' notebooks | Admin |
+| `notebooks.manage` | Force unlock, delete others' notebooks | Editor, Admin |
 
 See [Permissions Reference](../reference/permissions.md) for the full permissions list.
 
