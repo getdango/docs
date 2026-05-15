@@ -23,6 +23,15 @@ DuckDB is optimized for analytical workloads:
 - Automatic parallelization
 - In-memory processing with disk spillover
 
+### Version Alignment
+
+DuckDB requires that the Python library and the Metabase JDBC driver share the same major.minor version. Dango handles this automatically — the driver version (`1.5.1.0`) is pinned to match the Python DuckDB dependency (`1.5.x`).
+
+If you upgrade DuckDB manually, the Metabase driver must also be updated. Dango checks version alignment on startup and warns if there is a mismatch.
+
+??? info "Why Version Alignment Matters"
+    DuckDB's read-only mode cannot open database files created by a different major.minor version. If the Python library is 1.5.x but the Metabase JDBC driver bundles 1.4.x, Metabase cannot read the database. Dango's startup check and pre-commit hook prevent this drift.
+
 ### Memory Configuration
 
 ```sql
@@ -77,6 +86,72 @@ FROM orders o JOIN customers c USING (customer_id);
 
 ---
 
+## Sync Performance
+
+### Sync Subprocess Model
+
+Syncs run in isolated subprocesses, keeping the web UI responsive. The web server never blocks on a long-running sync — it monitors progress via status files at `.dango/state/sync_status_{id}.json` and broadcasts updates over WebSocket.
+
+This means you can continue using the dashboard, viewing data, and managing sources while a sync runs in the background.
+
+### Single-Writer Constraint
+
+DuckDB allows only one writer process at a time. Dango enforces this with `DbtLock` — a file lock at `.dango/state/dbt.lock`.
+
+**Do not run syncs in parallel.** DuckDB's single-writer constraint means parallel syncs will fail:
+
+```bash
+# WRONG: parallel syncs will fail on the second one
+dango sync --source source1 &
+dango sync --source source2 &
+
+# CORRECT: sync sources sequentially
+dango sync --source source1
+dango sync --source source2
+
+# CORRECT: sync all sources (Dango handles ordering)
+dango sync
+```
+
+When a sync is triggered from the web UI while another is running, it waits up to 5 minutes for the lock before failing. The CLI fails immediately.
+
+See [DuckDB Single-Writer](../core-concepts/duckdb.md) for details.
+
+### Reduce Sync Scope
+
+**Select specific endpoints**:
+```yaml
+sources:
+  - name: stripe
+    type: stripe
+    stripe:
+      endpoints:
+        - charges      # Only what you need
+        - customers
+        # Skip: products, plans, etc.
+```
+
+**Date range limits**:
+```yaml
+sources:
+  - name: google_analytics
+    type: google_analytics
+    google_analytics:
+      start_date: "2024-01-01"  # Don't fetch all history
+```
+
+### Full Refresh Scheduling
+
+```bash
+# Regular syncs: incremental
+dango sync
+
+# Weekly: full refresh for data quality
+dango sync --full-refresh  # Run on weekends
+```
+
+---
+
 ## Large Dataset Handling
 
 ### Sync Strategies
@@ -100,14 +175,6 @@ sources:
     type: rest_api
     rest_api:
       timeout: 600  # 10 minutes
-```
-
-**Parallel Syncs**:
-```bash
-# Sync multiple sources in parallel (background)
-dango sync --source source1 &
-dango sync --source source2 &
-wait
 ```
 
 ### Data Volume Guidelines
@@ -198,40 +265,18 @@ dbt run --threads 4
 
 ---
 
-## Sync Optimization
+## Multi-Worker Considerations
 
-### Reduce Sync Scope
+When running Dango with multiple uvicorn workers (cloud deployments use this by default), be aware of these characteristics:
 
-**Select specific endpoints**:
-```yaml
-sources:
-  - name: stripe
-    type: stripe
-    stripe:
-      endpoints:
-        - charges      # Only what you need
-        - customers
-        # Skip: products, plans, etc.
-```
+- **`app.state` is not shared across workers** — each worker has its own instance of in-memory state
+- **Scheduler runs in one worker only** — the lifespan context starts the scheduler, but only the first worker's scheduler is active
+- **WebSocket connections are per-worker** — a client connected to worker A won't receive broadcasts from worker B
 
-**Date range limits**:
-```yaml
-sources:
-  - name: google_analytics
-    type: google_analytics
-    google_analytics:
-      start_date: "2024-01-01"  # Don't fetch all history
-```
+Dango handles this automatically with a file-based sync status watcher that runs in every worker. Each worker monitors `.dango/state/sync_status_*.json` files for changes and broadcasts updates to its own WebSocket clients.
 
-### Full Refresh Scheduling
-
-```bash
-# Regular syncs: incremental
-dango sync
-
-# Weekly: full refresh for data quality
-dango sync --full-refresh  # Run on weekends
-```
+??? info "How Multi-Worker Sync Broadcasting Works"
+    Each worker runs a background `sync_status_watcher()` task that polls status files by mtime. When a status file changes, the worker broadcasts the update to its connected WebSocket clients. A `_locally_polled` set prevents duplicate broadcasts for syncs that the worker itself launched.
 
 ---
 
@@ -311,7 +356,7 @@ dango db clean
 time dango sync --source my_source
 
 # Check sync logs
-cat .dango/logs/sync_*.log | grep duration
+cat .dango/logs/activity.jsonl | tail -20
 ```
 
 ### Query Performance

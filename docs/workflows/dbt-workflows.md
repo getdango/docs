@@ -29,6 +29,7 @@ dbt/
 │   │   └── stg_*.sql        # Staging models
 │   ├── intermediate/        # Your business logic
 │   └── marts/               # Final tables
+├── snapshots/               # SCD Type 2 snapshots (dango snapshot add)
 ├── macros/                  # Reusable SQL
 ├── tests/                   # Custom tests
 └── seeds/                   # Static data
@@ -66,6 +67,60 @@ dbt run --select +my_model
 # Run entire lineage
 dbt run --select +my_model+
 ```
+
+!!! warning "DbtLock Not Acquired"
+    Running `dbt run` directly does **not** acquire Dango's `DbtLock`. If a sync or scheduled job runs concurrently, both processes write to DuckDB simultaneously, which can cause data corruption. Use `dango run` or `dango dev` instead for safe execution, or ensure no syncs are running.
+
+---
+
+## Dev Mode
+
+The `dango dev` command provides safe, isolated dbt development by running against a copy of your database.
+
+```bash
+# Run dbt against a dev copy of warehouse.duckdb
+dango dev
+
+# Compare row counts between dev and production
+dango dev --diff
+
+# Clean up dev artifacts when done
+dango dev clean
+```
+
+Dev mode copies your database to `.dango/dev/warehouse_dev.duckdb` and runs all transformations there. Your production database is untouched — experiment freely.
+
+For full details on the dev workflow, see [Dev Workflow](../transformations/dev-workflow.md).
+
+---
+
+## Snapshots (SCD Type 2)
+
+Track historical changes in your source data using dbt snapshots. Dango provides a wizard to generate snapshot definitions:
+
+```bash
+# Add a new snapshot (interactive wizard)
+dango snapshot add
+
+# List all configured snapshots
+dango snapshot list
+
+# Run snapshots to capture current state
+dango snapshot run
+
+# Run a specific snapshot
+dango snapshot run --select my_snapshot
+
+# Create a read-only DuckDB copy for notebooks
+dango snapshot db
+```
+
+The wizard generates a dbt snapshot SQL file in `dbt/snapshots/` with your chosen strategy:
+
+- **Timestamp** — track changes via an `updated_at` column
+- **Check** — track changes by comparing all (or selected) columns
+
+For full details, see [Snapshots](../transformations/snapshots.md).
 
 ---
 
@@ -211,7 +266,7 @@ dbt docs serve --port 8081
 # Dango also serves dbt docs
 dango docs
 
-# Or access directly
+# Or access directly at the default port
 open http://localhost:8081
 ```
 
@@ -276,21 +331,23 @@ dbt run --select my_model --log-level debug
 
 ## Materializations
 
+Dango uses `table` materialization for all auto-generated models to ensure reliable Metabase compatibility. Views can cause query issues in Metabase.
+
 ### Configure Materialization
 
 ```sql
--- View (default for staging)
-{{ config(materialized='view') }}
-
--- Table (for marts)
+-- Table (default for all Dango models)
 {{ config(materialized='table') }}
 
--- Incremental (for large tables)
+-- Incremental (for large fact tables)
 {{ config(
     materialized='incremental',
     unique_key='id'
 ) }}
 ```
+
+!!! note "Why Tables, Not Views"
+    Dango auto-generates staging models as tables (not views) because Metabase works more reliably with materialized tables. While views rebuild faster during development, they can cause query timeouts and missing data in Metabase dashboards.
 
 ### Incremental Models
 
@@ -368,6 +425,7 @@ dbt run --target prod
 | `dbt deps` | Install packages |
 | `dbt clean` | Remove compiled files |
 | `dbt seed` | Load seed data |
+| `dbt snapshot` | Run snapshots |
 
 ---
 
@@ -376,3 +434,5 @@ dbt run --target prod
 - [Staging Models](../transformations/staging-models.md) - Auto-generated models
 - [Custom Models](../transformations/custom-models.md) - Building transformations
 - [Testing](../transformations/testing.md) - Data quality tests
+- [Dev Workflow](../transformations/dev-workflow.md) - Safe development with `dango dev`
+- [Snapshots](../transformations/snapshots.md) - SCD Type 2 change tracking
