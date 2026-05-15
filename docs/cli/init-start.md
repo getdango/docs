@@ -141,27 +141,6 @@ Dango will create:
 Proceed? (y/N): y
 ```
 
-### Template-Based Initialization
-
-Use pre-configured templates:
-
-```bash
-# Analytics template (Stripe + GA4 + dbt)
-dango init my-analytics --template analytics
-
-# ETL template (databases + custom sources)
-dango init my-etl --template etl
-
-# Minimal template (bare bones)
-dango init my-project --template minimal
-```
-
-**Templates include**:
-
-- **analytics**: Stripe, Google Analytics 4, example dashboards
-- **etl**: PostgreSQL, MySQL connectors, scheduling config
-- **minimal**: Blank project, no pre-configured sources
-
 ### Force Reinitialize
 
 Reinitialize an existing project:
@@ -268,11 +247,8 @@ dango info
 # YAML format
 dango config show
 
-# JSON format
-dango config show --format json
-
-# Specific section
-dango config show --section platform
+# Show current config
+dango config show
 ```
 
 ---
@@ -330,76 +306,35 @@ Press Ctrl+C to stop, or run 'dango stop' in another terminal.
 
 **Subsequent starts are faster** (~10 seconds).
 
-### Custom Port
+### Skip Confirmation
 
-Override default Web UI port:
+Skip startup confirmation prompts:
 
 ```bash
-dango start --port 8888
+dango start -y
+dango start --yes
 ```
 
-**Access at**: http://localhost:8888
+### Custom Port
 
-**Persistent port change** - edit `.dango/project.yml`:
+Change the default Web UI port in `.dango/project.yml`:
 
 ```yaml
 platform:
   port: 8888
 ```
 
-### Selective Services
+### Production Mode
 
-Start only specific services:
-
-```bash
-# Skip Metabase
-dango start --no-metabase
-
-# Skip dbt-docs
-dango start --no-docs
-
-# Skip file watcher
-dango start --no-watcher
-
-# Only Web UI
-dango start --no-metabase --no-docs --no-watcher
-```
-
-**Use cases**:
-
-- **No Metabase**: Docker not available, or using external BI tool
-- **No dbt-docs**: Don't need documentation UI
-- **No watcher**: Disable auto-sync for production
-
-### Background Mode
-
-Run platform in background:
+For cloud deployments, use `dango serve` instead of `dango start`:
 
 ```bash
-dango start --background
+dango serve --host 0.0.0.0 --port 8800 --workers 2
 ```
 
-**Or use shorthand**:
+Unlike `dango start`, `serve` binds to all interfaces, runs in the foreground (for systemd), and skips browser/file-watcher.
 
-```bash
-dango start -d
-```
-
-**Background output**:
-
-```
-Starting Dango platform in background...
-✓ Platform started (PID: 12345)
-
-View logs: dango logs
-Stop: dango stop
-Status: dango status
-```
-
-**View logs** (using Docker):
-
-!!! note "No Logs Command"
-    Dango does not have a dedicated `logs` command. View logs using Docker:
+**View logs** using Docker:
 
 ```bash
 # Tail all platform logs
@@ -410,10 +345,9 @@ docker compose logs -f metabase
 
 # Last 100 lines
 docker compose logs --tail 100
-
-# Logs since timestamp
-docker compose logs --since "2024-12-09 12:00"
 ```
+
+For remote servers, use `dango remote logs` instead.
 
 ---
 
@@ -456,65 +390,6 @@ All services are stopped.
 Run 'dango start' to start the platform.
 ```
 
-### JSON Output
-
-For scripting:
-
-```bash
-dango status --json
-```
-
-**Response**:
-
-```json
-{
-  "project": "my-analytics",
-  "port": 8800,
-  "running": true,
-  "services": {
-    "web_ui": {
-      "status": "running",
-      "url": "http://localhost:8800",
-      "pid": 12345
-    },
-    "file_watcher": {
-      "status": "running",
-      "auto_sync": true,
-      "pid": 12346
-    },
-    "metabase": {
-      "status": "running",
-      "url": "http://localhost:3000",
-      "container_id": "abc123..."
-    },
-    "dbt_docs": {
-      "status": "running",
-      "url": "http://localhost:8081",
-      "container_id": "def456..."
-    }
-  },
-  "database": {
-    "path": "data/warehouse.duckdb",
-    "size_mb": 42.3
-  },
-  "uptime_seconds": 12240
-}
-```
-
-### Status Checks
-
-Exit code check for scripts:
-
-```bash
-dango status --check
-if [ $? -eq 0 ]; then
-  echo "Platform is running"
-else
-  echo "Platform is stopped"
-  dango start
-fi
-```
-
 ---
 
 ## Stopping the Platform
@@ -548,22 +423,6 @@ Stopping Dango platform...
 
 Platform stopped successfully.
 ```
-
-### Force Stop
-
-Force kill processes if graceful stop fails:
-
-```bash
-dango stop --force
-```
-
-**Use when**:
-
-- Normal stop hangs
-- Services not responding
-- Process crashed
-
-**Warning**: May cause data loss if sync in progress.
 
 ### Stop All Projects
 
@@ -705,12 +564,6 @@ cd ~/projects/marketing-data
 dango start
 ```
 
-**Or use `--project-dir`**:
-
-```bash
-dango --project-dir ~/projects/marketing-data start
-```
-
 ---
 
 ## Troubleshooting Startup
@@ -738,16 +591,17 @@ kill 12345
 dango start
 ```
 
-**Solution 2: Change port**:
+**Solution 2: Change port** in `.dango/project.yml`:
+
+```yaml
+platform:
+  port: 8888
+```
+
+Then restart:
 
 ```bash
-# Temporary
-dango start --port 8888
-
-# Permanent
-vim .dango/project.yml
-# Change port: 8888
-dango start
+dango stop && dango start
 ```
 
 ### Docker Not Running
@@ -772,11 +626,7 @@ sudo systemctl start docker
 dango start
 ```
 
-**Or skip Docker**:
-
-```bash
-dango start --no-metabase
-```
+**Or check that Docker is installed and running before starting Dango.**
 
 ### Database Locked
 
@@ -861,8 +711,8 @@ platform:
   file_watcher:
     enabled: true  # Should be true
 
-# Restart
-dango restart
+# Restart platform
+dango stop && dango start
 ```
 
 **Check watched patterns**:

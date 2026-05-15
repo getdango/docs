@@ -1,341 +1,362 @@
 # CLI Reference
 
-Complete command reference for all dango commands.
+Complete command reference for all `dango` commands.
 
 ---
 
-## Overview
+## Command Tree
 
-The Dango CLI provides a comprehensive set of commands for managing your data platform. This reference covers every command, option, and flag available.
-
-**Command Categories**:
-
-- [Project Management](#project-management) - init, info, status, validate, rename
-- [Data Operations](#data-operations) - sync, generate, run
-- [Source Management](#source-management) - source add/list/remove
-- [Model Management](#model-management) - model add/remove
-- [Platform Control](#platform-control) - start, stop
-- [Database](#database-operations) - db status, db clean
-- [Authentication](#authentication) - auth list/refresh/status/check/setup
-- [Metabase](#metabase-operations) - metabase save/load/refresh
-- [Dashboard](#dashboard-operations) - dashboard provision
-- [Documentation](#documentation) - docs
-- [Configuration](#configuration) - config validate/show
+```
+dango
+├── init [PROJECT_NAME]                  Create a new project
+├── start                                Start platform services
+├── stop                                 Stop platform services
+├── status                               Show platform status
+├── info                                 Show project information
+├── rename NEW_NAME                      Rename project
+├── serve                                Production server mode
+├── upgrade                              Upgrade Dango version
+├── cleanup                              Remove old artifacts
+├── validate                             Validate project config
+│
+├── sync [SOURCE_NAME]                   Sync data from sources
+├── generate                             Generate dbt staging models
+├── run [DBT_ARGS]...                    Run dbt models
+├── docs                                 Generate dbt documentation
+│
+├── source
+│   ├── add                              Add a data source (wizard)
+│   ├── list                             List configured sources
+│   ├── remove SOURCE_NAME               Remove a source
+│   └── edit [NAME]                      Open sources.yml in editor
+│
+├── model
+│   ├── add                              Create a dbt model (wizard)
+│   └── remove MODEL_NAME                Remove a dbt model
+│
+├── config
+│   ├── validate                         Validate config files
+│   ├── show                             Show current config
+│   └── do-token
+│       └── clear                        Remove stored DO token
+│
+├── db
+│   ├── status                           Show database status
+│   └── clean                            Remove orphaned tables
+│
+├── auth
+│   ├── enable                           Enable authentication
+│   ├── disable                          Disable authentication
+│   ├── status                           Show auth status
+│   ├── add-user EMAIL                   Create a new user
+│   ├── list-users                       List all users
+│   ├── reset-password EMAIL             Reset user password
+│   ├── change-role EMAIL ROLE           Change user role
+│   ├── deactivate-user EMAIL            Soft-disable a user
+│   ├── reactivate-user EMAIL            Re-enable a user
+│   ├── delete-user EMAIL                Permanently delete user
+│   ├── unlock EMAIL                     Unlock locked account
+│   ├── audit                            Query audit log
+│   └── recover                          Emergency admin recovery
+│
+├── oauth
+│   ├── setup {google|facebook}          OAuth setup wizard
+│   ├── status                           Show token expiry
+│   ├── check                            Validate OAuth config
+│   ├── list                             List all credentials
+│   ├── remove SOURCE_TYPE               Remove a credential
+│   ├── refresh OAUTH_NAME               Re-authenticate
+│   ├── google_sheets                    Authenticate Google Sheets
+│   ├── google_analytics                 Authenticate Google Analytics
+│   ├── google_ads                       Authenticate Google Ads
+│   └── facebook_ads                     Authenticate Facebook Ads
+│
+├── deploy                               Deploy wizard (interactive)
+│   └── destroy                          Tear down cloud infra
+│
+├── remote
+│   ├── push                             Push files and rebuild
+│   ├── rollback                         Restore from backup
+│   ├── status                           Show server status
+│   ├── logs                             View service logs
+│   ├── ssh                              Open SSH session
+│   ├── query SQL                        Run read-only SQL
+│   ├── upgrade                          Upgrade remote Dango
+│   ├── resize [SIZE]                    Resize server
+│   ├── migrate                          Migrate to new server
+│   ├── history                          Show deploy history
+│   ├── sync SOURCE                      Trigger remote sync
+│   ├── env
+│   │   ├── set KEY=VALUE                Set env var
+│   │   ├── get KEY                      Get env var (masked)
+│   │   ├── list                         List env vars (masked)
+│   │   └── delete KEY                   Remove env var
+│   ├── firewall
+│   │   ├── list                         Show firewall rules
+│   │   ├── allow-ip IP_ADDRESS          Restrict to IP
+│   │   └── allow-all                    Open to public
+│   ├── domain
+│   │   ├── set DOMAIN_NAME              Configure HTTPS
+│   │   └── remove                       Revert to IP-only
+│   ├── backup
+│   │   ├── list                         List backups
+│   │   ├── enable                       Enable daily backups
+│   │   ├── disable                      Disable daily backups
+│   │   ├── download NAME                Download from Spaces
+│   │   └── restore SOURCE               Restore from backup
+│   └── auth
+│       ├── add-user EMAIL               Create remote user
+│       ├── list-users                   List remote users
+│       ├── remove-user EMAIL            Remove remote user
+│       └── reset-password EMAIL         Reset remote password
+│
+├── schedule
+│   ├── add                              Add schedule (wizard)
+│   ├── list                             List schedules
+│   ├── remove NAME                      Remove a schedule
+│   ├── status [NAME]                    Show scheduler status
+│   ├── enable NAME                      Enable a schedule
+│   ├── disable NAME                     Disable a schedule
+│   └── webhook
+│       ├── add                          Add webhook (wizard)
+│       ├── list                         List webhooks
+│       ├── remove NAME                  Remove a webhook
+│       └── test NAME                    Test a webhook
+│
+├── dev                                  Run dbt on dev copy
+│   └── clean                            Remove dev artifacts
+│
+├── snapshot
+│   ├── add                              Create dbt snapshot (wizard)
+│   ├── list                             List dbt snapshots
+│   ├── run                              Execute dbt snapshot
+│   └── db                               Create DuckDB snapshot
+│
+├── monitor
+│   └── run                              Run monitor analysis
+├── analyze                              Alias for monitor run
+│
+├── governance
+│   ├── drift-report                     Show schema drift
+│   ├── pii-report                       Show PII findings
+│   ├── pii-set SOURCE TABLE COLUMN      Set PII override
+│   ├── pii-list                         List PII overrides
+│   └── accept SOURCE                    Accept schema drift
+│
+├── notebook
+│   ├── new                              Create notebook
+│   └── open NAME                        Open in Marimo
+│
+├── metabase
+│   ├── save                             Export dashboards to files
+│   ├── load                             Import dashboards from files
+│   └── refresh                          Refresh Metabase schema
+│
+├── dashboard
+│   └── provision                        Create health dashboard
+│
+├── migrate
+│   ├── status                           Show migration status
+│   └── run                              Apply pending migrations
+│
+└── web                                  Start Web UI server
+```
 
 ---
 
 ## Global Options
 
-Available for all commands:
-
 ```bash
-dango [COMMAND] [OPTIONS]
+dango [OPTIONS] COMMAND [ARGS]...
 ```
 
-### Common Flags
+| Option | Description |
+|--------|-------------|
+| `--version` | Show the version and exit |
+| `--help` | Show help message and exit |
 
-| Flag | Description |
-|------|-------------|
-| `--help`, `-h` | Show help message and exit |
-| `--version` | Show Dango version |
-
-**Examples**:
+Get help for any command:
 
 ```bash
-# Show help for any command
-dango sync --help
-
-# Check version
-dango --version
-# Output: dango version 0.0.5
-
-# Enable debug logging (via environment variable)
-RUNTIME__LOG_LEVEL=DEBUG dango sync
+dango <command> --help
+dango <group> <subcommand> --help
 ```
 
 ---
 
-## Project Management
+## Project Lifecycle
 
 ### dango init
 
-Initialize a new Dango project.
-
-**Syntax**:
+Create a new Dango data project.
 
 ```bash
 dango init [PROJECT_NAME] [OPTIONS]
 ```
 
-**Arguments**:
-
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `PROJECT_NAME` | No | Name for the project directory (defaults to current directory) |
-
-**Options**:
-
 | Option | Description |
 |--------|-------------|
-| `--skip-wizard` | Skip interactive setup wizard |
-| `--force`, `-f` | Overwrite existing project |
-
-**Examples**:
+| `PROJECT_NAME` | Project directory name (default: current directory `.`) |
+| `--skip-wizard` | Skip interactive wizard, create blank project |
+| `--force` | Force initialization even if project exists |
 
 ```bash
-# Interactive initialization
 dango init my-analytics
-
-# Blank project (no wizard)
 dango init . --skip-wizard
-
-# Force reinitialize
 dango init my-project --force
 ```
 
-**What it creates**:
-
-```
-my-analytics/
-├── .dango/
-│   ├── project.yml
-│   └── sources.yml
-├── .dlt/
-│   ├── config.toml
-│   └── secrets.toml
-├── data/
-│   └── .gitkeep
-├── dbt/
-│   ├── dbt_project.yml
-│   ├── models/
-│   └── tests/
-├── custom_sources/
-│   └── __init__.py
-├── docker-compose.yml
-├── .gitignore
-└── .env.example
-```
+[:octicons-arrow-right-24: Full guide](init-start.md)
 
 ---
 
-### dango info
+### dango start
 
-Display project metadata and configuration.
-
-**Syntax**:
+Start all platform services (Web UI, Metabase, dbt-docs, file watcher).
 
 ```bash
-dango info [OPTIONS]
+dango start [OPTIONS]
 ```
-
-**Options**:
 
 | Option | Description |
 |--------|-------------|
-| `--json` | Output in JSON format |
-| `--yaml` | Output in YAML format |
-
-**Examples**:
+| `-y`, `--yes` | Skip confirmation prompts |
 
 ```bash
-# Human-readable output
-dango info
-
-# JSON format
-dango info --json
-
-# YAML format
-dango info --yaml
+dango start
+dango start -y
 ```
 
-**Output**:
+Access the platform at `http://localhost:<port>` (default: 8800). Change port in `.dango/project.yml` under `platform.port`.
 
+[:octicons-arrow-right-24: Full guide](init-start.md)
+
+---
+
+### dango stop
+
+Stop all platform services.
+
+```bash
+dango stop [OPTIONS]
 ```
-Project: my-analytics
-Organization: Acme Corp
-Created: 2024-11-15 by alice@acme.com
-Dango Version: 0.0.5
 
-Purpose:
-  Track customer behavior and revenue metrics
+| Option | Description |
+|--------|-------------|
+| `--all` | Stop ALL Dango containers from any project |
 
-Stakeholders:
-  - Bob Chen (CEO) - bob@acme.com
-  - Sarah Lee (Analyst) - sarah@acme.com
-
-Data SLA:
-  Daily updates by 9am UTC
-
-Known Limitations:
-  - Stripe data has 24h delay
-  - Google Sheets updated manually
-
-Configuration:
-  Database: data/warehouse.duckdb (42.3 MB)
-  dbt Project: dbt/
-  Port: 8800
-  Auto-sync: Enabled (600s debounce)
+```bash
+dango stop
+dango stop --all
 ```
 
 ---
 
 ### dango status
 
-Check platform and service status.
-
-**Syntax**:
+Show platform status including service health and access URLs.
 
 ```bash
-dango status [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--json` | Output in JSON format |
-| `--check` | Exit with error code if not running |
-
-**Examples**:
-
-```bash
-# Check status
 dango status
-
-# JSON output
-dango status --json
-
-# Exit code check (for scripts)
-dango status --check && echo "Running" || echo "Stopped"
 ```
 
-**Output**:
-
-```
-Project: my-analytics (Port: 8800)
-Status: ● Running
-
-Services:
-  FastAPI Web UI     ● Running (http://localhost:8800)
-  File Watcher       ● Running (auto-sync enabled)
-  Metabase          ● Running (http://localhost:3000)
-  dbt-docs          ○ Stopped
-
-Database: data/warehouse.duckdb (42.3 MB)
-Sources: 5 configured (4 enabled)
-Last activity: 2 minutes ago
-```
-
-**Exit codes**:
-
-- `0` - Platform running
-- `1` - Platform stopped or error
+No additional options.
 
 ---
 
-### dango validate
+### dango info
 
-Validate project configuration and health.
-
-**Syntax**:
+Show project information: name, purpose, stakeholders, data refresh schedule, last sync time.
 
 ```bash
-dango validate [OPTIONS]
+dango info
 ```
 
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--fix` | Attempt to auto-fix issues |
-| `--strict` | Fail on warnings (not just errors) |
-| `--check TYPE` | Run specific check: config, sources, database, deps |
-
-**Examples**:
-
-```bash
-# Validate everything
-dango validate
-
-# Auto-fix issues
-dango validate --fix
-
-# Strict mode
-dango validate --strict
-
-# Validate sources only
-dango validate --check sources
-```
-
-**Output**:
-
-```
-Validating project configuration...
-
-✓ Project configuration (.dango/project.yml)
-✓ Sources configuration (.dango/sources.yml)
-✓ dbt project (dbt/dbt_project.yml)
-✓ DuckDB database accessible
-✗ Docker not running (Metabase won't start)
-⚠ OAuth token expires in 6 days (google_sheets)
-
-Validation complete: 1 error, 1 warning
-
-Errors:
-  1. Docker daemon not running
-     → Start Docker: docker start
-     → Or disable Metabase in docker-compose.yml
-
-Warnings:
-  1. OAuth credentials expire soon
-     → Run: dango auth refresh google_sheets
-```
-
-**Exit codes**:
-
-- `0` - No errors (warnings OK unless --strict)
-- `1` - Validation errors found
+No additional options.
 
 ---
 
 ### dango rename
 
-Rename project.
-
-**Syntax**:
+Rename the project and update its local domain routing.
 
 ```bash
-dango rename NEW_NAME [OPTIONS]
+dango rename NEW_NAME
 ```
 
-**Arguments**:
+| Argument | Description |
+|----------|-------------|
+| `NEW_NAME` | New project name (becomes `<new_name>.dango`) |
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `NEW_NAME` | Yes | New project name |
+Updates config, routing table, nginx config, and `/etc/hosts`.
 
-**Options**:
+```bash
+dango rename my-new-analytics
+```
+
+---
+
+### dango serve
+
+Run Dango in production server mode (foreground). Intended for systemd on cloud servers.
+
+```bash
+dango serve [OPTIONS]
+```
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `--host` | TEXT | `0.0.0.0` | Bind address |
+| `--port` | INTEGER | config or 8800 | Port |
+| `--workers` | INTEGER | 1 | Number of uvicorn workers |
+
+Unlike `dango start`, this binds to all interfaces, runs in the foreground, and skips browser/file-watcher.
+
+---
+
+### dango upgrade
+
+Upgrade Dango to the latest version (or a specific version), then run pending migrations.
+
+```bash
+dango upgrade [OPTIONS]
+```
 
 | Option | Description |
 |--------|-------------|
-| `--force`, `-f` | Skip confirmation prompt |
-
-**Examples**:
+| `--version TEXT` | Specific version to install (e.g. `1.2.3`) |
+| `-y`, `--yes` | Skip confirmation prompts |
 
 ```bash
-# Rename project
-dango rename new-analytics
-
-# Force rename
-dango rename new-analytics --force
+dango upgrade
+dango upgrade --version 1.2.3 -y
 ```
 
-**What it updates**:
+Restart services with `dango start` after upgrading.
 
-- `.dango/project.yml` → `project.name`
-- `.dango/routing.json` → Domain mappings
-- Docker container labels
-- dbt project name
+---
+
+### dango cleanup
+
+Remove old log archives, dbt artifacts, and Python cache.
+
+```bash
+dango cleanup [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Show what would be deleted without deleting |
+| `-y`, `--yes` | Skip confirmation prompt |
+| `--logs-only` | Only clean log archives, skip dbt/cache |
+| `--docker` | Also prune dangling Docker volumes |
+
+```bash
+dango cleanup --dry-run
+dango cleanup --yes
+dango cleanup --logs-only
+dango cleanup --docker
+```
 
 ---
 
@@ -343,210 +364,109 @@ dango rename new-analytics --force
 
 ### dango sync
 
-Sync data from configured sources.
-
-**Syntax**:
+Load data from all sources (or a specific source).
 
 ```bash
-dango sync [OPTIONS]
+dango sync [SOURCE_NAME] [OPTIONS]
 ```
 
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--source NAME` | Sync specific source only |
-| `--full-refresh` | Drop and reload all data |
-| `--dry-run` | Preview without syncing |
-| `--start-date DATE` | Override incremental start date (YYYY-MM-DD) |
-| `--workers N` | Number of parallel workers (default: 4) |
-| `--select TABLE` | Sync specific table/resource only |
-
-**Examples**:
+| Option | Type | Description |
+|--------|------|-------------|
+| `SOURCE_NAME` | positional | Sync only this source |
+| `--source TEXT` | option | Sync specific source (deprecated, use positional arg) |
+| `--since TEXT` | date | Start date for incremental loading (YYYY-MM-DD) |
+| `--until TEXT` | date | End date for incremental loading (YYYY-MM-DD) |
+| `--backfill TEXT` | duration | Backfill duration (e.g. `7d`, `2w`, `1m`) |
+| `--limit INTEGER` | number | Limit rows per source (dev testing) |
+| `--full-refresh` | flag | Drop existing data and reload from scratch |
+| `--dry-run` | flag | Show what would be synced without executing |
+| `--allow-schema-changes` | flag | Allow CSV schema changes (add columns, NULL for missing) |
+| `-y`, `--yes` | flag | Skip confirmation prompts |
 
 ```bash
-# Sync all enabled sources
-dango sync
-
-# Sync specific source
-dango sync --source stripe_payments
-
-# Full refresh
-dango sync --full-refresh
-
-# Dry run
-dango sync --dry-run
-
-# Override start date
-dango sync --source stripe_payments --start-date 2024-01-01
-
-# Parallel workers
-dango sync --workers 8
-
-# Specific table only
-dango sync --source stripe_payments --select charges
+dango sync                               # Sync all enabled sources
+dango sync chess                         # Sync only 'chess'
+dango sync --since 2024-01-01            # Override start date
+dango sync --backfill 30d                # Backfill last 30 days
+dango sync --limit 1000                  # Dev mode: limit rows
+dango sync --full-refresh                # Reset and reload all
+dango sync --dry-run                     # Preview only
 ```
 
-**Output**:
-
-```
-[12:34:56] Starting sync for stripe_payments
-[12:34:57] Connecting to Stripe API
-[12:34:58] Fetching charges (incremental from 2024-11-01)
-[12:35:12] Loaded 1,523 charges
-[12:35:13] Fetching customers (full refresh)
-[12:35:20] Loaded 342 customers
-[12:35:21] Writing to raw_stripe.charges
-[12:35:24] Writing to raw_stripe.customers
-[12:35:25] ✓ Sync complete (1,865 rows in 29.2s)
-```
-
-**Exit codes**:
-
-- `0` - Sync successful
-- `1` - Sync failed
+[:octicons-arrow-right-24: Full guide](source-sync.md)
 
 ---
 
 ### dango generate
 
-Auto-generate dbt staging models from raw tables.
-
-**Syntax**:
+Generate dbt staging models and schema artifacts from data sources.
 
 ```bash
 dango generate [OPTIONS]
 ```
 
-**Options**:
-
 | Option | Description |
 |--------|-------------|
-| `--source NAME` | Generate for specific source only |
-| `--models LAYER` | Generate specific layer: staging, all |
-| `--force`, `-f` | Overwrite existing models |
-| `--dedup-strategy STRATEGY` | Deduplication: latest_only, scd_type2, none |
-
-**Examples**:
+| `--models` | Generate staging models only |
+| `--all` | Generate all artifacts (models + schema) |
 
 ```bash
-# Generate all staging models
-dango generate
-
-# Generate for specific source
-dango generate --source stripe_payments
-
-# Force overwrite
-dango generate --force
-
-# Custom dedup strategy
-dango generate --dedup-strategy scd_type2
+dango generate --models
+dango generate --all
 ```
 
-**Output**:
+!!! tip
+    Run `dango sync` first to load data into DuckDB before generating models.
 
-```
-Generating staging models...
-Introspecting raw_stripe.* tables...
-
-✓ Generated stg_stripe_charges.sql (12 columns)
-✓ Generated stg_stripe_customers.sql (8 columns)
-✓ Generated stg_stripe_subscriptions.sql (15 columns)
-✓ Generated _stg_stripe__sources.yml
-✓ Generated _stg_stripe__schema.yml
-
-3 models created in dbt/models/staging/
-Run 'dango run' to materialize.
-```
-
-**Exit codes**:
-
-- `0` - Generation successful
-- `1` - Generation failed
+[:octicons-arrow-right-24: Full guide](transform-model.md)
 
 ---
 
 ### dango run
 
-Run dbt transformations.
-
-**Syntax**:
+Run dbt models. All dbt run arguments are passed through.
 
 ```bash
-dango run [OPTIONS] [DBT_ARGS...]
+dango run [DBT_ARGS]...
 ```
 
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--select MODEL` | Run specific model(s) |
-| `--exclude MODEL` | Exclude model(s) |
-| `--full-refresh` | Full rebuild of incremental models |
-| `--threads N` | Number of threads (default: 4) |
-
-**Additional dbt arguments**:
-
-Any dbt run argument can be passed through:
-
-- `--vars` - Set dbt variables
-- `--target` - Use specific target
-- `--models` - Alternative to --select
-- `--fail-fast` - Stop on first error
-
-**Examples**:
+Any `dbt run` argument works — `--select`, `--full-refresh`, `--exclude`, etc.
 
 ```bash
-# Run all models
-dango run
-
-# Run specific model
-dango run --select customer_metrics
-
-# Run model and downstream
-dango run --select customer_metrics+
-
-# Run model and upstream
-dango run --select +customer_metrics
-
-# Run all marts
-dango run --select marts.*
-
-# Full refresh
-dango run --full-refresh
-
-# Set variables
-dango run --vars '{"year": 2024}'
-
-# Custom threads
-dango run --threads 8
-
-# Fail fast
-dango run --fail-fast
+dango run                            # Run all models
+dango run --select my_model          # Run specific model
+dango run --select my_model+         # Model and downstream
+dango run --select tag:marts         # By tag
+dango run --full-refresh             # Full refresh incremental models
 ```
 
-**Output**:
+[:octicons-arrow-right-24: Full guide](transform-model.md)
 
-```
-Running dbt...
-12:45:01  Running with dbt=1.7.4
-12:45:02  Found 15 models, 8 tests, 0 snapshots
-12:45:03  Concurrency: 4 threads
-12:45:04
-12:45:04  1 of 15 START sql view model staging.stg_stripe_charges ........ [RUN]
-12:45:05  1 of 15 OK created sql view model staging.stg_stripe_charges ... [SUCCESS in 0.8s]
-12:45:05  2 of 15 START sql table model marts.customer_metrics ........... [RUN]
-12:45:07  2 of 15 OK created sql table model marts.customer_metrics ...... [SUCCESS in 2.1s]
-...
-12:45:15  Finished running 15 models in 12.3s.
-12:45:15
-12:45:15  Completed successfully
+---
+
+### dango docs
+
+Generate dbt documentation.
+
+```bash
+dango docs
 ```
 
-**Exit codes**:
+No additional options. After generation, view docs at `http://localhost:<port>/catalog` if the platform is running.
 
-- `0` - All models successful
-- `1` - One or more models failed
+---
+
+### dango validate
+
+Validate project configuration and setup.
+
+```bash
+dango validate
+```
+
+No additional options. Checks project structure, config files, source configs, dbt setup, database connectivity, dependencies, and file permissions.
+
+[:octicons-arrow-right-24: Full guide](other-commands.md#dango-validate)
 
 ---
 
@@ -554,170 +474,71 @@ Running dbt...
 
 ### dango source add
 
-Add a new data source interactively.
-
-**Syntax**:
+Add a new data source via interactive wizard. Supports 27+ sources across 9 categories.
 
 ```bash
-dango source add [SOURCE_TYPE] [OPTIONS]
-```
-
-**Arguments**:
-
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `SOURCE_TYPE` | No | Source type (launches wizard if omitted) |
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--name NAME` | Source name |
-| `--config FILE` | Load config from YAML file |
-| `--skip-test` | Skip connection test |
-
-**Examples**:
-
-```bash
-# Interactive wizard
 dango source add
-
-# Specify source type
-dango source add stripe
-
-# Non-interactive with config file
-dango source add --config stripe-config.yml
-
-# Skip connection test
-dango source add --skip-test
 ```
 
-**Interactive flow**:
+No additional options — the wizard handles all configuration interactively.
 
-```
-Select source type:
-  1. CSV files
-  2. Stripe
-  3. Google Sheets
-  ...
-  30. Custom (dlt_native)
-
-Choice: 2
-
-Source name: stripe_payments
-Stripe API Key (env var name): STRIPE_API_KEY
-Start date (YYYY-MM-DD): 2024-01-01
-
-Testing connection...
-✓ Connection successful
-✓ API key valid
-✓ Fetched sample data
-
-Save source? (Y/n): y
-
-✓ Source added to .dango/sources.yml
-Run 'dango sync --source stripe_payments' to load data.
-```
+[:octicons-arrow-right-24: Full guide](source-sync.md#adding-sources)
 
 ---
 
 ### dango source list
 
-List all configured sources.
-
-**Syntax**:
+List all configured data sources.
 
 ```bash
 dango source list [OPTIONS]
 ```
 
-**Options**:
-
 | Option | Description |
 |--------|-------------|
 | `--enabled-only` | Show only enabled sources |
 
-**Examples**:
-
 ```bash
-# List all sources
 dango source list
-
-# Enabled sources only
 dango source list --enabled-only
-```
-
-**Output**:
-
-```
-Configured Sources:
-
-  ● stripe_payments (stripe) - Enabled
-      Last synced: 2024-12-01 12:34:56
-      Rows: 1,865
-      Tables: charges, customers, subscriptions
-
-  ● orders_csv (csv) - Enabled
-      Last synced: 2024-12-01 08:15:23
-      Rows: 5,432
-      File: data/orders.csv
-
-  ○ old_hubspot (hubspot) - Disabled
-      Never synced
-      Reason: Deprecated source
 ```
 
 ---
 
 ### dango source remove
 
-Remove a source from configuration.
-
-**Syntax**:
+Remove a data source.
 
 ```bash
 dango source remove SOURCE_NAME [OPTIONS]
 ```
 
-**Arguments**:
-
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `SOURCE_NAME` | Yes | Name of source to remove |
-
-**Options**:
-
 | Option | Description |
 |--------|-------------|
-| `--force`, `-f` | Skip confirmation prompt |
-| `--delete-data` | Also delete data from database |
-
-**Examples**:
+| `-y`, `--yes` | Skip confirmation prompt |
 
 ```bash
-# Remove source (with confirmation)
-dango source remove old_hubspot
-
-# Force remove
-dango source remove old_hubspot --force
-
-# Remove and delete data
-dango source remove old_hubspot --delete-data
+dango source remove my_csv
+dango source remove my_csv --yes
 ```
 
-**Output**:
+---
 
+### dango source edit
+
+Open `sources.yml` in your default editor (`$EDITOR`).
+
+```bash
+dango source edit [NAME]
 ```
-Remove 'old_hubspot' source?
-This will:
-  - Remove from .dango/sources.yml
-  - Keep data in database (use --delete-data to remove)
 
-Proceed? (y/N): y
+| Argument | Description |
+|----------|-------------|
+| `NAME` | Optional — hints at the section to focus on |
 
-✓ Source removed from configuration
-Data remains in raw_old_hubspot schema
-Run 'dango db clean' to remove orphaned data
+```bash
+dango source edit
+dango source edit chess
 ```
 
 ---
@@ -726,995 +547,745 @@ Run 'dango db clean' to remove orphaned data
 
 ### dango model add
 
-Interactively create a new dbt model (intermediate or marts).
-
-**Syntax**:
+Create a new dbt model (intermediate or marts layer) via interactive wizard.
 
 ```bash
 dango model add
 ```
 
-**Interactive flow**:
+Staging models are auto-generated by `dango generate` — this wizard handles intermediate and marts layers only.
 
-```
-Select model layer:
-  1. intermediate - Reusable business logic, joins, aggregations
-  2. marts - Final tables for business intelligence
-
-Choice: 2
-
-Enter model name: customer_metrics
-Enter description (optional): Customer lifetime value and order metrics
-
-✓ Created dbt/models/marts/customer_metrics.sql
-✓ Created dbt/models/marts/_customer_metrics__schema.yml
-
-Next steps:
-  1. Edit dbt/models/marts/customer_metrics.sql with your SQL
-  2. Run: dango run --select customer_metrics
-```
-
-**What it creates**:
-
-For marts models:
-```
-dbt/models/marts/
-├── customer_metrics.sql          # SQL template
-└── _customer_metrics__schema.yml # Schema with description
-```
-
-For intermediate models:
-```
-dbt/models/intermediate/
-├── int_customer_metrics.sql          # SQL template (auto-prefixed with int_)
-└── _int_customer_metrics__schema.yml # Schema with description
-```
-
-**Generated SQL template**:
-
-```sql
-{{ config(
-    materialized='table',
-    schema='marts'
-) }}
-
--- TODO: Add your SQL here
--- Reference staging models with: {{ ref('stg_source_table') }}
--- Reference intermediate models with: {{ ref('int_model_name') }}
-
-SELECT 1 as placeholder
-```
-
-!!! tip "Naming conventions"
-    - **Intermediate models**: Automatically prefixed with `int_` (e.g., `customer_orders` → `int_customer_orders`)
-    - **Marts models**: Used as-is (e.g., `customer_metrics`)
+[:octicons-arrow-right-24: Full guide](transform-model.md#dango-model-add)
 
 ---
 
 ### dango model remove
 
-Remove a custom dbt model.
-
-**Syntax**:
+Remove a custom dbt model and cascade cleanup (SQL file, schema entry, monitors, optionally DuckDB table).
 
 ```bash
 dango model remove MODEL_NAME [OPTIONS]
 ```
 
-**Arguments**:
-
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `MODEL_NAME` | Yes | Name of model to remove |
-
-**Options**:
-
 | Option | Description |
 |--------|-------------|
-| `--force`, `-f` | Skip confirmation prompt |
-
-**Examples**:
-
-```bash
-# Remove with confirmation
-dango model remove customer_metrics
-
-# Force remove
-dango model remove customer_metrics --force
-```
-
-**Output**:
-
-```
-Remove 'customer_metrics' model?
-This will delete:
-  - dbt/models/marts/customer_metrics.sql
-  - dbt/models/marts/_customer_metrics__schema.yml
-
-Proceed? (y/N): y
-
-✓ Removed customer_metrics.sql
-✓ Removed _customer_metrics__schema.yml
-
-Note: The table may still exist in the database.
-Run 'dango run' to update the database state.
-```
-
-!!! warning "Staging models"
-    `dango model remove` is for custom models only (intermediate and marts).
-    Staging models are auto-generated by `dango sync` and should not be manually removed.
-
----
-
-## Platform Control
-
-### dango start
-
-Start the Dango platform and all services.
-
-**Syntax**:
+| `-y`, `--yes` | Skip confirmation prompt |
+| `--dry-run` | Show what would be removed without executing |
 
 ```bash
-dango start
-```
-
-!!! note "No Options Available"
-    The `start` command has no command-line options. All configuration is done via `.dango/project.yml`.
-
-**Example**:
-
-```bash
-# Start all services (Web UI, Metabase, dbt docs)
-dango start
-```
-
-**Configuration** (via `.dango/project.yml`):
-
-```yaml
-platform:
-  web_ui:
-    port: 8800  # Configure Web UI port here
-  auto_sync: true  # Enable file watcher
-```
-
-**Output**:
-
-```
-Starting Dango platform...
-✓ FastAPI Web UI started (http://localhost:8800)
-✓ File Watcher started (auto-sync enabled)
-✓ Metabase starting... (this may take 30s)
-✓ Metabase started (http://localhost:3000)
-✓ dbt-docs available (http://localhost:8800/dbt-docs)
-
-Platform running. Press Ctrl+C to stop.
-Open http://localhost:8800 in your browser.
+dango model remove fct_daily_sales
+dango model remove int_orders --yes
+dango model remove fct_daily_sales --dry-run
 ```
 
 ---
 
-### dango stop
-
-Stop the Dango platform and all services.
-
-**Syntax**:
-
-```bash
-dango stop [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--all` | Stop all Dango projects on machine |
-| `--force`, `-f` | Force kill processes |
-
-**Examples**:
-
-```bash
-# Stop current project
-dango stop
-
-# Stop all Dango projects
-dango stop --all
-
-# Force stop
-dango stop --force
-```
-
-**Output**:
-
-```
-Stopping Dango platform...
-✓ File Watcher stopped
-✓ FastAPI Web UI stopped
-✓ Metabase stopped
-✓ dbt-docs stopped
-
-Platform stopped.
-```
-
-!!! note "Restarting the Platform"
-    There is no `dango restart` command. To restart the platform:
-
-    ```bash
-    dango stop && dango start
-    ```
-
----
-
-## Database Operations
-
-### dango db status
-
-Show database status and statistics.
-
-**Syntax**:
-
-```bash
-dango db status [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--detailed` | Show table-level details |
-| `--json` | Output in JSON format |
-
-**Examples**:
-
-```bash
-# Database summary
-dango db status
-
-# Detailed table info
-dango db status --detailed
-
-# JSON output
-dango db status --json
-```
-
-**Output**:
-
-```
-Database: data/warehouse.duckdb (42.3 MB)
-
-Schemas:
-  raw                3 tables, 12,435 rows
-  raw_stripe         5 tables, 8,921 rows
-  staging           8 tables
-  intermediate      3 tables, 5,234 rows
-  marts             4 tables, 2,103 rows
-
-Total: 23 objects, 28,693 rows
-Disk usage: 42.3 MB
-Available space: 245 GB
-Last vacuum: 2024-12-08 10:30:15
-```
-
----
-
-### dango db clean
-
-Remove orphaned tables from disabled sources.
-
-**Syntax**:
-
-```bash
-dango db clean [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--dry-run` | Preview without deleting |
-| `--force`, `-f` | Skip confirmation |
-| `--source NAME` | Clean specific source only |
-
-**Examples**:
-
-```bash
-# Interactive clean
-dango db clean
-
-# Dry run
-dango db clean --dry-run
-
-# Force clean
-dango db clean --force
-
-# Clean specific source
-dango db clean --source old_hubspot
-```
-
-**Output**:
-
-```
-Found orphaned tables:
-  - raw_old_hubspot.contacts (1,234 rows, 0.5 MB)
-  - raw_old_hubspot.companies (567 rows, 0.2 MB)
-
-These sources are no longer in .dango/sources.yml.
-
-Drop these tables? (y/N): y
-
-✓ Dropped raw_old_hubspot.contacts
-✓ Dropped raw_old_hubspot.companies
-
-Cleaned 1,801 rows (0.7 MB freed).
-```
-
----
-
-## Authentication
-
-### dango auth list
-
-List stored OAuth credentials.
-
-**Syntax**:
-
-```bash
-dango auth list [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--expired` | Show only expired credentials |
-| `--expiring DAYS` | Show credentials expiring within N days |
-| `--json` | Output in JSON format |
-
-**Examples**:
-
-```bash
-# List all credentials
-dango auth list
-
-# Show expired only
-dango auth list --expired
-
-# Expiring within 7 days
-dango auth list --expiring 7
-```
-
-**Output**:
-
-```
-OAuth Credentials:
-
-  ✓ google_sheets_source
-      Provider: Google OAuth
-      Scopes: spreadsheets.readonly
-      Expires: 2024-12-15 (6 days)
-
-  ✗ facebook_ads_source
-      Provider: Facebook OAuth
-      Expires: 2024-11-20 (EXPIRED 19 days ago)
-
-  ✓ google_analytics_source
-      Provider: Google OAuth
-      Expires: 2024-12-08 (7 days)
-```
-
----
-
-### dango auth refresh
-
-Re-authenticate OAuth source.
-
-**Syntax**:
-
-```bash
-dango auth refresh SOURCE_NAME [OPTIONS]
-```
-
-**Arguments**:
-
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `SOURCE_NAME` | Yes | Name of OAuth source |
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--no-browser` | Don't auto-open browser |
-
-**Examples**:
-
-```bash
-# Refresh credentials
-dango auth refresh facebook_ads_source
-
-# Manual browser
-dango auth refresh google_sheets --no-browser
-```
-
-**Output**:
-
-```
-Opening browser for Facebook OAuth...
-✓ Browser opened at: https://www.facebook.com/...
-
-Waiting for authorization...
-✓ Authorization successful
-✓ Credentials refreshed
-
-New expiry: 2025-01-15 (60 days)
-```
-
----
-
-### dango auth status
-
-Show OAuth credential expiration status.
-
-**Syntax**:
-
-```bash
-dango auth status [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--source NAME` | Check specific source |
-
-**Examples**:
-
-```bash
-# Check all sources
-dango auth status
-
-# Specific source
-dango auth status --source google_sheets
-```
-
-**Output**:
-
-```
-OAuth Status:
-
-Expired:
-  - facebook_ads_source (expired 19 days ago)
-
-Expiring soon (< 7 days):
-  - google_sheets_source (expires in 6 days)
-  - google_analytics_source (expires in 7 days)
-
-Healthy:
-  - stripe_oauth_source (expires in 45 days)
-
-Run 'dango auth refresh <source>' to re-authenticate.
-```
-
----
-
-### dango auth check
-
-Validate OAuth configuration and credential status.
-
-**Syntax**:
-
-```bash
-dango auth check
-```
-
-**What it validates**:
-
-1. **OAuth Client Credentials** (.env file):
-   - Google: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`
-   - Facebook: `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`
-
-2. **Saved OAuth Tokens** (.dlt/secrets.toml):
-   - Token presence and validity
-   - Expiration status (expired, expiring soon, active)
-
-3. **Summary**:
-   - Overall configuration state
-   - Recommended next steps
-
-**Example**:
-
-```bash
-dango auth check
-```
-
-**Output**:
-
-```
-OAuth Configuration Check
-
-1. OAuth Client Credentials (.env)
-  ✓ Google
-    ✓ GOOGLE_CLIENT_ID: 1234...5678.apps.googleusercontent.com
-    ✓ GOOGLE_CLIENT_SECRET: ********
-    → Ready to authenticate
-
-  ✗ Facebook
-    ✗ FACEBOOK_APP_ID: Missing
-    ✗ FACEBOOK_APP_SECRET: Missing
-    → Run: dango auth setup facebook
-
-2. Saved OAuth Tokens (.dlt/secrets.toml)
-  ✓ my_sheets (user@example.com)
-    Provider: google_sheets | Source: my_sheets
-    Active
-
-  ⚠ my_analytics (user@example.com)
-    Provider: google_analytics | Source: my_analytics
-    Expires in 5d
-    → Run: dango auth refresh my_analytics
-
-3. Summary
-  Google credentials configured and authenticated.
-  Facebook credentials missing.
-  → Run: dango auth setup facebook
-```
-
-**Status indicators**:
-
-| Symbol | Meaning |
-|--------|---------|
-| `✓` (green) | Configured/Active |
-| `✗` (red) | Missing/Expired |
-| `⚠` (yellow) | Warning (expiring soon) |
-
----
-
-### dango auth setup
-
-Interactive OAuth setup wizard for creating provider credentials.
-
-**Syntax**:
-
-```bash
-dango auth setup PROVIDER
-```
-
-**Arguments**:
-
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `PROVIDER` | Yes | OAuth provider: `google` or `facebook` |
-
-**Supported Providers**:
-
-| Provider | Services | Required Credentials |
-|----------|----------|---------------------|
-| `google` | Google Sheets, GA4, Google Ads | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` |
-| `facebook` | Facebook Ads | `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET` |
-
-**Examples**:
-
-```bash
-# Setup Google OAuth
-dango auth setup google
-
-# Setup Facebook OAuth
-dango auth setup facebook
-```
-
-**Interactive flow**:
-
-```
-OAuth Setup: Google
-
-Why create your own OAuth app?
-────────────────────────────────
-Your data flows directly from Google → Your machine → Local database.
-Dango never touches your data. You control access and can revoke anytime.
-
-Current Configuration
-────────────────────────────────
-GOOGLE_CLIENT_ID: Not configured
-GOOGLE_CLIENT_SECRET: Not configured
-
-Setup Steps
-────────────────────────────────
-1. Go to Google Cloud Console → APIs & Services → Credentials
-   https://console.cloud.google.com/apis/credentials
-
-2. Click '+ CREATE CREDENTIALS' → 'OAuth client ID'
-
-3. Application type: 'Web application'
-   Name: 'Dango Local'
-
-4. Authorized redirect URIs:
-   Add: http://localhost:8080/callback
-
-5. Click 'Create' and copy credentials
-
-Enter Google Client ID: [paste here]
-Enter Google Client Secret: [paste here]
-
-✓ Credentials saved to .env
-
-Next steps:
-  dango auth google_sheets   # Authenticate Google Sheets
-  dango auth google_analytics # Authenticate GA4
-  dango auth google_ads      # Authenticate Google Ads
-```
-
-**After setup**:
-
-```bash
-# Authenticate with the provider
-dango auth google_sheets
-dango auth google_analytics
-dango auth facebook_ads
-
-# Then add a source
-dango source add
-```
-
----
-
-## Metabase Operations
-
-### dango metabase save
-
-Save Metabase dashboards and questions to JSON files.
-
-**Syntax**:
-
-```bash
-dango metabase save [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--output DIR` | Output directory (default: `.dango/metabase/`) |
-
-**Example**:
-
-```bash
-dango metabase save
-```
-
----
-
-### dango metabase load
-
-Load Metabase dashboards and questions from JSON files.
-
-**Syntax**:
-
-```bash
-dango metabase load [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--input DIR` | Input directory (default: `.dango/metabase/`) |
-
-**Example**:
-
-```bash
-dango metabase load
-```
-
----
-
-### dango metabase refresh
-
-Refresh Metabase database connection to discover new schemas.
-
-**Syntax**:
-
-```bash
-dango metabase refresh
-```
-
-**When to use**:
-
-- After creating new marts (analytics models)
-- When new schemas are added to the warehouse
-- After dbt transformations that create new tables
-- When Metabase doesn't show recently created tables
-
-**Prerequisites**:
-
-- Metabase must be running (`dango start`)
-- Metabase must be configured (`.dango/metabase.yml` exists)
-
-**Example**:
-
-```bash
-dango metabase refresh
-```
-
-**Output**:
-
-```
-Step 1: Logging in to Metabase...
-✓ Logged in successfully
-
-Step 2: Removing old database connection...
-✓ Old connection removed
-
-Step 3: Creating new database connection...
-✓ New connection created
-
-Step 4: Updating configuration...
-✓ Configuration updated
-
-Step 5: Waiting for schema sync...
-✓ Schema sync complete
-
-Discovered schemas: raw, raw_stripe, staging, marts
-Total tables: 15
-
-  raw: csv_uploads
-  raw_stripe: charges, customers, subscriptions
-  staging: stg_stripe_charges, stg_stripe_customers, ...
-  marts: customer_metrics, revenue_by_month
-
-✨ Metabase connection refreshed successfully!
-```
-
-**Troubleshooting**:
-
-| Error | Solution |
-|-------|----------|
-| "Metabase is not running" | Run `dango start` first |
-| "Metabase not configured" | Run `dango start` to initialize Metabase |
-| "Cannot connect to Metabase" | Check Docker is running, try `dango stop && dango start` |
-
----
-
-## Dashboard Operations
-
-### dango dashboard provision
-
-Provision pre-built dashboards in Metabase.
-
-**Syntax**:
-
-```bash
-dango dashboard provision [OPTIONS]
-```
-
-**Options**:
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `--url` | `http://localhost:3001` | Metabase URL |
-| `--username` | `admin@example.com` | Metabase admin username |
-| `--password` | (prompted) | Metabase admin password |
-
-!!! warning "Port Mismatch"
-    The CLI defaults to port 3001, but Metabase runs on port 3000 by default.
-    Always specify `--url http://localhost:3000` when using this command.
-
-!!! note "Use Auto-Created Credentials"
-    If Metabase was auto-configured by `dango start`, use the auto-created credentials:
-
-    - **Email**: `admin@dango.local`
-    - **Password**: `dangolocal123`
-
-**Example**:
-
-```bash
-# With auto-created Metabase credentials (correct port and username)
-dango dashboard provision --url http://localhost:3000 --username admin@dango.local
-```
-
-**What it creates**:
-
-- Data Pipeline Health dashboard with:
-  - Source sync status overview
-  - Recent sync failures
-  - Data freshness metrics
-  - Row count trends
-
----
-
-## Documentation
-
-### dango docs
-
-Generate and serve dbt documentation.
-
-**Syntax**:
-
-```bash
-dango docs [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--port PORT` | Custom port (default: 8081) |
-| `--no-serve` | Generate only, don't serve |
-| `--open`, `-o` | Auto-open browser |
-
-**Examples**:
-
-```bash
-# Generate and serve
-dango docs
-
-# Custom port
-dango docs --port 8082
-
-# Generate only
-dango docs --no-serve
-
-# Auto-open browser
-dango docs --open
-```
-
-**Output**:
-
-```
-Generating dbt documentation...
-12:50:01  Running with dbt=1.7.4
-12:50:02  Building catalog
-12:50:05  Catalog written to target/catalog.json
-12:50:05  Building docs
-12:50:06  Docs written to target/index.html
-
-Starting documentation server...
-✓ dbt-docs running at http://localhost:8081
-
-Press Ctrl+C to stop.
-```
-
----
-
-## Configuration
+## Config
 
 ### dango config validate
 
-Validate all configuration files.
-
-**Syntax**:
+Validate all configuration files: `sources.yml`, `project.yml`, and dbt source documentation.
 
 ```bash
-dango config validate [OPTIONS]
-```
-
-**Options**:
-
-| Option | Description |
-|--------|-------------|
-| `--fix` | Auto-fix issues |
-| `--file FILE` | Validate specific file |
-
-**Examples**:
-
-```bash
-# Validate all config
 dango config validate
-
-# Auto-fix
-dango config validate --fix
-
-# Specific file
-dango config validate --file .dango/sources.yml
 ```
 
-**Output**:
-
-```
-Validating configuration...
-
-✓ .dango/project.yml - OK
-✓ .dango/sources.yml - OK
-✓ dbt/dbt_project.yml - OK
-✗ .dlt/secrets.toml - Missing STRIPE_API_KEY
-
-1 issue found.
-Add STRIPE_API_KEY to .env or .dlt/secrets.toml.
-```
+No additional options.
 
 ---
 
 ### dango config show
 
-Display current configuration.
-
-**Syntax**:
+Show current configuration.
 
 ```bash
-dango config show [OPTIONS]
+dango config show
 ```
 
-**Options**:
+No additional options.
+
+---
+
+### dango config do-token clear
+
+Remove the stored DigitalOcean API token.
+
+```bash
+dango config do-token clear
+```
+
+---
+
+## Database
+
+### dango db status
+
+Show database status including orphaned tables (tables in DuckDB with no matching source config).
+
+```bash
+dango db status
+```
+
+No additional options.
+
+---
+
+### dango db clean
+
+Remove orphaned tables from DuckDB.
+
+```bash
+dango db clean [OPTIONS]
+```
 
 | Option | Description |
 |--------|-------------|
-| `--format FORMAT` | Output format: yaml, json, toml |
-| `--section SECTION` | Show specific section: project, platform, sources |
+| `-y`, `--yes` | Skip confirmation prompt |
 
-**Examples**:
+!!! warning
+    This permanently removes tables from DuckDB. Run `dango db status` first to review what will be deleted.
 
 ```bash
-# Show all config
-dango config show
-
-# JSON format
-dango config show --format json
-
-# Show project section only
-dango config show --section project
+dango db clean
+dango db clean --yes
 ```
+
+---
+
+## Auth
+
+User authentication and access management. See the [Auth Commands](auth-commands.md) page for detailed usage.
+
+### dango auth enable / disable
+
+```bash
+dango auth enable
+dango auth disable
+```
+
+### dango auth status
+
+```bash
+dango auth status
+```
+
+### dango auth add-user
+
+```bash
+dango auth add-user EMAIL [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--role [admin\|editor\|viewer]` | User role |
+| `--password` | Generate temp password instead of invite link |
+| `--base-url TEXT` | Base URL for invite links |
+
+### dango auth list-users
+
+```bash
+dango auth list-users
+```
+
+### dango auth reset-password
+
+```bash
+dango auth reset-password EMAIL
+```
+
+### dango auth deactivate-user / reactivate-user
+
+```bash
+dango auth deactivate-user EMAIL
+dango auth reactivate-user EMAIL
+```
+
+### dango auth delete-user
+
+```bash
+dango auth delete-user EMAIL
+```
+
+!!! danger
+    Permanently deletes the user. This cannot be undone.
+
+### dango auth unlock
+
+```bash
+dango auth unlock EMAIL
+```
+
+### dango auth change-role
+
+```bash
+dango auth change-role EMAIL {admin|editor|viewer}
+```
+
+### dango auth audit
+
+```bash
+dango auth audit [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--since TEXT` | Filter events after date (YYYY-MM-DD) |
+| `--type TEXT` | Filter by event type |
+| `--limit INTEGER` | Max events to show |
+
+### dango auth recover
+
+```bash
+dango auth recover
+```
+
+Creates a recovery admin account for emergency access.
+
+[:octicons-arrow-right-24: Full guide](auth-commands.md)
+
+---
+
+## OAuth
+
+OAuth provider authentication. See the [OAuth Commands](oauth-commands.md) page for detailed usage.
+
+### dango oauth setup
+
+```bash
+dango oauth setup {google|facebook}
+```
+
+### dango oauth status / check / list
+
+```bash
+dango oauth status      # Show credential expiry
+dango oauth check       # Validate OAuth config
+dango oauth list        # List all credentials
+```
+
+### dango oauth remove
+
+```bash
+dango oauth remove SOURCE_TYPE
+```
+
+### dango oauth refresh
+
+```bash
+dango oauth refresh OAUTH_NAME
+```
+
+### Provider-specific commands
+
+```bash
+dango oauth google_sheets
+dango oauth google_analytics
+dango oauth google_ads
+dango oauth facebook_ads
+```
+
+Each walks through the browser-based OAuth flow and saves credentials to `.dlt/secrets.toml`.
+
+[:octicons-arrow-right-24: Full guide](oauth-commands.md)
+
+---
+
+## Deploy
+
+### dango deploy
+
+Interactive deployment wizard. Supports DigitalOcean, BYOS (bring your own server), and reconnection.
+
+```bash
+dango deploy [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--non-interactive` | All params via flags/env (DigitalOcean) |
+| `--reconnect` | Reconnect to an existing server |
+| `--ip TEXT` | Server IP for `--reconnect` |
+| `--region TEXT` | DO region slug |
+| `--size TEXT` | Droplet size slug |
+| `--domain TEXT` | Custom domain for HTTPS |
+| `--admin-email TEXT` | Admin user email |
+| `--admin-password TEXT` | Admin password (or `DANGO_ADMIN_PASSWORD` env) |
+| `--skip-backups` | Skip automated backup setup |
+| `--skip-initial-sync` | Skip initial data sync |
+| `--byos` | Deploy to an existing server (any provider) |
+| `--server-ip TEXT` | Server IP/hostname for `--byos` |
+| `--ssh-user TEXT` | SSH user for `--byos` |
+| `--ssh-key TEXT` | SSH key path for `--byos` |
+
+```bash
+dango deploy                                    # Interactive wizard
+dango deploy --non-interactive --region nyc3    # Scripted DO deploy
+dango deploy --reconnect --ip 1.2.3.4          # Reconnect
+dango deploy --byos --server-ip 1.2.3.4        # Your own server
+```
+
+### dango deploy destroy
+
+Tear down all cloud infrastructure for this project.
+
+```bash
+dango deploy destroy [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--force` | Skip confirmation and backup prompts |
+| `--keep-spaces` | Keep the Spaces bucket |
+| `--keep-ssh-key` | Keep the SSH key on DigitalOcean |
+
+!!! danger
+    This deletes the Droplet, firewall, SSH key (from DO), and Spaces bucket. Local files and SSH keys are never deleted.
+
+[:octicons-arrow-right-24: Full guide](deploy-remote.md)
+
+---
+
+## Remote
+
+Manage the remote cloud server. See the [Deploy & Remote](deploy-remote.md) page for detailed usage.
+
+### Core commands
+
+```bash
+dango remote push [OPTIONS]           # Push files and rebuild
+dango remote rollback [OPTIONS]       # Restore from backup
+dango remote status                   # Show server status
+dango remote logs [OPTIONS]           # View service logs
+dango remote ssh                      # Interactive SSH session
+dango remote query SQL [OPTIONS]      # Read-only SQL query
+dango remote upgrade [OPTIONS]        # Upgrade remote Dango
+dango remote resize [SIZE]            # Resize server
+dango remote migrate [OPTIONS]        # Migrate to new server
+dango remote history [OPTIONS]        # Show deploy history
+dango remote sync SOURCE [OPTIONS]    # Trigger remote sync
+```
+
+### Environment variables
+
+```bash
+dango remote env set KEY=VALUE
+dango remote env get KEY
+dango remote env list
+dango remote env delete KEY
+```
+
+### Firewall
+
+```bash
+dango remote firewall list
+dango remote firewall allow-ip IP_ADDRESS
+dango remote firewall allow-all
+```
+
+### Domain & HTTPS
+
+```bash
+dango remote domain set DOMAIN_NAME
+dango remote domain remove
+```
+
+### Backups
+
+```bash
+dango remote backup list
+dango remote backup enable
+dango remote backup disable
+dango remote backup download NAME [-o PATH]
+dango remote backup restore SOURCE [-y]
+```
+
+### Remote user management
+
+```bash
+dango remote auth add-user EMAIL [--role ROLE]
+dango remote auth list-users
+dango remote auth remove-user EMAIL
+dango remote auth reset-password EMAIL
+```
+
+[:octicons-arrow-right-24: Full guide](deploy-remote.md)
+
+---
+
+## Schedule
+
+Manage data sync schedules and webhook notifications. See the [Schedule Commands](schedule-commands.md) page for detailed usage.
+
+### Schedules
+
+```bash
+dango schedule add                   # Interactive wizard
+dango schedule list                  # List all schedules
+dango schedule remove NAME [-y]      # Remove by name
+dango schedule status [NAME]         # Overview or single schedule detail
+dango schedule enable NAME           # Enable a schedule
+dango schedule disable NAME          # Disable a schedule
+```
+
+### Webhooks
+
+```bash
+dango schedule webhook add           # Interactive wizard
+dango schedule webhook list          # List webhooks
+dango schedule webhook remove NAME   # Remove webhook
+dango schedule webhook test NAME     # Send test payload
+```
+
+[:octicons-arrow-right-24: Full guide](schedule-commands.md)
+
+---
+
+## Dev
+
+### dango dev
+
+Run dbt against a copy of the production database. The production database is never modified.
+
+```bash
+dango dev [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-s`, `--select TEXT` | dbt model selection (e.g. `stg_*`, `my_model+`) |
+| `--diff` | Show row-count comparison after run |
+
+```bash
+dango dev                     # Run all models on dev copy
+dango dev -s stg_orders       # Run specific model
+dango dev --diff              # Show diff after run
+```
+
+The dev database persists at `.dango/dev/warehouse_dev.duckdb` for inspection.
+
+### dango dev clean
+
+Remove the dev database and related artifacts.
+
+```bash
+dango dev clean
+```
+
+[:octicons-arrow-right-24: Full guide](transform-model.md#dango-dev)
+
+---
+
+## Snapshot
+
+### dango snapshot add
+
+Interactive wizard to create a dbt snapshot (SCD Type 2).
+
+```bash
+dango snapshot add
+```
+
+### dango snapshot list
+
+List configured dbt snapshots.
+
+```bash
+dango snapshot list
+```
+
+### dango snapshot run
+
+Execute dbt snapshot to capture SCD Type 2 change history.
+
+```bash
+dango snapshot run [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-s`, `--select TEXT` | Run specific snapshot(s) by name |
+
+```bash
+dango snapshot run
+dango snapshot run -s snap_shopify_orders
+```
+
+### dango snapshot db
+
+Create a DuckDB read-only snapshot for notebook use.
+
+```bash
+dango snapshot db [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-u`, `--user TEXT` | Username for the snapshot |
+
+[:octicons-arrow-right-24: Full guide](transform-model.md#snapshots)
+
+---
+
+## Monitor
+
+### dango monitor run
+
+Run monitor analysis and display data quality results.
+
+```bash
+dango monitor run [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--source TEXT` | Filter by source name |
+
+### dango analyze
+
+Alias for `dango monitor run`.
+
+```bash
+dango analyze [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--source TEXT` | Filter by source name |
+
+---
+
+## Governance
+
+### dango governance drift-report
+
+Show schema drift events.
+
+```bash
+dango governance drift-report [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--source TEXT` | Filter by source name |
+| `--table TEXT` | Filter by table name |
+| `--limit INTEGER` | Max events to show |
+
+### dango governance pii-report
+
+Show PII findings.
+
+```bash
+dango governance pii-report [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--source TEXT` | Filter by source name |
+| `--table TEXT` | Filter by table name |
+| `--limit INTEGER` | Max findings to show |
+
+### dango governance pii-set
+
+Set a PII override for a column.
+
+```bash
+dango governance pii-set SOURCE TABLE COLUMN [OPTIONS]
+```
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `--status [pii\|not_pii]` | Yes | PII status to set |
+| `--reason TEXT` | No | Reason for the override |
+
+```bash
+dango governance pii-set my_source users email --status pii --reason "Contains user emails"
+dango governance pii-set my_source orders order_id --status not_pii
+```
+
+### dango governance pii-list
+
+List PII overrides.
+
+```bash
+dango governance pii-list [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--source TEXT` | Filter by source name |
+
+### dango governance accept
+
+Accept schema drift for a source and resume dbt.
+
+```bash
+dango governance accept SOURCE
+```
+
+---
+
+## Notebook
+
+### dango notebook new
+
+Create a new Marimo notebook from a starter template.
+
+```bash
+dango notebook new [OPTIONS]
+```
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `-t`, `--template [explore\|quality\|blank]` | No | Starter template |
+| `-n`, `--name TEXT` | Yes | Notebook name (no extension) |
+
+```bash
+dango notebook new -n my_analysis -t explore
+dango notebook new -n data_quality -t quality
+```
+
+### dango notebook open
+
+Open a notebook in Marimo. Acquires a lock, creates a DuckDB snapshot, and starts Marimo. Press Ctrl+C to exit.
+
+```bash
+dango notebook open NAME
+```
+
+---
+
+## Metabase
+
+### dango metabase save
+
+Export Metabase dashboards and questions to files (YAML format in `metabase/` directory).
+
+```bash
+dango metabase save [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--all` | Include personal collections (currently exports "Shared" only) |
+| `--collections TEXT` | Specific collections to export (comma-separated) |
+
+```bash
+dango metabase save
+dango metabase save --collections "Shared,Marketing"
+```
+
+### dango metabase load
+
+Import Metabase dashboards and questions from files.
+
+```bash
+dango metabase load [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--overwrite` | Replace existing dashboards/questions |
+| `--dry-run` | Preview what would be imported |
+
+!!! warning
+    `--overwrite` replaces existing items in Metabase. Uncommitted changes will be lost.
+
+```bash
+dango metabase load
+dango metabase load --dry-run
+dango metabase load --overwrite
+```
+
+### dango metabase refresh
+
+Refresh Metabase schema to discover new tables and schemas.
+
+```bash
+dango metabase refresh
+```
+
+---
+
+## Dashboard
+
+### dango dashboard provision
+
+Provision the Data Pipeline Health dashboard in Metabase.
+
+```bash
+dango dashboard provision [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--url TEXT` | Metabase URL |
+| `--username TEXT` | Metabase admin username (auto-detected from auth DB) |
+| `--password TEXT` | Metabase admin password |
+
+Creates a pre-built dashboard with pipeline health score, source sync status, data freshness indicators, row count trends, and dbt test results.
+
+---
+
+## Migrate
+
+### dango migrate status
+
+Show migration status for all databases.
+
+```bash
+dango migrate status
+```
+
+### dango migrate run
+
+Apply pending migrations.
+
+```bash
+dango migrate run [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--db TEXT` | Apply to a specific database only |
+
+---
+
+## Web
+
+### dango web
+
+Start the Web UI backend server only (without Metabase, file watcher, or dbt-docs).
+
+```bash
+dango web [OPTIONS]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--host TEXT` | Host to bind to |
+| `--port INTEGER` | Port to bind to |
+| `--reload` | Enable auto-reload (development) |
+
+[:octicons-arrow-right-24: Full guide](other-commands.md#dango-web)
 
 ---
 
 ## Exit Codes
 
-All commands follow standard exit code conventions:
-
 | Code | Meaning |
 |------|---------|
 | `0` | Success |
-| `1` | Error (validation failed, command failed) |
-| `2` | Invalid usage (wrong arguments) |
-| `130` | Interrupted (Ctrl+C) |
-
-**Use in scripts**:
-
-```bash
-#!/bin/bash
-dango validate
-if [ $? -eq 0 ]; then
-  dango sync
-  dango run
-else
-  echo "Validation failed"
-  exit 1
-fi
-```
+| `1` | Error (check output for details) |
 
 ---
 
-## Next Steps
+## Related Pages
 
-<div class="grid cards" markdown>
-
--   :material-rocket-launch: **Init & Start**
-
-    ---
-
-    Learn project initialization and starting services.
-
-    [:octicons-arrow-right-24: Init & Start Guide](init-start.md)
-
--   :material-sync: **Sync & Run**
-
-    ---
-
-    Master data syncing and running transformations.
-
-    [:octicons-arrow-right-24: Source & Sync Guide](source-sync.md)
-
--   :material-database-outline: **Source Management**
-
-    ---
-
-    CLI commands for managing data sources.
-
-    [:octicons-arrow-right-24: Source & Sync](source-sync.md)
-
--   :material-check-circle-outline: **Validation**
-
-    ---
-
-    Validate configuration and troubleshoot issues.
-
-    [:octicons-arrow-right-24: Other Commands](other-commands.md)
-
-</div>
+- [Init & Start Guide](init-start.md) — Project setup and service management
+- [Source & Sync](source-sync.md) — Data source and sync operations
+- [Transform & Model](transform-model.md) — dbt transformations and model management
+- [Auth Commands](auth-commands.md) — User authentication details
+- [OAuth Commands](oauth-commands.md) — OAuth provider setup
+- [Deploy & Remote](deploy-remote.md) — Cloud deployment and server management
+- [Schedule Commands](schedule-commands.md) — Scheduled syncs and webhooks
+- [Other Commands](other-commands.md) — Config, database, governance, and more
