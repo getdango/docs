@@ -61,6 +61,34 @@ docker --version
 
 ---
 
+### Docker Desktop Not Running
+
+**Error:**
+
+```
+Cannot connect to the Docker daemon at unix:///var/run/docker.sock
+```
+
+**Solution:**
+
+Docker is installed but the daemon isn't running:
+
+1. **Open Docker Desktop** from your Applications folder or system tray
+2. Wait for the Docker icon to show "Docker Desktop is running" (the whale icon stops animating)
+3. Verify it's ready:
+
+```bash
+docker info
+```
+
+If Docker Desktop won't start, try restarting your computer. On Linux, you may need to start the service manually:
+
+```bash
+sudo systemctl start docker
+```
+
+---
+
 ### pip install getdango Failed
 
 **Error:**
@@ -206,6 +234,23 @@ dango --version
 
 ---
 
+### "dango: command not found" After pip Install
+
+**Problem:** You ran `pip install getdango` (or `pip install --upgrade getdango`) but the `dango` command still points to the old version or isn't found.
+
+**Solution:**
+
+Your shell caches the location of commands. Clear the cache after installing:
+
+```bash
+hash -r
+dango --version
+```
+
+This tells your shell to re-scan `PATH` for the `dango` command. If you're using a virtual environment, make sure it's activated first.
+
+---
+
 ### Port 8800 Already in Use
 
 **Error:**
@@ -243,6 +288,67 @@ dango stop
 **Option 3: Change the port**
 
 Edit `.dango/project.yml` and change `platform.port` to a different value (e.g., 8801).
+
+---
+
+### Port 3000 Already in Use (Metabase)
+
+**Error:**
+
+Metabase fails to start because port 3000 is already in use by another application.
+
+**Solution:**
+
+Find and stop the process using port 3000:
+
+=== "macOS / Linux"
+
+    ```bash
+    # Find what's using port 3000
+    lsof -ti:3000
+
+    # Kill the process
+    lsof -ti:3000 | xargs kill -9
+    ```
+
+=== "Windows"
+
+    ```powershell
+    netstat -ano | findstr :3000
+    taskkill /PID <PID> /F
+    ```
+
+Then restart the platform:
+
+```bash
+dango stop
+dango start
+```
+
+Common applications that use port 3000: React dev servers, Grafana, Rails applications.
+
+---
+
+### Port 2718 Already in Use (dbt Docs)
+
+**Error:**
+
+The dbt docs server fails to start because port 2718 is occupied.
+
+**Solution:**
+
+=== "macOS / Linux"
+
+    ```bash
+    lsof -ti:2718 | xargs kill -9
+    ```
+
+Then restart:
+
+```bash
+dango stop
+dango start
+```
 
 ---
 
@@ -286,6 +392,23 @@ Make sure Docker has enough resources allocated:
 - Open Docker Desktop → Settings → Resources
 - Allocate at least 4GB RAM
 - Restart Docker Desktop
+
+---
+
+### Metabase Cold Start (Slow First Launch)
+
+**Problem:** Metabase shows a loading screen for several minutes on first launch.
+
+**This is normal.** Metabase takes 2–3 minutes to initialize its internal database on the first startup. Subsequent starts are much faster.
+
+**How to check progress:**
+
+```bash
+# Check container health status
+docker ps
+```
+
+The Metabase container will show "health: starting" during initialization and "healthy" when ready. Wait for the healthy status before accessing `http://localhost:8800`.
 
 ---
 
@@ -344,16 +467,23 @@ ERROR: OAuth token expired for source 'google_sheets'
 
 **Solution:**
 
-Re-authenticate with the source:
+Re-authenticate with the OAuth provider:
 
 ```bash
-# Re-authenticate
-dango source auth <source-name>
+# Check which tokens need renewal
+dango oauth status
 
-# Or remove and re-add the source
-dango source remove <source-name>
-dango source add
+# Re-authenticate with a specific provider
+dango oauth google
+
+# Or re-authenticate Facebook
+dango oauth facebook
 ```
+
+!!! info "Token lifetimes"
+    Google tokens are refreshed automatically by dlt. Facebook tokens last 60 days and require manual re-authentication. Run `dango oauth status` periodically to check expiry dates.
+
+See [OAuth Guide](../security/oauth.md) for details on each provider.
 
 ---
 
@@ -398,21 +528,50 @@ Make sure all `{{ ref() }}` references point to existing models.
 ERROR: database is locked
 ```
 
-**Solution:**
+**Cause:**
 
-DuckDB can only have one write connection at a time:
+DuckDB uses a single-writer model — only one process can write to the database at a time. This happens when:
+
+- Two `dango sync` commands run simultaneously
+- A sync is running while you try to query with write access
+- A previous process crashed and left a lock file
+
+**Solutions:**
+
+**1. Stop all Dango processes:**
 
 ```bash
-# Stop all Dango processes
 dango stop
+```
 
-# Kill any stuck processes
-ps aux | grep dango
-kill -9 <process-id>
+**2. Check for running sync processes:**
 
-# Restart
+=== "macOS / Linux"
+
+    ```bash
+    ps aux | grep dango
+    ```
+
+=== "Windows"
+
+    ```powershell
+    Get-Process | Where-Object { $_.ProcessName -like "*dango*" }
+    ```
+
+Kill any stuck processes, then restart:
+
+```bash
 dango start
 ```
+
+**3. Remove stale lock files (if no processes are running):**
+
+```bash
+# Only do this if no dango processes are running
+rm -f data/warehouse.duckdb.wal
+```
+
+Learn more about DuckDB's concurrency model in [DuckDB](../core-concepts/duckdb.md).
 
 ---
 
@@ -425,22 +584,26 @@ dango start
 **1. Verify data was synced:**
 
 ```bash
-dango query "SELECT COUNT(*) FROM raw.<your_source>"
+dango query "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema LIKE 'staging%'"
 ```
 
-**2. Check Metabase database connection:**
+**2. Refresh Metabase schema:**
 
-Open Metabase → Admin → Databases → Verify DuckDB is connected
+After adding new sources or dbt models, tell Metabase to discover the new tables:
 
-**3. Refresh Metabase schema:**
+```bash
+dango metabase refresh
+```
 
-Metabase → Admin → Databases → Your Database → "Sync database schema now"
-
-**4. Check table exists:**
+**3. Check table exists:**
 
 ```bash
 dango query "SHOW TABLES"
 ```
+
+**4. Check Metabase database connection:**
+
+Open Metabase → Admin → Databases → Verify DuckDB is connected
 
 ---
 
@@ -480,8 +643,11 @@ Test with a small sample CSV first:
 
 ```bash
 head -10 /path/to/your/file.csv > sample.csv
-dango source add  # Add sample.csv
+dango source add  # Add sample.csv as a File Import source
 ```
+
+!!! tip "Use File Import, not CSV"
+    When adding file sources, select **File Import (CSV, JSON, Parquet)** in the wizard. This is the `local_files` source type. The legacy `csv` type is hidden from the wizard.
 
 ---
 
@@ -594,7 +760,7 @@ Some browser extensions can interfere with local development.
 **1. Check file watcher is running:**
 
 ```bash
-dango watch
+dango status
 ```
 
 **2. Verify file path configuration:**
@@ -656,7 +822,10 @@ If you can't find a solution, open an issue with:
 
 ## Additional Resources
 
-- **[Installation Guide](installation.md)** - Reinstall if needed
-- **[Quick Start](quick-start.md)** - Review basic workflows
-- **[CLI Reference](../reference/index.md)** - All available commands
-- **[GitHub Issues](https://github.com/getdango/dango/issues)** - Community support
+- **[Installation Guide](installation.md)** — Reinstall if needed
+- **[Quick Start](quick-start.md)** — Review basic workflows
+- **[CLI Reference](../cli/cli-reference.md)** — All available commands
+- **[Security & Authentication](../security/index.md)** — Auth, OAuth, credentials
+- **[Scheduling & Monitoring](../scheduling-monitoring/index.md)** — Syncs, alerts, health checks
+- **[Deployment](../deployment/index.md)** — Cloud deployment guide
+- **[GitHub Issues](https://github.com/getdango/dango/issues)** — Community support

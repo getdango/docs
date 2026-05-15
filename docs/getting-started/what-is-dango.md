@@ -2,7 +2,7 @@
 
 Dango is an open-source data platform that integrates production-grade tools (dlt, dbt, DuckDB, Metabase) into a single, cohesive platform.
 
-**Works on your laptop today. Designed to scale to production tomorrow.**
+**Develop locally. Deploy to the cloud when you're ready.**
 
 ## The Problem
 
@@ -25,11 +25,12 @@ dango init
 
 You get:
 
-- **dlt** for data ingestion (29+ verified sources)
+- **dlt** for data ingestion (33 data sources)
 - **dbt** for SQL transformations
 - **DuckDB** as your analytics database
 - **Metabase** for dashboards and SQL queries
-- **Web UI** for monitoring and management
+- **Web UI** for monitoring, management, and authentication
+- **50+ CLI commands** for every aspect of your data workflow
 
 ## Architecture
 
@@ -48,17 +49,19 @@ graph LR
 
 ### Data Layers
 
-1. **Raw** - Immutable source of truth with metadata
-2. **Staging** - Clean, deduplicated data
-3. **Intermediate** - Reusable business logic
-4. **Marts** - Final business metrics
+1. **Raw** — Immutable source of truth with metadata
+2. **Staging** — Clean, deduplicated data
+3. **Intermediate** — Reusable business logic
+4. **Marts** — Final business metrics
+
+Learn more in [Data Layers](../core-concepts/data-layers.md).
 
 ### Tech Stack
 
 | Component | Purpose | Why This Tool? |
 |-----------|---------|----------------|
 | **DuckDB** | Analytics database | Embedded, fast, no server needed |
-| **dlt** | Data ingestion | 29+ sources, schema evolution |
+| **dlt** | Data ingestion | 33 sources, schema evolution |
 | **dbt** | Transformations | SQL-based, version controlled |
 | **Metabase** | BI dashboards | Auto-configured, easy to use |
 | **Docker** | Service orchestration | Consistent environments |
@@ -68,50 +71,80 @@ graph LR
 
 ### Data Ingestion
 
-- 29+ verified dlt sources (Stripe, Google Sheets, GA4, Facebook Ads, etc.)
-- CSV upload and auto-sync
-- Custom source development
+- 33 data sources (Stripe, Google Sheets, GA4, Facebook Ads, Salesforce, HubSpot, and more)
+- File import for CSV, JSON, and Parquet files
+- Custom source development via `dlt_native` and REST API types
 - OAuth authentication for cloud sources
+
+Learn more in [Data Sources](../data-sources/index.md).
 
 ### Transformations
 
 - dbt auto-generation for staging models
-- Full dbt project access
+- Full dbt project access with custom models
 - SQL-based transformations
 - Incremental model support
+- Branch-based development with `dango dev`
 
-### Monitoring
+Learn more in [Transformations](../transformations/index.md).
 
-- Web UI with live pipeline status
-- File watcher with auto-triggers
-- Token expiry warnings
-- Validation and health checks
+### Monitoring & Scheduling
+
+- Web UI with live pipeline status and sync history
+- Scheduled syncs with flexible cron expressions
+- Schema drift detection with automatic alerts
+- Webhook notifications (Slack, email, custom endpoints)
+- Health monitoring with capacity tracking
+- Token expiry warnings for OAuth sources
+
+Learn more in [Scheduling & Monitoring](../scheduling-monitoring/index.md).
+
+### Authentication & Security
+
+- Authentication enabled by default — configured automatically during `dango init`
+- Session-based auth with configurable timeouts
+- Admin password management via CLI and Web UI
+- Metabase SSO bridge — access dashboards through the Web UI without a separate login
+- Credential encryption for source secrets
+- Audit logging for security events
+
+Learn more in [Security](../security/index.md).
+
+### Governance
+
+- Automated PII scanning across your data warehouse
+- Column-level descriptions synced to Metabase
+- Data catalog with schema documentation
+- dbt test integration for data quality monitoring
+
+Learn more in [Data Catalog](../scheduling-monitoring/data-catalog.md) and [PII Scanning](../scheduling-monitoring/pii-scanning.md).
+
+### Notebooks
+
+- Marimo notebook integration for interactive data exploration
+- Read-only DuckDB snapshots to avoid write locks
+- Built-in templates for common analysis patterns
+
+Learn more in [Notebooks](../notebooks/index.md).
 
 ### Dashboards
 
 - Metabase auto-configured with DuckDB
-- Pre-built dashboard templates
+- Pre-built pipeline health dashboard (`dango dashboard provision`)
 - SQL query interface
-- Dashboard backup and restore
+- Dashboard backup and restore (`dango metabase save` / `dango metabase load`)
 
-## Current Status
+Learn more in [Dashboards](../dashboards/index.md).
 
-Dango is currently in **early development (MVP)**. Core functionality is stable and usable.
+### Cloud Deployment
 
-### What Works Now
+- One-command deployment to any server via SSH
+- DigitalOcean provisioning with `dango deploy`
+- Bring Your Own Server (BYOS) support
+- Automatic TLS via Caddy, fail2ban, unattended upgrades
+- Push-based deployment model with `dango remote push`
 
-- ✅ Full CLI with 10+ commands
-- ✅ CSV, Stripe, Google Sheets, GA4, Facebook Ads sources
-- ✅ dbt auto-generation for staging models
-- ✅ Web UI with live monitoring
-- ✅ Metabase dashboards
-- ✅ File watcher with auto-triggers
-- ✅ Custom sources via `dlt_native` type
-
-### Coming Soon
-
-- 🚧 Additional data sources (Google Ads), demo project, expanded documentation
-- 🔮 Cloud deployment guides, advanced scheduling, team collaboration
+Learn more in [Deployment](../deployment/index.md).
 
 ## Design Philosophy
 
@@ -119,19 +152,19 @@ Dango is built on two core principles:
 
 ### Opinionated but Modular
 
-Best practices are built-in so you can focus on insights, not infrastructure. As the open-source data ecosystem evolves, components can be swapped for better alternatives without rebuilding your entire stack.
+Best practices are built in so you can focus on insights, not infrastructure. As the open-source data ecosystem evolves, components can be swapped for better alternatives without rebuilding your entire stack.
 
 ### Democratize Analytics Infrastructure
 
-Enterprise-grade data tooling shouldn't require a dedicated platform team. Dango brings production-quality patterns to teams of any size—the same tools used by sophisticated data teams, packaged for accessibility.
+Enterprise-grade data tooling shouldn't require a dedicated platform team. Dango brings production-quality patterns to teams of any size — the same tools used by sophisticated data teams, packaged for accessibility.
 
 ## Target Users
 
-- **Solo data professionals** - Complete stack, zero complexity
-- **Small data teams** - Full analytics stack that grows with you
-- **Fractional consultants** - Fast client onboarding
-- **SMEs** - Analytics infrastructure without the overhead
-- **Learners** - Production tools without production costs
+- **Solo data professionals** — Complete stack, zero complexity
+- **Small data teams** — Full analytics stack that grows with you
+- **Fractional consultants** — Fast client onboarding
+- **SMEs** — Analytics infrastructure without the overhead
+- **Learners** — Production tools without production costs
 
 ## Why Dango vs. Alternatives?
 
@@ -143,7 +176,8 @@ Enterprise-grade data tooling shouldn't require a dedicated platform team. Dango
 | **Cost** | Free and open source | Pay for compute and storage |
 | **Stack** | Integrated (dlt + dbt + DuckDB + Metabase) | Build your own toolchain |
 | **Iteration** | Instant local feedback loop | Round-trip to cloud for each change |
-| **Scale** | Local compute limits | Scales to petabytes |
+| **Deployment** | Local or self-hosted cloud | Managed cloud only |
+| **Scale** | Local compute or single server | Scales to petabytes |
 
 ### vs. Managed ETL Tools (Fivetran, Airbyte Cloud)
 
@@ -152,7 +186,7 @@ Enterprise-grade data tooling shouldn't require a dedicated platform team. Dango
 | **Customization** | Fully customizable | Limited to supported connectors |
 | **Configuration** | Version controlled (YAML, SQL) | UI-based, harder to track changes |
 | **Cost** | Free and open source | Subscription or usage-based pricing |
-| **Integration** | Complete stack included | ETL only—BI, transforms, warehouse separate |
+| **Integration** | Complete stack included | ETL only — BI, transforms, warehouse separate |
 | **Complexity** | Requires some code for advanced use | Point-and-click for supported sources |
 
 !!! note
@@ -163,24 +197,25 @@ Enterprise-grade data tooling shouldn't require a dedicated platform team. Dango
 | Dango | DIY Stack |
 |-------|-----------|
 | ✅ Integrated from day one | ❌ Weeks of integration work |
-| ✅ Best practices built-in | ⚠️ Easy to make mistakes |
+| ✅ Best practices built in | ⚠️ Easy to make mistakes |
 | ✅ Maintained by community | ❌ You maintain everything |
 | ⚠️ Opinionated structure | ✅ Complete flexibility |
 
 ## What Dango is NOT
 
-- **Not a SaaS platform** - It's a CLI tool that runs locally
-- **Not cloud-only** - MVP is local, cloud support coming later
-- **Not a BI tool** - It integrates BI (Metabase) but focuses on data infrastructure
-- **Not production-ready for enterprise** - Currently in early development (MVP)
+- **Not a SaaS platform** — It's a CLI tool you run locally or on your own server
+- **Not cloud-only** — Develop locally first, deploy to the cloud when you're ready
+- **Not a BI tool** — It integrates BI (Metabase) but focuses on data infrastructure
+- **Not a petabyte-scale warehouse** — Designed for small-to-medium datasets on DuckDB
 
 ## Next Steps
 
 Ready to try Dango?
 
-1. **[Install Dango](installation.md)** - Get set up in minutes
-2. **[Quick Start](quick-start.md)** - Run your first pipeline
-3. **[Core Concepts](../core-concepts/index.md)** - Deep dive into architecture
+1. **[Install Dango](installation.md)** — Get set up in minutes
+2. **[Quick Start](quick-start.md)** — Run your first pipeline
+3. **[Your First Dashboard](first-dashboard.md)** — Build a Metabase dashboard
+4. **[Core Concepts](../core-concepts/index.md)** — Deep dive into architecture
 
 ## Questions?
 
