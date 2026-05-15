@@ -314,6 +314,11 @@ If no other push is running, the lock may be stale:
 
 ```bash
 dango remote ssh
+```
+
+Then on the server:
+
+```bash
 rm /srv/dango/.dango/state/deploy.lock
 ```
 
