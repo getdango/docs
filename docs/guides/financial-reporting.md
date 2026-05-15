@@ -22,6 +22,9 @@ By the end of this tutorial, you'll have:
 - Stripe account with API access (test mode works)
 - Basic SQL knowledge
 
+!!! note "Authentication"
+    Dango v1 enables authentication by default. All web UI access requires login with the admin credentials you set during `dango init`. See [Authentication](../security/authentication.md) for details.
+
 ---
 
 ## Step 1: Configure Stripe Source

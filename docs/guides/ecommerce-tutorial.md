@@ -83,7 +83,7 @@ CUST005,Eve Davis,eve@example.com,2024-01-10,US
 
 ---
 
-## Step 3: Add CSV Source
+## Step 3: Add Data Source
 
 Run the interactive source wizard:
 

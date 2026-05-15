@@ -352,7 +352,7 @@ Share the invite link with your team. See [Team Setup](team-setup.md) for the fu
 | `VLOOKUP(A2, Sheet2!A:B, 2)` | `JOIN ... USING (key)` | `FROM sales JOIN customers USING (customer_id)` |
 | Pivot table | `GROUP BY` | `SELECT region, sum(amount) GROUP BY region` |
 | `SUMIFS(range, criteria)` | `SUM(CASE WHEN ...)` | `sum(case when status = 'paid' then amount end)` |
-| `COUNTIF(range, ">100")` | `COUNT(*) FILTER` | `count(*) filter (where amount > 100)` |
+| `COUNTIF(range, ">100")` | `COUNT + CASE WHEN` | `count(case when amount > 100 then 1 end)` |
 | `IF(A1>0, "Yes", "No")` | `CASE WHEN` | `case when amount > 0 then 'Yes' else 'No' end` |
 | `TEXT(date, "YYYY-MM")` | `date_trunc` | `date_trunc('month', sale_date)` |
 | `UNIQUE(range)` | `DISTINCT` | `select distinct customer_id from sales` |

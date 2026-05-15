@@ -231,9 +231,14 @@ models:
           - not_null
 ```
 
-Run tests:
+Run models and tests:
 ```bash
 dango run
+```
+
+To run tests only (without rebuilding models):
+```bash
+cd dbt && dbt test
 ```
 
 ---
