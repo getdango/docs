@@ -61,7 +61,7 @@ For Google, Facebook, etc.:
 
 ```bash
 # Authenticate via browser
-dango auth google_sheets
+dango oauth google_sheets
 ```
 
 OAuth tokens are stored in `.dlt/secrets.toml` under the source's credentials section:
@@ -157,14 +157,14 @@ dango config show
 
 To verify OAuth credentials exist:
 ```bash
-dango auth status
+dango oauth status
 ```
 
 ### Updating Credentials
 
 ```bash
 # Re-run auth for OAuth
-dango auth google_sheets
+dango oauth google_sheets
 
 # Edit secrets.toml for API keys
 nano .dlt/secrets.toml
@@ -174,11 +174,28 @@ nano .dlt/secrets.toml
 
 ```bash
 # Remove OAuth token
-dango auth remove google_sheets
+dango oauth remove google_sheets
 
 # Remove from secrets.toml manually
 nano .dlt/secrets.toml
 ```
+
+### Cloud Credentials
+
+For cloud deployments, manage environment variables and secrets on the remote server:
+
+```bash
+# Set a credential on the remote server
+dango remote env set STRIPE_API_KEY=sk_live_xxx
+
+# List all remote environment variables
+dango remote env list
+
+# Remove a remote credential
+dango remote env delete STRIPE_API_KEY
+```
+
+Remote credentials are stored in the server's `.env` file and are **not synced** during `dango remote push` — they must be managed separately.
 
 ---
 
@@ -321,6 +338,9 @@ Watch for:
 
 ## Next Steps
 
-- [OAuth Tokens](oauth.md) - OAuth-specific security
-- [Best Practices](best-practices.md) - Security recommendations
-- [Git Workflows](../workflows/git-workflows.md) - Avoiding commits of secrets
+- [Authentication](authentication.md) — login flows and session management
+- [Users & Roles](users-roles.md) — user management and permissions
+- [OAuth Tokens](oauth.md) — OAuth-specific security
+- [Audit Logging](audit-logging.md) — track credential changes
+- [Best Practices](best-practices.md) — security recommendations
+- [Git Workflows](../workflows/git-workflows.md) — avoiding commits of secrets

@@ -927,6 +927,7 @@ echo "Pipeline complete"
 
 ## Next Steps
 
+- **[Dev Workflow](dev-workflow.md)** - Run tests safely against a dev copy of your database
 - **[dbt Basics](dbt-basics.md)** - Learn dbt fundamentals
 - **[Custom Models](custom-models.md)** - Build testable marts
 - **[Staging Models](staging-models.md)** - Understand the foundation

@@ -63,6 +63,49 @@ ls -la .dlt/secrets.toml
 
 ---
 
+## Authentication Best Practices
+
+### Enable Auth for All Deployments
+
+Authentication is enabled by default in v1. Keep it enabled — even for local development — to match your production security posture.
+
+### Set Up 2FA for Admin Accounts
+
+All admin accounts should enable [two-factor authentication](two-factor.md). Admins have full control over user accounts, credentials, and platform configuration.
+
+### Use Strong Passwords
+
+Dango enforces [NIST SP 800-63B](authentication.md#password-policy) password policy: minimum 8 characters, no complexity rules, ~1,000 common passwords blocked. Use a password manager to generate strong, unique passwords.
+
+### Review Audit Logs
+
+Check [audit logs](audit-logging.md) regularly for suspicious activity:
+
+```bash
+# Check for failed logins in the last week
+dango auth audit --type login_failure --since $(date -u -v-7d +%Y-%m-%d)
+
+# Check for locked accounts
+dango auth audit --type account_locked
+```
+
+### Configure Session Timeouts
+
+For cloud deployments, review session timeout settings. The defaults (60-minute idle, 30-day absolute) are reasonable for most teams. Tighten for sensitive environments:
+
+```yaml
+# .dango/project.yml
+auth:
+  idle_timeout_minutes: 30
+  session_max_days: 7
+```
+
+### Use API Keys for Automation
+
+For scripts and CI/CD pipelines, use [API keys](authentication.md#api-keys) instead of session cookies. Each API key is tied to a specific user (inheriting their role permissions) and can be revoked independently.
+
+---
+
 ## Development Environment
 
 ### Secrets Template
@@ -77,7 +120,7 @@ Create a template for team onboarding:
 stripe_secret_key = "YOUR_STRIPE_KEY_HERE"
 
 [sources.google_sheets]
-# Use: dango auth google_sheets
+# Use: dango oauth google_sheets
 ```
 
 ### Use Test Credentials
@@ -235,41 +278,51 @@ tar --exclude='.dlt/secrets.toml' \
 
 ## Production Considerations
 
-### Change Default Passwords
+### Secure Admin Accounts
 
-After `dango start`:
-
-```bash
-# Change Metabase password immediately
-# Login to http://localhost:3000
-# Admin → Account → Password
-```
+- Set a strong admin password during `dango init`
+- Enable [two-factor authentication](two-factor.md) for all admin accounts
+- Use `dango auth list-users` to verify no unnecessary admin accounts exist
 
 ### Restrict Network Access
 
-For services exposed on localhost:
+For cloud deployments:
 
 ```bash
-# Only bind to localhost (default)
-# Don't expose ports externally without auth
+# Restrict web access to specific IPs
+dango remote firewall allow-ip 203.0.113.0/24
+
+# Set up a domain for automatic HTTPS
+dango remote domain set analytics.example.com
 ```
 
-If you need external access:
-- Use VPN or SSH tunnel
-- Add authentication proxy
-- Configure firewall rules
+For local development, Dango binds to localhost by default. Don't expose ports externally without authentication.
 
-### Audit Logging
+### Monitor with Audit Logs
 
-Track access to sensitive operations:
+Review the [audit log](audit-logging.md) for security events:
 
 ```bash
-# Check sync logs
-ls -la .dango/logs/
+# View recent audit events
+dango auth audit
 
-# Monitor for unusual activity
-grep -i "error\|failed\|unauthorized" .dango/logs/*.log
+# Check for failed logins
+dango auth audit --type login_failure
+
+# Check for permission denials
+dango auth audit --type permission_denied
 ```
+
+### Set Up Uptime Monitoring
+
+Monitor your cloud deployment's health:
+
+```bash
+# The /api/health endpoint is public and returns minimal info
+curl https://your-domain.com/api/health
+```
+
+See [Hardening Guide — Monitoring Integration](hardening.md#monitoring-integration) for setup instructions.
 
 ---
 
@@ -315,21 +368,33 @@ Know your data:
 - [ ] Set up `secrets.toml.example` template
 - [ ] Configure file permissions
 - [ ] Install pre-commit hooks
+- [ ] Set a strong admin password during `dango init`
+- [ ] Enable [2FA](two-factor.md) for all admin accounts
 
 ### Ongoing Operations
 
 - [ ] Use environment variables for credentials
 - [ ] Rotate credentials periodically (quarterly)
 - [ ] Review git history for exposures
+- [ ] Review [audit logs](audit-logging.md) regularly
 - [ ] Encrypt backups
 - [ ] Monitor for unauthorized access
 
 ### Team Practices
 
-- [ ] Each user has own credentials
-- [ ] Use password manager for sharing
-- [ ] Document offboarding process
+- [ ] Each user has own credentials and Dango account
+- [ ] Use password manager for sharing deploy keys
+- [ ] Assign appropriate [roles](users-roles.md) (principle of least privilege)
+- [ ] Document offboarding process (deactivate users, rotate credentials)
 - [ ] Regular security reviews
+
+### Cloud Deployments
+
+- [ ] Set a domain for auto-TLS
+- [ ] Configure [IP restriction](hardening.md#ip-restriction) if not public-facing
+- [ ] Review [session timeouts](authentication.md#session-timeouts) for cloud defaults
+- [ ] Set up [uptime monitoring](hardening.md#monitoring-integration)
+- [ ] Share deploy key securely (never via email or Slack)
 
 ---
 
@@ -357,6 +422,11 @@ Know your data:
 
 ## Next Steps
 
-- [Credential Management](credentials.md) - Detailed credential guidance
-- [OAuth Tokens](oauth.md) - OAuth security
-- [Git Workflows](../workflows/git-workflows.md) - Version control practices
+- [Authentication](authentication.md) — login flows and session management
+- [Users & Roles](users-roles.md) — user management and permissions
+- [Two-Factor Auth](two-factor.md) — enable TOTP-based 2FA
+- [Credential Management](credentials.md) — API key and credential security
+- [OAuth Tokens](oauth.md) — OAuth token lifecycle
+- [Hardening Guide](hardening.md) — production security configuration
+- [Audit Logging](audit-logging.md) — track security events
+- [Git Workflows](../workflows/git-workflows.md) — version control practices

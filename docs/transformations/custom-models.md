@@ -890,6 +890,9 @@ tests:
       expression: "first_order_date <= last_order_date"
 ```
 
+!!! tip "Use dango dev for Safe Testing"
+    Run `dango dev` to test custom models against a copy of your production database. Use `--diff` to compare row counts between production and dev. See [Dev Workflow](dev-workflow.md).
+
 ### 5. Keep Models Focused
 
 One model = one business concept
@@ -905,6 +908,8 @@ One model = one business concept
 ## Next Steps
 
 - **[Testing](testing.md)** - Comprehensive data quality testing guide
+- **[Snapshots](snapshots.md)** - Track historical changes with SCD Type 2
+- **[Dev Workflow](dev-workflow.md)** - Test model changes safely against a dev copy
 - **[dbt Basics](dbt-basics.md)** - Learn dbt fundamentals
 - **[Staging Models](staging-models.md)** - Understand the foundation
 - **[dbt Documentation](https://docs.getdbt.com/)** - Official dbt resources
