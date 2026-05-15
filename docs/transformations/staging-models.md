@@ -222,7 +222,7 @@ SELECT * FROM deduplicated
 WHERE _rn = 1
 ```
 
-This keeps only the most recently extracted version of each record.
+This keeps only the most recently extracted version of each record. See [Deduplication Strategies](#deduplication-strategies) below for all available strategies.
 
 ### Selecting Specific Columns
 
@@ -266,6 +266,104 @@ For append-only event logs, the template works as-is:
 
 SELECT * FROM {{ source('analytics', 'events') }}
 ```
+
+---
+
+## Deduplication Strategies
+
+Dango's model generator supports 4 named deduplication strategies. When you run `dango generate`, the generator uses `infer_dedup_strategy()` to auto-detect the best strategy based on column names.
+
+### `last_modified` (Auto-Detected)
+
+Keeps the most recent record based on a timestamp column. Auto-detected when columns named `updated_at`, `modified_at`, or `last_modified` exist in the source table.
+
+```sql
+{{ config(materialized='table', schema='staging') }}
+
+WITH deduplicated AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY id
+            ORDER BY updated_at DESC
+        ) AS _rn
+    FROM {{ source('shopify', 'orders') }}
+)
+
+SELECT * FROM deduplicated
+WHERE _rn = 1
+```
+
+### `first_seen`
+
+Keeps the oldest record (first occurrence). Useful for append-only event logs where you want the original version.
+
+```sql
+{{ config(materialized='table', schema='staging') }}
+
+WITH deduplicated AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY id
+            ORDER BY _dlt_load_id ASC
+        ) AS _rn
+    FROM {{ source('analytics', 'events') }}
+)
+
+SELECT * FROM deduplicated
+WHERE _rn = 1
+```
+
+### `composite_key`
+
+Deduplicates using multiple columns as a composite key. Use this when no single column uniquely identifies a row.
+
+```sql
+{{ config(materialized='table', schema='staging') }}
+
+WITH deduplicated AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY customer_id, product_id, order_date
+            ORDER BY _dlt_load_id DESC
+        ) AS _rn
+    FROM {{ source('shopify', 'line_items') }}
+)
+
+SELECT * FROM deduplicated
+WHERE _rn = 1
+```
+
+### `row_number`
+
+Custom sort-based deduplication with user-specified columns. A general-purpose strategy when the others don't fit.
+
+```sql
+{{ config(materialized='table', schema='staging') }}
+
+WITH deduplicated AS (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY id
+            ORDER BY priority DESC, created_at DESC
+        ) AS _rn
+    FROM {{ source('jira', 'issues') }}
+)
+
+SELECT * FROM deduplicated
+WHERE _rn = 1
+```
+
+### Strategy Summary
+
+| Strategy | Partition By | Order By | Use Case |
+|----------|-------------|----------|----------|
+| `last_modified` | Primary key | Timestamp column DESC | Tables with `updated_at` / `modified_at` |
+| `first_seen` | Primary key | `_dlt_load_id` ASC | Append-only event logs |
+| `composite_key` | Multiple columns | `_dlt_load_id` DESC | Multi-column uniqueness |
+| `row_number` | Primary key | Custom columns | Custom sort requirements |
+
+!!! tip "Auto-Detection"
+    `dango generate` automatically selects `last_modified` when it finds `updated_at` or `modified_at` columns. For other strategies, customize the generated SQL manually or specify the strategy in your source configuration.
 
 ---
 
@@ -713,5 +811,7 @@ See [Customizing Staging Models](#customizing-staging-models) for examples.
 
 - **[Custom Models](custom-models.md)** - Build marts and intermediate layers
 - **[Testing](testing.md)** - Comprehensive data quality testing
+- **[Snapshots](snapshots.md)** - Track historical changes with SCD Type 2
+- **[Dev Workflow](dev-workflow.md)** - Test model changes safely against a dev copy
 - **[dbt Basics](dbt-basics.md)** - Learn dbt fundamentals
 - **[Data Layers](../core-concepts/data-layers.md)** - Understand the full architecture
