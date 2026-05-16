@@ -124,7 +124,7 @@ Follow the prompts:
 4. Give it a descriptive name (e.g., `marketing_data`)
 
 !!! tip "Managing OAuth credentials"
-    Check the status of your OAuth tokens with `dango oauth status`. Re-authenticate anytime with `dango oauth <provider>` (e.g., `dango oauth google`). See [OAuth Guide](../security/oauth.md) for details.
+    Check the status of your OAuth tokens with `dango oauth status`. Re-authenticate anytime with the source-specific command (e.g., `dango oauth google_sheets`, `dango oauth facebook_ads`). See [OAuth Guide](../security/oauth.md) for details.
 
 ---
 

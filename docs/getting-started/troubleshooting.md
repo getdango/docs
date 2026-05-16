@@ -467,11 +467,11 @@ Re-authenticate with the OAuth provider:
 # Check which tokens need renewal
 dango oauth status
 
-# Re-authenticate with a specific provider
-dango oauth google
+# Re-authenticate with the source-specific command
+dango oauth google_sheets
 
-# Or re-authenticate Facebook
-dango oauth facebook
+# Or re-authenticate Facebook Ads
+dango oauth facebook_ads
 ```
 
 !!! info "Token lifetimes"
