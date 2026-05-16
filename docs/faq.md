@@ -45,10 +45,10 @@ Yes. Dango is open source under the Apache 2.0 license. You can use it for perso
 
 ### What are the system requirements?
 
-- **Python**: 3.9 or higher
-- **Docker**: For Metabase (optional)
+- **Python**: 3.10-3.12 (3.11 or 3.12 recommended)
+- **Docker Desktop**: Required for Metabase and Web UI
 - **Memory**: 4GB+ recommended
-- **Disk**: Varies by data volume
+- **Disk**: 10GB+ free space recommended
 
 ### Does Dango work on Windows?
 
@@ -56,17 +56,15 @@ Yes, Dango works on Windows, macOS, and Linux. Some features may require WSL2 on
 
 ### Why do I need Docker?
 
-Docker runs Metabase for dashboards. If you don't need visualization, you can run Dango without Docker:
-
-```bash
-dango start --no-metabase
-```
+Docker runs Metabase for dashboards and the Web UI. You can use Dango for data syncing and dbt transformations without Docker, but dashboards and the Web UI require it.
 
 ### How do I upgrade Dango?
 
 ```bash
-pip install --upgrade getdango
+dango upgrade
 ```
+
+Or with pip directly: `pip install --upgrade getdango`
 
 ---
 
@@ -74,11 +72,9 @@ pip install --upgrade getdango
 
 ### How many data sources does Dango support?
 
-Dango has 8 wizard-supported sources with guided setup:
+Dango supports 33 data sources total, with 25 available through the interactive setup wizard (`dango source add`). Sources include Stripe, Google Sheets, GA4, Facebook Ads, HubSpot, Salesforce, GitHub, Slack, PostgreSQL, file imports (CSV, JSON, Parquet), REST API, and more.
 
-- CSV, Stripe, Google Sheets, GA4, Facebook Ads, Google Ads, REST API, dlt Native
-
-Plus 25+ additional sources via dlt's verified sources.
+See [Data Sources](data-sources/index.md) for the complete list.
 
 ### Can I add custom data sources?
 
