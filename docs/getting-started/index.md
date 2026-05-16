@@ -4,7 +4,7 @@ Welcome to the Dango Getting Started guide! This section will help you install D
 
 ## Overview
 
-Dango is an open-source data platform that integrates dlt, dbt, DuckDB, and Metabase into a single, cohesive platform. It's designed to work on your laptop today and scale to production infrastructure tomorrow.
+Dango is an open-source data platform that integrates dlt, dbt, DuckDB, and Metabase into a single, cohesive platform. Develop locally, then deploy to the cloud when you're ready.
 
 ## What You'll Learn
 
@@ -27,6 +27,12 @@ Dango is an open-source data platform that integrates dlt, dbt, DuckDB, and Meta
     ---
 
     Get your first data pipeline running in under 10 minutes
+
+- :material-view-dashboard:{ .lg .middle } **[Your First Dashboard](first-dashboard.md)**
+
+    ---
+
+    Build a Metabase dashboard from your synced data
 
 - :material-help-circle:{ .lg .middle } **[Troubleshooting](troubleshooting.md)**
 
@@ -70,10 +76,12 @@ Before installing Dango, you'll need:
 
 After installation:
 
-1. **[Quick Start](quick-start.md)** - Get your first pipeline running
-2. **[Core Concepts](../core-concepts/index.md)** - Understand Dango's architecture
-3. **[Data Sources](../data-sources/index.md)** - Connect to your data sources
-4. **[Transformations](../transformations/index.md)** - Transform data with dbt
+1. **[Quick Start](quick-start.md)** — Get your first pipeline running
+2. **[Your First Dashboard](first-dashboard.md)** — Build a Metabase dashboard
+3. **[Core Concepts](../core-concepts/index.md)** — Understand Dango's architecture
+4. **[Data Sources](../data-sources/index.md)** — Connect to your data sources
+5. **[Security](../security/index.md)** — Authentication, OAuth, credentials
+6. **[Deployment](../deployment/index.md)** — Deploy to the cloud
 
 ## Need Help?
 

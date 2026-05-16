@@ -35,6 +35,11 @@ The installer will:
 - Install Dango from PyPI
 - Run `dango init` to configure your project
 
+During `dango init`, you set an admin password for the Web UI. This configures authentication automatically — no extra setup needed.
+
+!!! info "Authentication is always on"
+    Dango enables authentication by default. During `dango init`, you set an admin password that protects the Web UI and Metabase. For local development, sessions last 365 days so you rarely need to re-authenticate. See [Authentication](../security/authentication.md) for details.
+
 !!! tip "Already installed?"
     If you've already run the installer, activate your environment and skip to Step 2:
 
@@ -56,9 +61,9 @@ The installer will:
 
 ## Step 2: Add a Data Source
 
-Let's add your first data source. Dango supports CSV files and 29+ verified dlt sources.
+Let's add your first data source. Dango supports 33 data sources including file imports, APIs, databases, and OAuth-based services.
 
-### Option A: CSV File (Simplest)
+### Option A: File Import (Simplest)
 
 ```bash
 dango source add
@@ -66,18 +71,29 @@ dango source add
 
 Follow the prompts:
 
-1. Select **CSV** as the source type
-2. Provide a path to your CSV file
+1. Select **File Import (CSV, JSON, Parquet)** as the source type
+2. Provide a path to your data file (CSV, JSON, or Parquet)
 3. Give it a descriptive name (e.g., `sales_data`)
 
 **Example:**
 
 ```bash
 $ dango source add
-? Select source type: CSV
-? CSV file path: /path/to/your/data.csv
+? Select source type: File Import (CSV, JSON, Parquet)
+? File path: /path/to/your/data.csv
 ? Source name: sales_data
-✓ CSV source 'sales_data' added successfully
+✓ Source 'sales_data' added successfully
+```
+
+Your `sources.yml` will look like this:
+
+```yaml
+# .dango/sources.yml
+sources:
+  - name: sales_data
+    type: local_files
+    local_files:
+      file_path: /path/to/your/data.csv
 ```
 
 ### Option B: Stripe (API Integration)
@@ -106,6 +122,9 @@ Follow the prompts:
 2. Complete OAuth authentication in your browser
 3. Provide the Google Sheet URL
 4. Give it a descriptive name (e.g., `marketing_data`)
+
+!!! tip "Managing OAuth credentials"
+    Check the status of your OAuth tokens with `dango oauth status`. Re-authenticate anytime with the source-specific command (e.g., `dango oauth google_sheets`, `dango oauth facebook_ads`). See [OAuth Guide](../security/oauth.md) for details.
 
 ---
 
@@ -157,9 +176,9 @@ dango start
 
 **What starts:**
 
-- **Web UI** - `http://localhost:8800`
-- **Metabase** - Accessible through Web UI
-- **dbt docs** - Accessible through Web UI
+- **Web UI** — `http://localhost:8800`
+- **Metabase** — Accessible through the Web UI (SSO bridge)
+- **dbt docs** — Accessible through the Web UI
 
 **Example output:**
 
@@ -173,7 +192,10 @@ $ dango start
 [18:31:06] Opening http://localhost:8800 in your browser...
 ```
 
-Your browser should open automatically. If it doesn't, visit `http://localhost:8800` manually.
+Your browser should open automatically. If it doesn't, visit `http://localhost:8800` manually. Log in with the admin password you set during `dango init`.
+
+!!! note "Metabase cold start"
+    The first time Metabase starts, it takes 2–3 minutes to initialize its database. Subsequent starts are much faster. You can check progress with `docker ps`.
 
 ### Open the Dashboard
 
@@ -199,43 +221,32 @@ Or simply visit `http://localhost:8800` in your browser.
 
 The Web UI provides:
 
-- **Pipeline Status** - See all your data sources and their sync status
-- **Data Sources** - Add, edit, and manage sources
-- **Transformations** - View and manage dbt models
-- **Metabase** - Access dashboards (link in Web UI)
-- **dbt docs** - Explore your data models (link in Web UI)
+- **Pipeline Status** — See all your data sources and their sync status
+- **Data Sources** — Add, edit, and manage sources
+- **Transformations** — View and manage dbt models
+- **Metabase** — Access dashboards (SSO bridge, no separate login needed)
+- **dbt docs** — Explore your data models
+- **Monitoring** — Schema drift alerts, sync history, health checks
 
 ### Metabase Dashboards
 
-1. Click **"Open Metabase"** in the Web UI
+1. Click **"Open Metabase"** in the Web UI sidebar
 2. Metabase is auto-configured with your DuckDB database
-3. Start exploring your data with SQL or visual query builder
+3. Start exploring your data with SQL or the visual query builder
 
-**First time setup:**
-
-- No login required (auto-configured)
-- All tables are already connected
-- Start creating dashboards immediately
+!!! tip "Build a full dashboard"
+    See **[Your First Dashboard](first-dashboard.md)** for a step-by-step guide to creating questions, building dashboards, and saving your configuration.
 
 ### Query Your Data with SQL
 
-You can also query DuckDB directly using the DuckDB CLI:
-
-```bash
-# Install DuckDB CLI if not already installed
-# brew install duckdb  # macOS
-# apt-get install duckdb  # Linux
-
-# Query your data
-duckdb data/warehouse.duckdb "SELECT * FROM marts.dim_customers LIMIT 10"
-```
-
-Or open an interactive SQL session:
+You can query DuckDB directly using Metabase's SQL editor (via the Web UI) or from the command line. Open an interactive DuckDB session:
 
 ```bash
 duckdb data/warehouse.duckdb
+```
 
-D SELECT * FROM marts.dim_customers LIMIT 10;
+```sql
+D SELECT * FROM staging.stg_sales_data LIMIT 10;
 D .exit
 ```
 
@@ -276,9 +287,9 @@ Your new model is now available in DuckDB and Metabase!
 
 ---
 
-## Step 7: Automate with File Watcher
+## Step 7: Automate with Scheduling
 
-Enable automatic syncing when CSV files change by configuring auto-sync:
+Set up automatic syncing on a schedule:
 
 **1. Enable in configuration:**
 
@@ -290,32 +301,23 @@ platform:
   debounce_seconds: 600  # Wait 10 minutes after last change
 ```
 
-**2. Start platform with auto-sync:**
+**2. Add a schedule:**
+
+```bash
+dango schedule add
+```
+
+The interactive wizard will prompt you for the source name and schedule (e.g., "every day at 8am", custom cron expressions).
+
+**3. Start the platform:**
 
 ```bash
 dango start
 ```
 
-**What it does:**
+The scheduler runs automatically while the platform is running.
 
-- Monitors CSV files configured with `watch: true` in sources.yml
-- Automatically runs `dango sync` when changes detected
-- Debounces changes to avoid excessive syncing
-- Keeps your data up-to-date automatically
-
-**Configure which sources to watch:**
-
-```yaml
-# .dango/sources.yml
-sources:
-  - name: sales_data
-    type: csv
-    csv:
-      file_path: data/sales.csv
-      watch: true  # Enable auto-sync for this file
-```
-
-Auto-sync runs in the background while `dango start` is running.
+Learn more in [Scheduled Syncs](../scheduling-monitoring/scheduled-syncs.md) and [Configuring Schedules](../scheduling-monitoring/configuring.md).
 
 ---
 
@@ -364,8 +366,8 @@ dango sync --source stripe_payments
 Let's make sure your setup is complete:
 
 ```bash
-# Check Dango version
-dango --version
+# Check Dango is installed
+which dango
 
 # Validate installation
 dango validate
@@ -383,11 +385,16 @@ dango source list
 
 Now that you have a working pipeline:
 
-1. **[Core Concepts](../core-concepts/index.md)** - Understand Dango's architecture
-2. **[Data Sources](../data-sources/index.md)** - Connect more data sources
-3. **[Transformations](../transformations/index.md)** - Write advanced dbt models
-4. **[Dashboards](../dashboards/index.md)** - Build Metabase dashboards
-5. **[Web UI & CLI](../reference/index.md)** - Explore all commands
+1. **[Your First Dashboard](first-dashboard.md)** — Build a Metabase dashboard step by step
+2. **[Core Concepts](../core-concepts/index.md)** — Understand Dango's architecture
+3. **[Data Sources](../data-sources/index.md)** — Connect more data sources
+4. **[Transformations](../transformations/index.md)** — Write advanced dbt models
+5. **[Dashboards](../dashboards/index.md)** — Advanced Metabase features
+6. **[Scheduling & Monitoring](../scheduling-monitoring/index.md)** — Automate your pipelines
+7. **[Security](../security/index.md)** — Authentication, OAuth, credentials
+8. **[Deployment](../deployment/index.md)** — Deploy to the cloud
+9. **[CLI Reference](../cli/cli-reference.md)** — Explore all 50+ commands
+10. **[Notebooks](../notebooks/index.md)** — Interactive data exploration
 
 ---
 
@@ -408,6 +415,12 @@ Make sure your virtual environment is activated:
     ```powershell
     .\venv\Scripts\Activate.ps1
     ```
+
+If you just installed Dango, clear the shell's command cache:
+
+```bash
+hash -r
+```
 
 ### "Docker not running"
 
@@ -441,7 +454,7 @@ Check the full **[Troubleshooting Guide](troubleshooting.md)** or [open an issue
 
 You've successfully:
 
-- ✅ Initialized a Dango project
+- ✅ Initialized a Dango project (with authentication)
 - ✅ Added a data source
 - ✅ Synced data to DuckDB
 - ✅ Started the Web UI and Metabase
@@ -449,6 +462,7 @@ You've successfully:
 
 **Keep learning:**
 
-- Explore the **[CLI Reference](../reference/index.md)** for all commands
+- Explore the **[CLI Reference](../cli/cli-reference.md)** for all 50+ commands
 - Learn about **[Data Sources](../data-sources/index.md)**
 - Master **[dbt Transformations](../transformations/index.md)**
+- Set up **[Scheduled Syncs](../scheduling-monitoring/scheduled-syncs.md)**

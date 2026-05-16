@@ -41,19 +41,22 @@ Metabase is available at: **http://localhost:3000**
 
 ### Auto-Created Credentials
 
-Dango automatically creates an admin user:
+Dango automatically creates a Metabase admin account during first startup. The email comes from your Dango admin account, and the password is randomly generated.
 
-- **Email**: `admin@dango.local`
-- **Password**: `dangolocal123`
+Credentials are stored in `.dango/metabase.yml`:
 
-!!! tip "Change Password"
-    For production use, change the default password in Account Settings after first login.
+```bash
+cat .dango/metabase.yml
+```
+
+!!! tip "Recommended: Use the Web UI"
+    Access Metabase through the Dango Web UI at `http://localhost:8800` — the SSO bridge logs you in automatically, so you don't need to look up the Metabase credentials.
 
 ### First Login
 
-1. Open http://localhost:3000
-2. Login with credentials above
-3. Start querying - DuckDB connection is pre-configured
+1. Open `http://localhost:8800` (Web UI) and click **"Open Metabase"** in the sidebar
+2. You're logged in automatically via SSO bridge
+3. Start querying — DuckDB connection is pre-configured
 
 ---
 

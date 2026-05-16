@@ -286,9 +286,24 @@ After installation, verify Dango is working:
 
 ## Upgrading Dango
 
-### Automatic Upgrade (Recommended)
+### Using `dango upgrade` (Recommended)
 
-If you installed with the bootstrap script:
+The built-in upgrade command is the simplest way to stay up to date:
+
+```bash
+# Upgrade to the latest version
+dango upgrade
+
+# Upgrade to a specific version
+dango upgrade --version 1.2.3
+
+# Skip confirmation prompt
+dango upgrade --yes
+```
+
+### Using the Bootstrap Script
+
+If you installed with the bootstrap script, re-running it offers an upgrade option:
 
 ```bash
 cd your-project
@@ -296,7 +311,7 @@ curl -sSL https://getdango.dev/install.sh | bash
 # Select [u] to upgrade when prompted
 ```
 
-### Manual Upgrade
+### Using pip
 
 === "macOS / Linux"
 
@@ -306,6 +321,9 @@ curl -sSL https://getdango.dev/install.sh | bash
 
     # Upgrade to latest version
     pip install --upgrade getdango
+
+    # Clear shell command cache
+    hash -r
 
     # Verify new version
     dango --version
@@ -424,9 +442,10 @@ docker rmi metabase/metabase
 
 Now that Dango is installed:
 
-1. **[Quick Start](quick-start.md)** - Get your first pipeline running
-2. **[Troubleshooting](troubleshooting.md)** - If you encounter issues
-3. **[Core Concepts](../core-concepts/index.md)** - Learn about Dango's architecture
+1. **[Quick Start](quick-start.md)** — Get your first pipeline running
+2. **[Your First Dashboard](first-dashboard.md)** — Build a Metabase dashboard
+3. **[Troubleshooting](troubleshooting.md)** — If you encounter issues
+4. **[Core Concepts](../core-concepts/index.md)** — Learn about Dango's architecture
 
 ---
 
