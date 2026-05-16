@@ -181,10 +181,10 @@ Yes:
 
 ```bash
 dango metabase save
-# Creates metabase_export.json
+# Exports to metabase/ directory
 
 # Import on another machine
-dango metabase load --file metabase_export.json
+dango metabase load
 ```
 
 ### Why is Metabase slow?
@@ -272,10 +272,11 @@ cat .dango/sources.yml
 Re-authenticate or check your API key:
 
 ```bash
-# OAuth sources
-dango auth [provider]
+# OAuth sources — re-authenticate with source-specific command
+dango oauth google_sheets
+dango oauth facebook_ads
 
-# API key sources
+# API key sources — check your credentials
 cat .dlt/secrets.toml
 ```
 
