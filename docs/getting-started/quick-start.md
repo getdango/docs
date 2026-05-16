@@ -239,13 +239,7 @@ The Web UI provides:
 
 ### Query Your Data with SQL
 
-You can query DuckDB directly using Metabase's SQL editor (via the Web UI) or from the command line:
-
-```bash
-dango query "SELECT * FROM staging.stg_sales_data LIMIT 10"
-```
-
-Or open an interactive DuckDB session:
+You can query DuckDB directly using Metabase's SQL editor (via the Web UI) or from the command line. Open an interactive DuckDB session:
 
 ```bash
 duckdb data/warehouse.duckdb
@@ -307,11 +301,13 @@ platform:
   debounce_seconds: 600  # Wait 10 minutes after last change
 ```
 
-**2. Configure a schedule:**
+**2. Add a schedule:**
 
 ```bash
-dango schedule set sales_data --cron "0 8 * * *"  # Daily at 8am
+dango schedule add
 ```
+
+The interactive wizard will prompt you for the source name and schedule (e.g., "every day at 8am", custom cron expressions).
 
 **3. Start the platform:**
 

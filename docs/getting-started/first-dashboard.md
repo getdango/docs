@@ -22,12 +22,9 @@ The easiest way to access Metabase is through the Dango Web UI, which handles au
 The Web UI uses an SSO bridge to log you into Metabase automatically — no separate Metabase credentials needed.
 
 ??? info "Direct Metabase access (alternative)"
-    You can also access Metabase directly at `http://localhost:3000`. Use the bootstrap credentials:
+    You can also access Metabase directly at `http://localhost:3000`. Dango creates a Metabase admin account during setup with a randomly generated password stored in `.dango/metabase.yml`. Check that file for the `email` and `password` fields.
 
-    - **Email:** `admin@dango.local`
-    - **Password:** `dangolocal123`
-
-    The SSO bridge approach (via the Web UI) is recommended because it keeps authentication centralized.
+    The SSO bridge approach (via the Web UI) is recommended because it handles authentication automatically.
 
 !!! note "First-time startup"
     Metabase takes 2–3 minutes to initialize on its first launch. If you see a loading screen, wait for it to complete. Check progress with `docker ps` — the container health will show as "healthy" when ready.

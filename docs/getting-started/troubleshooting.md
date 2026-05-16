@@ -436,20 +436,14 @@ cat .dango/sources.yml
 ping google.com
 ```
 
-**3. Test source connection:**
-
-```bash
-dango source test <source-name>
-```
-
-**4. Check source-specific documentation:**
+**3. Check source-specific documentation:**
 
 Different sources have different requirements. See:
 
 - [Data Sources Documentation](../data-sources/index.md)
 - [dlt Source Documentation](https://dlthub.com/docs/dlt-ecosystem/verified-sources/)
 
-**5. Run with debug logging:**
+**4. Run with debug logging:**
 
 ```bash
 RUNTIME__LOG_LEVEL=DEBUG dango sync
@@ -511,7 +505,7 @@ dbt debug
 **3. Run specific model:**
 
 ```bash
-dango sync --models staging.stg_my_source
+dango run --select staging.stg_my_source
 ```
 
 **4. Check model dependencies:**
@@ -583,8 +577,10 @@ Learn more about DuckDB's concurrency model in [DuckDB](../core-concepts/duckdb.
 
 **1. Verify data was synced:**
 
+Open a DuckDB session to check:
+
 ```bash
-dango query "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema LIKE 'staging%'"
+duckdb data/warehouse.duckdb "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema LIKE 'staging%'"
 ```
 
 **2. Refresh Metabase schema:**
@@ -595,10 +591,10 @@ After adding new sources or dbt models, tell Metabase to discover the new tables
 dango metabase refresh
 ```
 
-**3. Check table exists:**
+**3. Check tables exist:**
 
 ```bash
-dango query "SHOW TABLES"
+duckdb data/warehouse.duckdb "SHOW TABLES"
 ```
 
 **4. Check Metabase database connection:**
