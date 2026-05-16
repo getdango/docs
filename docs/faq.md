@@ -161,13 +161,13 @@ Common issues:
 # Start services
 dango start
 
-# Open Metabase
-open http://localhost:3000
+# Open Web UI (recommended — SSO bridge handles Metabase login)
+open http://localhost:8800
 ```
 
-Default credentials:
-- Email: `admin@dango.local`
-- Password: `dangolocal123`
+Click **"Open Metabase"** in the Web UI sidebar. The SSO bridge logs you in automatically.
+
+For direct access at `http://localhost:3000`, check credentials in `.dango/metabase.yml` (email and randomly generated password).
 
 ### My tables don't show in Metabase
 

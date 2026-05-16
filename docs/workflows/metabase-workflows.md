@@ -133,10 +133,10 @@ Metabase has a REST API for automation:
 http://localhost:3000/api/
 
 # Authentication
-# First, get a session token
+# First, get a session token (credentials are in .dango/metabase.yml)
 curl -X POST http://localhost:3000/api/session \
   -H "Content-Type: application/json" \
-  -d '{"username": "admin@dango.local", "password": "your-password"}'
+  -d '{"username": "your-email@example.com", "password": "your-password"}'
 ```
 
 ### Common API Operations
@@ -165,12 +165,12 @@ curl http://localhost:3000/api/dashboard/1 \
 ```python
 import requests
 
-# Login
+# Login (credentials are in .dango/metabase.yml)
 session = requests.Session()
 response = session.post(
     "http://localhost:3000/api/session",
     json={
-        "username": "admin@dango.local",
+        "username": "your-email@example.com",
         "password": "your-password"
     }
 )
