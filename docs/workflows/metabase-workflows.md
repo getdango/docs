@@ -68,10 +68,10 @@ On cloud deployments, Metabase accesses the DuckDB database file via a Docker vo
 # Save all dashboards to JSON
 dango metabase save
 
-# Output: metabase_export.json
+# Exports to metabase/ directory
 
-# Load dashboards from JSON
-dango metabase load --file metabase_export.json
+# Load dashboards from export
+dango metabase load
 ```
 
 ### Export Location
@@ -202,7 +202,7 @@ git add metabase_export.json
 git commit -m "Update dashboard: added revenue chart"
 
 # 3. On another machine, restore
-dango metabase load --file metabase_export.json
+dango metabase load
 ```
 
 ### Tracking Changes
