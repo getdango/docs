@@ -1,8 +1,218 @@
 # Permissions Matrix
 
-Detailed permission matrix for admin, editor, and viewer roles.
+Complete reference for Dango's role-based access control system.
 
 ---
 
-!!! note "Under Construction"
-    This page is being written as part of the v1 documentation update.
+## Overview
+
+Dango uses a **role-based access control (RBAC)** system with 3 roles and 29 permissions. Permissions follow a `<domain>.<action>` naming convention across 9 domains.
+
+Authentication is **always enabled** by default for both local and cloud deployments. The initial admin account is created during `dango init`.
+
+---
+
+## Roles
+
+| Role | Permissions | Description |
+|------|-------------|-------------|
+| **Admin** | All (wildcard `*`) | Full access to all features including user management and platform configuration |
+| **Editor** | 19 permissions | Can sync sources, run dbt, create dashboards, manage notebooks, and view governance data |
+| **Viewer** | 8 permissions | Read-only access to sources, models, dashboards, health, logs, notebooks, schedules, and governance |
+
+---
+
+## Permission Matrix
+
+The complete mapping of all 29 permissions to roles:
+
+| Permission | Admin | Editor | Viewer | Description |
+|------------|:-----:|:------:|:------:|-------------|
+| `source.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: | List sources, view status |
+| `source.view_credentials` | :white_check_mark: | | | View OAuth tokens and secrets |
+| `source.sync` | :white_check_mark: | :white_check_mark: | | Trigger a sync |
+| `source.manage` | :white_check_mark: | :white_check_mark: | | Add, remove, or configure sources |
+| `csv.upload` | :white_check_mark: | :white_check_mark: | | Upload CSV files |
+| `csv.delete` | :white_check_mark: | :white_check_mark: | | Delete uploaded CSV files |
+| `dbt.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: | View dbt models and docs |
+| `dbt.run` | :white_check_mark: | :white_check_mark: | | Trigger dbt runs |
+| `dbt.manage` | :white_check_mark: | :white_check_mark: | | Add or remove dbt models |
+| `dashboard.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: | View Metabase dashboards |
+| `dashboard.create` | :white_check_mark: | :white_check_mark: | | Create and edit dashboards |
+| `dashboard.manage` | :white_check_mark: | | | Manage Metabase settings |
+| `query.execute` | :white_check_mark: | :white_check_mark: | | Run ad-hoc SQL queries |
+| `health.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: | View platform health and status |
+| `logs.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: | View activity logs |
+| `platform.manage` | :white_check_mark: | | | Start, stop, or configure platform |
+| `config.view` | :white_check_mark: | :white_check_mark: | | View project configuration |
+| `config.manage` | :white_check_mark: | | | Modify project configuration |
+| `users.view` | :white_check_mark: | | | List users |
+| `users.manage` | :white_check_mark: | | | Create, edit, or deactivate users |
+| `auth.manage` | :white_check_mark: | | | Manage auth settings (2FA policy, etc.) |
+| `audit.view` | :white_check_mark: | | | View audit logs |
+| `notebooks.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: | View notebooks |
+| `notebooks.execute` | :white_check_mark: | :white_check_mark: | | Run notebook cells |
+| `notebooks.manage` | :white_check_mark: | :white_check_mark: | | Create or delete notebooks |
+| `governance.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: | View PII reports and schema drift |
+| `governance.manage` | :white_check_mark: | | | Configure governance rules |
+| `scheduler.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: | View scheduled jobs |
+| `scheduler.manage` | :white_check_mark: | | | Create or edit schedules |
+
+---
+
+## Permissions by Domain
+
+### Source (4 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `source.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| `source.view_credentials` | :white_check_mark: | | |
+| `source.sync` | :white_check_mark: | :white_check_mark: | |
+| `source.manage` | :white_check_mark: | :white_check_mark: | |
+
+### CSV (2 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `csv.upload` | :white_check_mark: | :white_check_mark: | |
+| `csv.delete` | :white_check_mark: | :white_check_mark: | |
+
+### dbt (3 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `dbt.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| `dbt.run` | :white_check_mark: | :white_check_mark: | |
+| `dbt.manage` | :white_check_mark: | :white_check_mark: | |
+
+### Dashboard (4 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `dashboard.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| `dashboard.create` | :white_check_mark: | :white_check_mark: | |
+| `dashboard.manage` | :white_check_mark: | | |
+| `query.execute` | :white_check_mark: | :white_check_mark: | |
+
+### Platform (5 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `health.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| `logs.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| `platform.manage` | :white_check_mark: | | |
+| `config.view` | :white_check_mark: | :white_check_mark: | |
+| `config.manage` | :white_check_mark: | | |
+
+### Auth (4 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `users.view` | :white_check_mark: | | |
+| `users.manage` | :white_check_mark: | | |
+| `auth.manage` | :white_check_mark: | | |
+| `audit.view` | :white_check_mark: | | |
+
+### Notebooks (3 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `notebooks.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| `notebooks.execute` | :white_check_mark: | :white_check_mark: | |
+| `notebooks.manage` | :white_check_mark: | :white_check_mark: | |
+
+### Governance (2 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `governance.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| `governance.manage` | :white_check_mark: | | |
+
+### Scheduler (2 permissions)
+
+| Permission | Admin | Editor | Viewer |
+|------------|:-----:|:------:|:------:|
+| `scheduler.view` | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| `scheduler.manage` | :white_check_mark: | | |
+
+---
+
+## Session & Security
+
+### Session Timeouts
+
+Session timeouts are configured in the `auth` section of `project.yml`:
+
+| Setting | Local Default | Cloud Default | Description |
+|---------|:------------:|:-------------:|-------------|
+| `idle_timeout_minutes` | 1440 (24 hours) | 60 (1 hour) | Session invalidated after this period of inactivity |
+| `session_max_days` | 365 (1 year) | 30 (30 days) | Maximum session lifetime regardless of activity |
+
+!!! info
+    Cloud defaults are set during `dango deploy` and differ from local defaults for security. You can customize both in `project.yml`.
+
+### Account Lockout
+
+| Setting | Default | Description |
+|---------|:-------:|-------------|
+| `max_attempts` | 5 | Failed login attempts before account is locked |
+| `lockout_minutes` | 15 | Duration of account lockout |
+
+Locked accounts can be unlocked by an admin via `POST /api/admin/users/{user_id}/unlock`.
+
+### Rate Limiting
+
+| Endpoint Group | Default Limit | Window |
+|----------------|:------------:|:------:|
+| Login (`/api/auth/login`) | 10 requests | 60 seconds |
+| General API | 200 requests | 60 seconds |
+
+Rate limiting is enabled by default. Localhost requests are exempt. Configure trusted proxy IPs via `auth.rate_limit.trusted_proxies` for correct client IP detection behind a reverse proxy.
+
+### Two-Factor Authentication (2FA)
+
+- Optional by default (`require_2fa: false`)
+- When enabled globally, all users must set up TOTP before accessing the platform
+- Uses TOTP (Time-based One-Time Password) with standard authenticator apps
+- Recovery codes are generated during 2FA setup
+
+---
+
+## API Key Authentication
+
+API keys provide programmatic access without interactive login.
+
+### Key Format
+
+```
+dango_ak_<32-character-url-safe-random-token>
+```
+
+- **Prefix**: `dango_ak_` (used to identify Dango API keys)
+- **Display prefix**: First 12 characters shown for identification (e.g., `dango_ak_XYZ`)
+- **Storage**: Only a SHA-256 hash is stored in the database; the raw key is shown once at creation
+
+### Usage
+
+Include the API key as a Bearer token in the `Authorization` header:
+
+```bash
+curl -H "Authorization: Bearer dango_ak_..." http://localhost:8800/api/sources
+```
+
+### Key Properties
+
+| Property | Default | Description |
+|----------|---------|-------------|
+| Expiry | None (never expires) | Optional per-key expiry date |
+| Scope | Full user permissions | Key inherits all permissions of the associated user |
+| Revocation | Manual | Revoke via API or admin UI |
+
+---
+
+## Related Pages
+
+- [Authentication & Security](../security/authentication.md) — Login flows, session management, 2FA setup
+- [Users & Roles](../security/users-roles.md) — User management, role assignment, invitations
+- [API Reference](api.md) — Endpoint-level permission requirements
