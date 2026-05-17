@@ -75,6 +75,5 @@ Complete technical reference documentation for Dango.
 
 ## Related
 
-- [CLI Reference](../cli/cli-reference.md) — complete command-line reference
 - [Quick Start](../getting-started/quick-start.md) — get started with Dango
 - [FAQ](../faq.md) — frequently asked questions

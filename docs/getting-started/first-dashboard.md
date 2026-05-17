@@ -133,7 +133,7 @@ dango metabase save
 # Save specific collections only
 dango metabase save --collections "Sales,Marketing"
 
-# Save everything including personal collections
+# Save all shared collections
 dango metabase save
 ```
 

@@ -103,13 +103,13 @@ Dango uses dlt's merge strategy with primary keys to deduplicate records during 
 
 ### Can I schedule automatic syncs?
 
-Yes. Configure schedules with:
+Yes. Add a schedule with the interactive wizard:
 
 ```bash
-dango schedule add my_source --cron "0 */6 * * *"
+dango schedule add
 ```
 
-See [Scheduled Syncs](scheduling-monitoring/scheduled-syncs.md) for cron syntax and options.
+The wizard prompts for the source, cron expression, and options. See [Scheduled Syncs](scheduling-monitoring/scheduled-syncs.md) for cron syntax and options.
 
 ### Why isn't my data syncing?
 
@@ -351,13 +351,13 @@ See [PII Scanning](scheduling-monitoring/pii-scanning.md) for configuration and 
 
 ### Can I get webhook notifications?
 
-Yes. Configure webhooks to receive notifications on sync success, failure, or stale data:
+Yes. Add a webhook with the interactive wizard:
 
 ```bash
-dango webhook add https://hooks.slack.com/services/...
+dango schedule webhook add
 ```
 
-See [Webhook Notifications](scheduling-monitoring/webhooks.md) for setup and payload format.
+The wizard prompts for the webhook URL and event types (success, failure, stale data). See [Webhook Notifications](scheduling-monitoring/webhooks.md) for setup and payload format.
 
 ---
 

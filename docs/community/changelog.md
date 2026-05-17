@@ -19,7 +19,7 @@ Dango follows [Semantic Versioning](https://semver.org/):
 
 ### v1.0.0
 
-*Released: 2026*
+*Released: June 2026*
 
 **Status**: First major release
 
