@@ -101,7 +101,7 @@ sources:
 ### First Sync
 
 ```bash
-dango sync --source hubspot
+dango sync hubspot
 ```
 
 ---

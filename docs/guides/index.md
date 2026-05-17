@@ -143,3 +143,9 @@ If you get stuck:
 1. Check the [Troubleshooting Guide](../workflows/troubleshooting.md)
 2. Review the relevant section docs (Data Sources, Transformations, etc.)
 3. Ask in [GitHub Discussions](https://github.com/getdango/dango/discussions)
+
+## Related
+
+- [Quick Start](../getting-started/quick-start.md) — get your first pipeline running
+- [Data Sources](../data-sources/index.md) — all supported source types
+- [Workflows](../workflows/index.md) — operational guides and best practices

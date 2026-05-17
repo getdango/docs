@@ -125,7 +125,7 @@ project_id = "your-project"
 ### Step 4: Sync
 
 ```bash
-dango sync --source my_google_sheets
+dango sync my_google_sheets
 ```
 
 Data loads into `raw_my_google_sheets` schema in DuckDB.
@@ -211,7 +211,7 @@ pip install "dlt[hubspot]"
 # api_key = "your-hubspot-api-key"
 
 # Sync
-dango sync --source crm_data
+dango sync crm_data
 ```
 
 See [Custom Sources](custom-sources.md) for detailed dlt_native setup.
@@ -270,7 +270,7 @@ Edit `.dango/sources.yml`:
 ### Step 4: Authenticate
 
 ```bash
-dango sync --source custom_oauth_source
+dango sync custom_oauth_source
 ```
 
 On first sync, browser opens for OAuth. After authentication, refresh token is saved to `.dlt/secrets.toml`.
@@ -389,7 +389,7 @@ jobs:
           SOURCES__GOOGLE_SHEETS__CREDENTIALS__CLIENT_ID: ${{ secrets.GS_CLIENT_ID }}
           SOURCES__GOOGLE_SHEETS__CREDENTIALS__CLIENT_SECRET: ${{ secrets.GS_CLIENT_SECRET }}
         run: |
-          dango sync --source my_google_sheets
+          dango sync my_google_sheets
 ```
 
 ---

@@ -260,7 +260,7 @@ credentials = """
 
 [sources.facebook_ads]
 access_token = "EAABwzLix..."
-account_id = "act_123456789"
+account_id = "123456789"
 ```
 
 **Security**:

@@ -356,7 +356,7 @@ dango source add
 dango sync
 
 # Sync specific source only
-dango sync --source stripe_payments
+dango sync stripe_payments
 ```
 
 ---

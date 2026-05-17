@@ -93,7 +93,7 @@ sources:
 ### First Sync
 
 ```bash
-dango sync --source stripe
+dango sync stripe
 ```
 
 ---

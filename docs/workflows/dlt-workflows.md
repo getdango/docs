@@ -96,7 +96,7 @@ dlt pipeline my_source sync-state
 dlt pipeline my_source drop
 
 # Then sync again
-dango sync --source my_source --full-refresh
+dango sync my_source --full-refresh
 ```
 
 ---
@@ -150,7 +150,7 @@ For full details, see [OAuth](../security/oauth.md).
 ```bash
 # Set environment variable for detailed logs
 export RUNTIME__LOG_LEVEL=DEBUG
-dango sync --source problematic_source
+dango sync problematic_source
 ```
 
 ### Check dlt Logs

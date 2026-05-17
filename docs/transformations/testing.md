@@ -912,7 +912,7 @@ fi
 # Run full pipeline with tests
 
 # Sync data (auto-generates staging templates)
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # Run transformations
 dango run

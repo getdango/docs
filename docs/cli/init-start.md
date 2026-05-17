@@ -298,6 +298,9 @@ Press Ctrl+C to stop, or run 'dango stop' in another terminal.
 ──────────────────────────────────────────────
 ```
 
+!!! tip "Recommended: Access via the Web UI"
+    Open `http://localhost:8800` and click **"Open Metabase"** in the sidebar. The SSO bridge logs you in automatically — no need to look up Metabase credentials.
+
 **First-time setup takes longer**:
 
 - Docker images downloaded (Metabase ~500 MB)

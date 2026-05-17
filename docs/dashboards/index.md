@@ -164,7 +164,7 @@ Or wait for the daily automatic sync (2 AM default).
 After syncing a data source:
 
 ```bash
-dango sync --source stripe_payments
+dango sync stripe_payments
 ```
 
 View raw data in Metabase:

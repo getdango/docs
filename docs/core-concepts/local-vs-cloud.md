@@ -17,7 +17,7 @@ This page covers the key differences so you know what to expect in each environm
 | **File watcher** | Yes (auto-sync on file changes) | No |
 | **Notebook idle timeout** | 2 hours | 1 hour |
 | **Backups** | Manual (`dango snapshot db`) | DigitalOcean Spaces (automated) |
-| **Metabase access** | Direct (localhost:3000) | Via Caddy reverse proxy with auth |
+| **Metabase access** | Web UI (localhost:8800) or direct (localhost:3000) | Via Caddy reverse proxy with auth |
 
 ## Authentication
 
@@ -59,7 +59,7 @@ You can change these in your authentication configuration. Cloud deployments wil
 
     Dango runs Uvicorn directly on `localhost:8800`. There is no HTTPS &mdash; traffic never leaves your machine.
 
-    Metabase runs on `localhost:3000` and is accessed directly in your browser.
+    Access Metabase through the Web UI at `localhost:8800` (recommended — SSO bridge handles login automatically), or directly at `localhost:3000`.
 
 === "Cloud"
 

@@ -94,7 +94,7 @@ Choose which sheets/tabs to load. Each selected sheet becomes a table in DuckDB.
 ### Step 4: Sync
 
 ```bash
-dango sync --source my_google_sheets
+dango sync my_google_sheets
 ```
 
 ---

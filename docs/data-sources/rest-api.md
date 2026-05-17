@@ -103,7 +103,7 @@ sources:
 ### First Sync
 
 ```bash
-dango sync --source acme
+dango sync acme
 ```
 
 ---
@@ -504,7 +504,7 @@ sources:
 No `.env` file needed. Sync with:
 
 ```bash
-dango sync --source jsonplaceholder
+dango sync jsonplaceholder
 ```
 
 **Tables created**: `raw_jsonplaceholder.posts`, `raw_jsonplaceholder.users`, `raw_jsonplaceholder.comments`

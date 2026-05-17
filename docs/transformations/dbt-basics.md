@@ -31,7 +31,7 @@ dbt (data build tool) transforms raw data in your warehouse using SQL. In Dango,
 
 ```bash
 # Add and sync a data source
-dango sync --source stripe_payments
+dango sync stripe_payments
 ```
 
 Raw data is loaded into DuckDB:

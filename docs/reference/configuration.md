@@ -582,7 +582,7 @@ refresh_token = "1//0abc123..."
 # Facebook Ads
 [sources.facebook_marketing]
 access_token = "EAAB123..."
-account_id = "act_123456789"
+account_id = "123456789"
 
 # HubSpot
 [sources.hubspot_crm]

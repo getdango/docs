@@ -94,7 +94,7 @@ sources:
 ### First Sync
 
 ```bash
-dango sync --source slack
+dango sync slack
 ```
 
 ---

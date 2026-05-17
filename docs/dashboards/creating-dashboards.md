@@ -19,7 +19,10 @@ Create a revenue dashboard in 5 minutes.
 
 ### Step 1: Create a Question
 
-1. Open Metabase: http://localhost:3000
+1. Open the Web UI at `http://localhost:8800` and click **Open Metabase** in the sidebar (SSO bridge handles login automatically)
+
+    Alternatively, access Metabase directly at `http://localhost:3000`. Check `.dango/metabase.yml` for credentials.
+
 2. Click **"+ New"** → **"Question"**
 3. Select **"DuckDB"** database
 4. Choose table: `marts.customer_metrics` (or any marts table)

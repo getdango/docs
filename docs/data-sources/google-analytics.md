@@ -85,7 +85,7 @@ The wizard will:
 ### Step 4: Sync
 
 ```bash
-dango sync --source website_analytics
+dango sync website_analytics
 ```
 
 ---

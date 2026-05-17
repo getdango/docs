@@ -213,7 +213,7 @@ Rotate credentials when:
 
 1. **Generate new credential** in the service provider's dashboard
 2. **Update Dango** with new credential
-3. **Test** with `dango sync --source affected_source`
+3. **Test** with `dango sync affected_source`
 4. **Revoke old credential** in the service provider
 
 ```bash
@@ -221,7 +221,7 @@ Rotate credentials when:
 nano .dlt/secrets.toml
 
 # Test
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # If successful, revoke old key in Stripe dashboard
 ```

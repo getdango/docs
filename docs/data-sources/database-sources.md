@@ -84,7 +84,7 @@ sources:
 ### First Sync
 
 ```bash
-dango sync --source my_postgres
+dango sync my_postgres
 ```
 
 Data loads into `raw_my_postgres` schema in DuckDB:
@@ -172,7 +172,7 @@ sources:
 ### First Sync
 
 ```bash
-dango sync --source my_mongo
+dango sync my_mongo
 ```
 
 Data loads into `raw_my_mongo` schema in DuckDB:
@@ -296,7 +296,7 @@ sources:
 ### Step 4: Sync
 
 ```bash
-dango sync --source my_mysql
+dango sync my_mysql
 ```
 
 ---

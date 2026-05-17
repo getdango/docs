@@ -469,10 +469,10 @@ dango validate
 
 ```bash
 # Enable debug logging
-RUNTIME__LOG_LEVEL=DEBUG dango sync --source my_source
+RUNTIME__LOG_LEVEL=DEBUG dango sync my_source
 
 # Reduce scope with date range
-dango sync --source my_source --start-date 2024-01-01
+dango sync my_source --start-date 2024-01-01
 ```
 
 ### Partial Sync / Missing Data
@@ -487,7 +487,7 @@ dango sync --source my_source --start-date 2024-01-01
 **Reset incremental state**:
 ```bash
 # Force full refresh
-dango sync --source my_source --full-refresh
+dango sync my_source --full-refresh
 ```
 
 ---

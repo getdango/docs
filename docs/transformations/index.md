@@ -60,7 +60,7 @@ graph LR
 
 ```bash
 # 1. Load raw data (also generates staging model templates)
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # 2. Create a custom mart using the wizard
 dango model add
@@ -174,7 +174,7 @@ LEFT JOIN customer_orders o ON c.id = o.customer
 When you run `dango sync`, staging model templates are automatically generated:
 
 ```bash
-dango sync --source stripe_payments
+dango sync stripe_payments
 # Creates raw data AND staging templates
 ```
 
@@ -326,7 +326,7 @@ When source data changes:
 
 ```bash
 # 1. Sync new data (auto-regenerates staging templates)
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # 2. Update downstream models if needed
 vim dbt/models/marts/customer_metrics.sql
@@ -603,7 +603,7 @@ If staging templates don't reflect source schema changes:
 
 ```bash
 # Option 1: Re-sync (recommended - also updates data)
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # Option 2: Regenerate templates only
 dango generate
@@ -644,7 +644,7 @@ sources:
 ### 2. Load Raw Data
 
 ```bash
-dango sync --source stripe_payments
+dango sync stripe_payments
 ```
 
 **Creates**:
