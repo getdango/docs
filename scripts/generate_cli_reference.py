@@ -24,44 +24,21 @@ DOCS_ROOT = SCRIPT_DIR.parent
 OUTPUT_FILE = DOCS_ROOT / "docs" / "cli" / "cli-reference.md"
 
 DANGO_ROOT = SCRIPT_DIR.parent.parent / "dango"
+if not DANGO_ROOT.exists():
+    print(f"ERROR: dango repo not found at {DANGO_ROOT}", file=sys.stderr)
+    print("Scripts must run from the docs repo with dango as a sibling directory.", file=sys.stderr)
+    sys.exit(1)
 sys.path.insert(0, str(DANGO_ROOT))
 
 # Suppress noisy import warnings during Click introspection
-warnings.filterwarnings("ignore")
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
 # ---------------------------------------------------------------------------
 # Type mapping for Click parameter types
 # ---------------------------------------------------------------------------
 
 import click  # noqa: E402
-
-TYPE_MAP: dict[type, str] = {
-    click.STRING: "TEXT",
-    click.INT: "INTEGER",
-    click.FLOAT: "FLOAT",
-    click.BOOL: "BOOLEAN",
-    click.Path: "PATH",
-}
-
-
-def get_type_str(param: click.Parameter) -> str | None:
-    """Return a human-readable type string for a Click parameter."""
-    if isinstance(param, click.Argument):
-        return None  # Arguments don't show type in our format
-
-    if isinstance(param.type, click.Choice):
-        choices = param.type.choices
-        return "{" + "|".join(choices) + "}"
-
-    if param.is_flag:
-        return None  # Flags have no type annotation
-
-    ptype = param.type
-    for click_type, display in TYPE_MAP.items():
-        if ptype is click_type or isinstance(ptype, type(click_type)):
-            return display
-
-    return None
 
 
 # ---------------------------------------------------------------------------
@@ -346,8 +323,6 @@ TREE_ARGS: dict[str, str] = {
     "source.edit": "[NAME]",
     "model.remove": "MODEL_NAME",
 }
-
-# Add TREE_ARGS for top-level "rename" etc. already present above
 
 # Short help text overrides (when Click's help text doesn't match docs)
 TREE_HELP: dict[str, str] = {
@@ -802,7 +777,7 @@ COMMAND_METADATA: dict[str, dict] = {
     "auth.enable": {
         "heading": "dango auth enable / disable",
         "usage_block": "dango auth enable\ndango auth disable",
-        "merge_with": "auth.disable",
+
 
     },
     "auth.disable": {"skip": True},
@@ -830,7 +805,7 @@ COMMAND_METADATA: dict[str, dict] = {
     "auth.deactivate-user": {
         "heading": "dango auth deactivate-user / reactivate-user",
         "usage_block": "dango auth deactivate-user EMAIL\ndango auth reactivate-user EMAIL",
-        "merge_with": "auth.reactivate-user",
+
 
     },
     "auth.reactivate-user": {"skip": True},
@@ -875,8 +850,6 @@ COMMAND_METADATA: dict[str, dict] = {
     "oauth.status": {
         "heading": "dango oauth status / check / list",
         "usage_block": "dango oauth status      # Show credential expiry\ndango oauth check       # Validate OAuth config\ndango oauth list        # List all credentials",
-        "merge_with_list": ["oauth.check", "oauth.list"],
-
     },
     "oauth.check": {"skip": True},
     "oauth.list": {"skip": True},
@@ -897,7 +870,6 @@ COMMAND_METADATA: dict[str, dict] = {
             "dango oauth facebook_ads"
         ),
         "after_usage": "Each walks through the browser-based OAuth flow and saves credentials to `.dlt/secrets.toml`.",
-        "merge_with_list": ["oauth.google_analytics", "oauth.google_ads", "oauth.facebook_ads"],
         "link": "[:octicons-arrow-right-24: Full guide](oauth-commands.md)",
     },
     "oauth.google_analytics": {"skip": True},
@@ -963,12 +935,6 @@ COMMAND_METADATA: dict[str, dict] = {
             "dango remote history [OPTIONS]        # Show deploy history\n"
             "dango remote sync SOURCE [OPTIONS]    # Trigger remote sync"
         ),
-        "merge_with_list": [
-            "remote.rollback", "remote.status", "remote.logs", "remote.ssh",
-            "remote.query", "remote.upgrade", "remote.resize", "remote.migrate",
-            "remote.history", "remote.sync",
-        ],
-
     },
     "remote.rollback": {"skip": True},
     "remote.status": {"skip": True},
@@ -988,8 +954,6 @@ COMMAND_METADATA: dict[str, dict] = {
             "dango remote env list\n"
             "dango remote env delete KEY"
         ),
-        "merge_with_list": ["remote.env.get", "remote.env.list", "remote.env.delete"],
-
     },
     "remote.env.get": {"skip": True},
     "remote.env.list": {"skip": True},
@@ -1001,15 +965,13 @@ COMMAND_METADATA: dict[str, dict] = {
             "dango remote firewall allow-ip IP_ADDRESS\n"
             "dango remote firewall allow-all"
         ),
-        "merge_with_list": ["remote.firewall.allow-ip", "remote.firewall.allow-all"],
-
     },
     "remote.firewall.allow-ip": {"skip": True},
     "remote.firewall.allow-all": {"skip": True},
     "remote.domain.set": {
         "heading": "Domain & HTTPS",
         "usage_block": "dango remote domain set DOMAIN_NAME\ndango remote domain remove",
-        "merge_with": "remote.domain.remove",
+
 
     },
     "remote.domain.remove": {"skip": True},
@@ -1022,11 +984,6 @@ COMMAND_METADATA: dict[str, dict] = {
             "dango remote backup download NAME [-o PATH]\n"
             "dango remote backup restore SOURCE [-y]"
         ),
-        "merge_with_list": [
-            "remote.backup.enable", "remote.backup.disable",
-            "remote.backup.download", "remote.backup.restore",
-        ],
-
     },
     "remote.backup.enable": {"skip": True},
     "remote.backup.disable": {"skip": True},
@@ -1040,10 +997,6 @@ COMMAND_METADATA: dict[str, dict] = {
             "dango remote auth remove-user EMAIL\n"
             "dango remote auth reset-password EMAIL"
         ),
-        "merge_with_list": [
-            "remote.auth.list-users", "remote.auth.remove-user",
-            "remote.auth.reset-password",
-        ],
         "link": "[:octicons-arrow-right-24: Full guide](deploy-remote.md)",
     },
     "remote.auth.list-users": {"skip": True},
@@ -1063,11 +1016,6 @@ COMMAND_METADATA: dict[str, dict] = {
             "dango schedule enable NAME           # Enable a schedule\n"
             "dango schedule disable NAME          # Disable a schedule"
         ),
-        "merge_with_list": [
-            "schedule.list", "schedule.remove", "schedule.status",
-            "schedule.enable", "schedule.disable",
-        ],
-
     },
     "schedule.list": {"skip": True},
     "schedule.remove": {"skip": True},
@@ -1082,10 +1030,6 @@ COMMAND_METADATA: dict[str, dict] = {
             "dango schedule webhook remove NAME   # Remove webhook\n"
             "dango schedule webhook test NAME     # Send test payload"
         ),
-        "merge_with_list": [
-            "schedule.webhook.list", "schedule.webhook.remove",
-            "schedule.webhook.test",
-        ],
         "link": "[:octicons-arrow-right-24: Full guide](schedule-commands.md)",
     },
     "schedule.webhook.list": {"skip": True},
@@ -1281,7 +1225,9 @@ def generate() -> str:
     def w(s: str = "") -> None:
         lines.append(s)
 
-    # --- Header ---
+    # --- Auto-gen header ---
+    w("<!-- Auto-generated by scripts/generate_cli_reference.py — do not edit manually -->")
+    w()
     w("# CLI Reference")
     w()
     w("Complete command reference for all `dango` commands.")
