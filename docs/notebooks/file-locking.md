@@ -182,3 +182,9 @@ Notebook server will shut down in 5 minutes due to inactivity.
 ```
 
 This WebSocket notification appears when no notebooks have been actively locked for most of the idle timeout period. To prevent shutdown, open a notebook (which acquires a lock and resets the idle timer).
+
+## Related
+
+- [Getting Started with Notebooks](getting-started.md) — notebook setup and basics
+- [DuckDB Snapshots](duckdb-snapshots.md) — how snapshots provide isolation
+- [DuckDB & Single-Writer](../core-concepts/duckdb.md) — understanding DuckDB's write model

@@ -186,7 +186,7 @@ sources:
   - name: facebook_marketing
     type: facebook_ads
     facebook_ads:
-      account_id: act_123456789
+      account_id: 123456789
       access_token_env: FB_ACCESS_TOKEN
       initial_load_past_days: 30
 ```

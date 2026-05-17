@@ -42,7 +42,7 @@ Staging templates are auto-generated when you sync data:
 
 ```bash
 # Load raw data AND generate staging templates
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # Run transformations
 dango run
@@ -487,7 +487,7 @@ git status
 cp dbt/models/staging/stg_stripe_charges.sql dbt/models/staging/stg_stripe_charges.sql.backup
 
 # 3. Sync (will regenerate staging)
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # 4. Restore customizations
 # Either manually restore from backup or use git checkout for individual files

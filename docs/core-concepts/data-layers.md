@@ -327,7 +327,7 @@ Let's trace how Stripe payment data flows through all layers:
 
 **dlt loads data**:
 ```bash
-dango sync --source stripe_payments
+dango sync stripe_payments
 ```
 
 **Tables created**:

@@ -825,3 +825,9 @@ If you can't find a solution, open an issue with:
 - **[Scheduling & Monitoring](../scheduling-monitoring/index.md)** — Syncs, alerts, health checks
 - **[Deployment](../deployment/index.md)** — Cloud deployment guide
 - **[GitHub Issues](https://github.com/getdango/dango/issues)** — Community support
+
+## Related
+
+- [Advanced Troubleshooting](../workflows/troubleshooting.md) — in-depth debugging techniques and solutions
+- [FAQ](../faq.md) — answers to common questions
+- [DuckDB & Single-Writer](../core-concepts/duckdb.md) — understanding database locking issues

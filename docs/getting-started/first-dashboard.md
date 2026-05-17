@@ -133,8 +133,8 @@ dango metabase save
 # Save specific collections only
 dango metabase save --collections "Sales,Marketing"
 
-# Save everything including personal collections
-dango metabase save --all
+# Save all shared collections
+dango metabase save
 ```
 
 This exports to the `metabase/` directory in your project. To restore on another machine or after a reset:
@@ -214,7 +214,7 @@ dango metabase refresh
 
 - Verify the date filter range includes your data
 - Check that the underlying questions return data when run individually
-- Re-sync your source if the data is stale: `dango sync --source <name>`
+- Re-sync your source if the data is stale: `dango sync <name>`
 
 ### Can't access Metabase through Web UI
 

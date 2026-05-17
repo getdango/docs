@@ -17,7 +17,7 @@ Metabase's SQL editor provides direct access to your DuckDB warehouse. This guid
 
 ### Open SQL Editor
 
-1. Navigate to http://localhost:3000
+1. Open the Web UI at `http://localhost:8800` and click **Open Metabase** in the sidebar (or access Metabase directly at `http://localhost:3000`)
 2. Click **"+ New"** → **"SQL query"**
 3. Select **"DuckDB"** database
 4. Write SQL and click **"Get Answer"**

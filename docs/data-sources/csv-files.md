@@ -112,7 +112,7 @@ mkdir -p data/uploads/sales_data
 cp my_sales.csv data/uploads/sales_data/
 
 # Sync
-dango sync --source sales_data
+dango sync sales_data
 ```
 
 ---
@@ -335,7 +335,7 @@ data/uploads/monthly_sales/
 cp sales_2024_05.csv data/uploads/monthly_sales/
 
 # Sync - table now contains Jan through May
-dango sync --source monthly_sales
+dango sync monthly_sales
 ```
 
 The table `raw_monthly_sales.monthly_sales` contains all rows from all months.
@@ -367,7 +367,7 @@ rm data/uploads/product_catalog/products.csv
 cp new_products_export.csv data/uploads/product_catalog/products.csv
 
 # Sync - table reflects only the new file
-dango sync --source product_catalog
+dango sync product_catalog
 ```
 
 ### Regional/Category Files (Combined)
@@ -425,7 +425,7 @@ Dango does not currently support Excel files (.xlsx) directly.
 ```bash
 # Example: save to sales_data directory
 # Then sync
-dango sync --source sales_data
+dango sync sales_data
 ```
 
 !!! tip "Future support"

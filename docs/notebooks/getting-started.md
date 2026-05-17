@@ -202,3 +202,9 @@ The DuckDB snapshot is created when Marimo starts. If you've synced new data sin
 2. Re-open the notebook — a new snapshot is created if Marimo restarts
 
 See [DuckDB Snapshots](duckdb-snapshots.md) for more on snapshot lifecycle.
+
+## Related
+
+- [Templates](templates.md) — built-in notebook templates for common analyses
+- [DuckDB Snapshots](duckdb-snapshots.md) — how notebooks access your data safely
+- [File Locking](file-locking.md) — understanding lock isolation

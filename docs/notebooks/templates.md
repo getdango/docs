@@ -249,3 +249,9 @@ Notebook files are standard Marimo Python scripts stored in the `notebooks/` dir
 3. Copy the file to use as a base for future notebooks
 
 The key requirement is the `setup` cell with the DuckDB connection pattern shown above.
+
+## Related
+
+- [Getting Started with Notebooks](getting-started.md) — notebook setup and basics
+- [Custom Models](../transformations/custom-models.md) — build dbt models to feed your notebooks
+- [DuckDB Snapshots](duckdb-snapshots.md) — how notebooks access your data

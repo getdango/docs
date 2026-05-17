@@ -109,7 +109,7 @@ security_token = "your_security_token"
 ### First Sync
 
 ```bash
-dango sync --source salesforce
+dango sync salesforce
 ```
 
 ---

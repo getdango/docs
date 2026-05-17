@@ -150,7 +150,7 @@ dango oauth setup google_sheets
 dango sync
 
 # Sync specific source
-dango sync --source my_csv_data
+dango sync my_csv_data
 ```
 
 ### 4. Develop Transformations
@@ -279,7 +279,7 @@ For faster development cycles:
 ```bash
 # 1. Make changes to CSV or source config
 # 2. Sync immediately (skip watcher debounce)
-dango sync --source my_source
+dango sync my_source
 
 # 3. Run only affected models
 cd dbt && dbt run --select my_model+

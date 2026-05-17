@@ -91,7 +91,7 @@ Opening browser for Google authentication...
 ### Step 3: Sync
 
 ```bash
-dango sync --source my_google_ads
+dango sync my_google_ads
 ```
 
 ---

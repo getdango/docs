@@ -148,3 +148,9 @@ If snapshots are consuming too much disk, you can:
 1. Reduce the number of active users (fewer users = fewer snapshots)
 2. Manually delete old snapshots: `rm .dango/snapshots/warehouse_*.duckdb`
 3. Run `dango cleanup` to free disk space from logs and cache (note: `cleanup` does not remove snapshots — use option 2 for that)
+
+## Related
+
+- [File Locking](file-locking.md) — how snapshots prevent lock conflicts
+- [DuckDB & Single-Writer](../core-concepts/duckdb.md) — understanding DuckDB's write model
+- [Getting Started with Notebooks](getting-started.md) — notebook basics

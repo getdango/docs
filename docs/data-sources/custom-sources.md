@@ -79,7 +79,7 @@ NOTION_API_KEY="your-notion-integration-token"
 **Step 5: Sync**
 
 ```bash
-dango sync --source my_notion
+dango sync my_notion
 ```
 
 ### Common Manual Sources
@@ -169,7 +169,7 @@ sources:
 ### Step 3: Sync
 
 ```bash
-dango sync --source my_api
+dango sync my_api
 ```
 
 Dango will:
@@ -249,7 +249,7 @@ sources:
 
 ### Result
 
-After running `dango sync --source ecommerce`:
+After running `dango sync ecommerce`:
 
 - **Raw tables**: `raw_ecommerce.products`, `raw_ecommerce.carts`, `raw_ecommerce.users`
 - **Staging models**: Auto-generated in `dbt/models/staging/`
@@ -351,14 +351,14 @@ MY_API_KEY=your-key-here
 
 Then run:
 ```bash
-dango sync --source my_api
+dango sync my_api
 ```
 
 **Alternative: Environment variable** (current session only):
 
 ```bash
 export MY_API_KEY="your-key-here"
-dango sync --source my_api
+dango sync my_api
 ```
 
 ---
@@ -661,7 +661,7 @@ def get_data():
 
 Run sync to see output:
 ```bash
-dango sync --source my_api
+dango sync my_api
 ```
 
 ---

@@ -102,12 +102,12 @@ DuckDB allows only one writer process at a time. Dango enforces this with `DbtLo
 
 ```bash
 # WRONG: parallel syncs will fail on the second one
-dango sync --source source1 &
-dango sync --source source2 &
+dango sync source1 &
+dango sync source2 &
 
 # CORRECT: sync sources sequentially
-dango sync --source source1
-dango sync --source source2
+dango sync source1
+dango sync source2
 
 # CORRECT: sync all sources (Dango handles ordering)
 dango sync
@@ -353,7 +353,7 @@ dango db clean
 
 ```bash
 # Time a sync
-time dango sync --source my_source
+time dango sync my_source
 
 # Check sync logs
 cat .dango/logs/activity.jsonl | tail -20

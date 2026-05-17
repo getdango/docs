@@ -67,7 +67,7 @@ The token is saved to `.env` as `GITHUB_ACCESS_TOKEN`.
 ### Step 3: Sync
 
 ```bash
-dango sync --source my_github
+dango sync my_github
 ```
 
 ---

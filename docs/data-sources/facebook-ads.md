@@ -96,7 +96,7 @@ The wizard will:
 ### Step 4: Sync
 
 ```bash
-dango sync --source facebook_campaigns
+dango sync facebook_campaigns
 ```
 
 ---
