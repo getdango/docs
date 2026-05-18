@@ -434,21 +434,23 @@ dango sync || {
 echo "Success!"
 ```
 
-### Parallel Execution
+### Sequential Execution
+
+DuckDB enforces a [single-writer constraint](../core-concepts/duckdb.md) — only one process can write to the database at a time. Run syncs sequentially, not in parallel:
 
 ```bash
 #!/bin/bash
+set -e
 
-# Sync sources in parallel
-dango sync stripe &
-dango sync google_sheets &
-dango sync sales_data &
-
-# Wait for all to complete
-wait
+# Sync sources sequentially (DuckDB allows only one writer at a time)
+dango sync stripe
+dango sync google_sheets
+dango sync sales_data
 
 echo "All syncs complete"
 ```
+
+See [Performance Tuning](../workflows/performance.md#single-writer-constraint) for more on optimizing sync execution.
 
 ---
 
