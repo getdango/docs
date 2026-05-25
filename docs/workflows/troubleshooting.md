@@ -230,10 +230,11 @@ kill <PID>
 
 ```yaml
 # .dango/project.yml
-web_port: 8801        # Default: 8800
-metabase_port: 3001   # Default: 3000
-dbt_docs_port: 8082   # Default: 8081
-marimo_port: 7806     # Default: 7805
+platform:
+  port: 8801            # Default: 8800
+  metabase_port: 3001   # Default: 3000
+  dbt_docs_port: 8082   # Default: 8081
+  marimo_port: 7806     # Default: 7805
 ```
 
 Then restart: `dango stop && dango start`
@@ -272,15 +273,10 @@ dango status
 
 **If the lock is stale** (process crashed), see [DuckDB Locks](#duckdb-locks) above.
 
-**Schedule syncs to avoid overlap.** If multiple sources sync on overlapping schedules, stagger their cron expressions:
+**Schedule syncs to avoid overlap.** If multiple sources sync on overlapping schedules, stagger their cron expressions. Use `dango schedule add` (interactive wizard) to create schedules with different times:
 
-```bash
-# Source 1: every 6 hours starting at midnight
-dango schedule set source1 --cron "0 0,6,12,18 * * *"
-
-# Source 2: every 6 hours starting at 1 AM
-dango schedule set source2 --cron "0 1,7,13,19 * * *"
-```
+- Source 1: every 6 hours starting at midnight (`0 0,6,12,18 * * *`)
+- Source 2: every 6 hours starting at 1 AM (`0 1,7,13,19 * * *`)
 
 ---
 
@@ -472,7 +468,7 @@ dango validate
 RUNTIME__LOG_LEVEL=DEBUG dango sync my_source
 
 # Reduce scope with date range
-dango sync my_source --start-date 2024-01-01
+dango sync my_source --since 2024-01-01
 ```
 
 ### Partial Sync / Missing Data

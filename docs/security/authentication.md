@@ -152,7 +152,7 @@ API keys provide stateless authentication for scripts and automation.
       -H "Cookie: dango_session=..." \
       -H "X-Requested-With: XMLHttpRequest" \
       -H "Content-Type: application/json" \
-      -d '{"name": "ci-deploy", "expires_in_days": 90}'
+      -d '{"name": "ci-deploy", "expires_at": "2026-09-01T00:00:00"}'
     ```
 
 ### Using API Keys
