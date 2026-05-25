@@ -516,7 +516,7 @@ Know your data:
 
 - ✅ Use environment variables
 - ✅ Use `.gitignore` for secrets
-- ✅ Use `dango auth` for OAuth (auto-saves to secrets.toml)
+- ✅ Use `dango oauth` for OAuth (auto-saves to secrets.toml)
 - ✅ Rotate credentials regularly
 - ✅ Use test credentials for development
 - ✅ Encrypt backups

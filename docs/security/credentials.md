@@ -300,7 +300,7 @@ Dango can optionally use the system keyring to store an encryption key that prot
 |-------|----------|
 | "No keyring backend" | Install `keyrings.alt` package |
 | Permission denied | Check OS keyring permissions |
-| Credential not found | Re-authenticate with `dango auth` |
+| Credential not found | Re-authenticate with `dango oauth setup <provider>` |
 
 ---
 
