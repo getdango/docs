@@ -432,7 +432,7 @@ dango remote push --allow-branch
 # Deploy with uncommitted changes
 dango remote push --allow-dirty
 
-# Skip pre-deploy backup (not recommended)
+# Override an existing deploy lock (not recommended)
 dango remote push --force
 ```
 

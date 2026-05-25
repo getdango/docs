@@ -249,7 +249,7 @@ dango start --yes
 
 When deploying with `dango remote push`:
 
-- `--force` — skip the pre-deploy backup (use with caution)
+- `--force` — override an existing deploy lock (use with caution)
 - `--allow-dirty` — deploy with uncommitted changes
 - `--allow-branch` — deploy from a non-main branch
 
