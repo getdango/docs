@@ -313,7 +313,7 @@ Review the drift report and accept the new schema:
 
 ```bash
 # Accept the current schema as the new baseline
-dango governance accept --source my_source
+dango governance accept my_source
 ```
 
 After accepting, the next sync will run dbt normally.

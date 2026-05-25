@@ -74,7 +74,7 @@ These are referenced by source configurations in `.dango/sources.yml` (via `*_en
 | `GOOGLE_CREDENTIALS` | Google Analytics | Service account JSON or OAuth credentials |
 
 !!! note
-    Google Sheets, Google Analytics, and Google Ads use OAuth tokens stored in `.dlt/secrets.toml` after running `dango oauth google`. The `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` variables listed above are for the **login provider** (allowing users to sign in with Google), not for source data access.
+    Google Sheets, Google Analytics, and Google Ads use OAuth tokens stored in `.dlt/secrets.toml` after running `dango oauth setup google`. The `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` variables listed above are for the **login provider** (allowing users to sign in with Google), not for source data access.
 
 ### Facebook OAuth
 

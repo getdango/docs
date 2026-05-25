@@ -341,7 +341,7 @@ See [Hardening Guide — Monitoring Integration](hardening.md#monitoring-integra
 
 ### API Key Management
 
-API keys let external scripts and services authenticate with your Dango instance. Manage them from the web UI **Account** page (`/account`), or via the REST API (`POST /api/auth/api-keys`, `DELETE /api/auth/api-keys/{key_id}`).
+API keys let external scripts and services authenticate with your Dango instance. Manage them from the web UI **Account** page (`/settings/account`), or via the REST API (`POST /api/auth/api-keys`, `DELETE /api/auth/api-keys/{key_id}`).
 
 **Key handling:**
 

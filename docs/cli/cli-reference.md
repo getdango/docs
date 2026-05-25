@@ -813,7 +813,6 @@ dango deploy [OPTIONS]
 | `--admin-email TEXT` | Admin user email |
 | `--admin-password TEXT` | Admin password (or `DANGO_ADMIN_PASSWORD` env) |
 | `--skip-backups` | Skip automated backup setup |
-| `--skip-initial-sync` | Skip initial data sync |
 | `--byos` | Deploy to an existing server (any provider) |
 | `--server-ip TEXT` | Server IP/hostname for `--byos` |
 | `--ssh-user TEXT` | SSH user for `--byos` |

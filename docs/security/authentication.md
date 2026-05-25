@@ -119,7 +119,7 @@ After successful login, Dango creates a session and sets a cookie.
 
 ### Managing Sessions
 
-View and manage your active sessions from the **Account** page (`/account`) in the web UI. You can sign out of individual sessions or all sessions at once.
+View and manage your active sessions from the **Account** page (`/settings/account`) in the web UI. You can sign out of individual sessions or all sessions at once.
 
 ---
 
@@ -139,7 +139,7 @@ API keys provide stateless authentication for scripts and automation.
 
 === "Web UI"
 
-    1. Go to **Account** (`/account`)
+    1. Go to **Account** (`/settings/account`)
     2. Scroll to **API Keys**
     3. Click **Create API Key**
     4. Set a name and optional expiry date

@@ -59,10 +59,11 @@ Override any port in `.dango/project.yml`:
 
 ```yaml
 # .dango/project.yml
-web_port: 8800
-metabase_port: 3000
-dbt_docs_port: 8081
-marimo_port: 7805
+platform:
+  port: 8800
+  metabase_port: 3000
+  dbt_docs_port: 8081
+  marimo_port: 7805
 ```
 
 If a port is already in use, check what process holds it:
@@ -298,7 +299,8 @@ Create separate configurations for different environments:
     ```yaml
     # .dango/project.yml (development)
     name: my-analytics-dev
-    web_port: 8800
+    platform:
+      port: 8800
     ```
 
 === "Production"
@@ -307,7 +309,8 @@ Create separate configurations for different environments:
     # .dango/project.yml (production)
     name: my-analytics-prod
     # Different port to avoid conflicts
-    web_port: 8801
+    platform:
+      port: 8801
     ```
 
 ### Using Environment Variables

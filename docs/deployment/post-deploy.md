@@ -42,7 +42,7 @@ Open `http://<your-server-ip>` in a browser. Log in with the admin email and pas
 
 ### Check Initial Sync
 
-If you did not use `--skip-initial-sync`, your data sources should already be syncing. Check the Sources page in the web UI or run:
+Your data sources should already be syncing from the initial sync during deployment. Check the Sources page in the web UI or run:
 
 ```bash
 dango remote logs
@@ -212,9 +212,11 @@ Cloud deployments typically use scheduled syncs instead of the local file watche
 Configure schedules via the web UI Schedules page or the CLI:
 
 ```bash
-dango schedule set stripe --cron "0 */6 * * *"   # Every 6 hours
-dango schedule set hubspot --cron "0 2 * * *"     # Daily at 2am
+# Interactive wizard — prompts for source, cron expression, and options
+dango schedule add
 ```
+
+Common cron expressions: `0 */6 * * *` (every 6 hours), `0 2 * * *` (daily at 2am), `0 9 * * 1` (weekly on Monday at 9am).
 
 See [Scheduled Syncs](../scheduling-monitoring/scheduled-syncs.md) for full documentation on schedule configuration, cron syntax, and misfire handling.
 

@@ -154,8 +154,7 @@ dango deploy \
   --ssh-user root \
   --ssh-key ~/.ssh/id_rsa \
   --admin-email admin@yourcompany.com \
-  --admin-password "$DANGO_ADMIN_PASSWORD" \
-  --skip-initial-sync
+  --admin-password "$DANGO_ADMIN_PASSWORD"
 ```
 
 ### BYOS-Specific Flags
@@ -167,7 +166,7 @@ dango deploy \
 | `--ssh-user` | SSH username | `root` |
 | `--ssh-key` | Path to SSH private key | Prompted |
 
-All [common flags](digitalocean.md#cli-flags) also apply (`--non-interactive`, `--admin-email`, `--admin-password`, `--domain`, `--skip-initial-sync`).
+All [common flags](digitalocean.md#cli-flags) also apply (`--non-interactive`, `--admin-email`, `--admin-password`, `--domain`).
 
 ---
 

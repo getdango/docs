@@ -385,7 +385,7 @@ The generic webhook sends JSON with these fields:
 
 ## `.dango/monitors.yml` { #monitors-yml }
 
-Metric monitoring and alert definitions. Managed via `dango monitor add` or manual editing.
+Metric monitoring and alert definitions. Managed via manual editing.
 
 ### Structure
 

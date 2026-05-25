@@ -114,7 +114,7 @@ After each sync, Dango runs a post-sync hook that detects schema drift — colum
 dango governance drift-report
 
 # Accept current schema as new baseline
-dango governance accept --source my_source
+dango governance accept my_source
 ```
 
 Until you accept breaking drift, dbt transformations are skipped for that source after each sync.
