@@ -31,7 +31,7 @@ Make changes to your dbt models in the `dbt/models/` directory. Use your preferr
 dango validate
 ```
 
-This runs dbt's `parse` and `compile` phases, which catch most SQL errors before they reach your cloud server.
+This runs dbt's `parse` phase, which catches most SQL and configuration errors before they reach your cloud server.
 
 ### 3. Test Locally with `dango dev`
 
@@ -57,7 +57,7 @@ git commit -m "Add monthly revenue model"
 dango remote push
 ```
 
-`dango remote push` syncs your project files (including dbt models) to the cloud server and re-runs dbt.
+`dango remote push` syncs your project files (including dbt models) to the cloud server and re-runs dbt. Ensure you're on the deploy branch configured in `.dango/cloud.yml` (default: `main`), or use `--allow-branch` to deploy from a different branch.
 
 ### 5. Verify on Cloud
 
@@ -81,12 +81,14 @@ If your data only exists on the cloud (you haven't synced sources locally), you 
 
 - **Sync sources locally too.** Even a small date range gives you data to test against:
     ```bash
-    dango sync my_source --start-date 2026-01-01
+    dango sync my_source --since 2026-01-01
     ```
 - **Push and verify.** Deploy the change to cloud, then use `dango remote query` to check results. If something is wrong, fix and redeploy.
-- **Use `dango dev` on the cloud data.** If you download a backup locally, you can test against real data:
+- **Use `dango dev` on cloud data.** Download a backup locally, then test against real data:
     ```bash
-    dango remote backup download latest
+    # List available backups, then download one
+    dango remote backup list
+    dango remote backup download backup-20260224-143000.tar.gz
     # Restore the backup locally, then use dango dev
     ```
 

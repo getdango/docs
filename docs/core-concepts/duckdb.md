@@ -167,14 +167,14 @@ curl -X POST https://your-dango-instance.com/api/query \
 ```
 
 ```python
-import httpx
+import requests
 
-client = httpx.Client(
-    base_url="https://your-dango-instance.com",
+response = requests.post(
+    "https://your-dango-instance.com/api/query",
     headers={"Authorization": "Bearer dango_ak_your_key_here"},
+    json={"sql": "SELECT count(*) FROM raw_stripe.customers"},
 )
 
-response = client.post("/api/query", json={"sql": "SELECT count(*) FROM raw_stripe.customers"})
 data = response.json()
 print(data["columns"], data["rows"])
 ```
@@ -190,7 +190,7 @@ dango remote query "SELECT count(*) FROM information_schema.tables"
 dango remote query "SELECT * FROM raw_stripe.customers LIMIT 10" --timeout 120
 ```
 
-This routes through the API endpoint (authenticated and audited).
+This routes through the API endpoint (authenticated and audited). The `--timeout` flag controls the SSH request timeout; the server-side query timeout is governed by `api.query_timeout_seconds` in `project.yml`.
 
 ### Direct File Access (Local Only)
 
