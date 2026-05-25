@@ -104,6 +104,17 @@ auth:
 
 For scripts and CI/CD pipelines, use [API keys](authentication.md#api-keys) instead of session cookies. Each API key is tied to a specific user (inheriting their role permissions) and can be revoked independently.
 
+### Enable Password Rotation for Cloud
+
+Force periodic password changes with `password_max_age_days` in `.dango/project.yml`:
+
+```yaml
+auth:
+  password_max_age_days: 90  # Force password change every 90 days (0 = disabled)
+```
+
+When a password expires, the user is redirected to the change-password page on their next login. OAuth login bypasses password rotation (by design — the identity provider handles credential management).
+
 ---
 
 ## Development Environment
@@ -323,6 +334,107 @@ curl https://your-domain.com/api/health
 ```
 
 See [Hardening Guide — Monitoring Integration](hardening.md#monitoring-integration) for setup instructions.
+
+---
+
+## API Security
+
+### API Key Management
+
+API keys let external scripts and services authenticate with your Dango instance. Manage them from the web UI **Account** page (`/account`), or via the REST API (`POST /api/auth/api-keys`, `DELETE /api/auth/api-keys/{key_id}`).
+
+**Key handling:**
+
+- Keys are prefixed with `dango_ak_` — treat them like passwords
+- The full key is shown **only once** at creation time. Store it in a secrets manager.
+- Each key inherits the creating user's role and permissions
+- Use **one key per integration** (e.g., separate keys for a reporting script and a CI pipeline) so you can revoke individually
+- Rotate keys periodically: create a new key, update your script, then revoke the old key
+
+### Query Endpoint for External Scripts
+
+The `POST /api/query` endpoint lets external scripts run read-only SQL against your DuckDB warehouse.
+
+**Security layers:**
+
+- Read-only, `SELECT`-only (enforced by sqlglot whitelist + DuckDB `read_only` mode)
+- Default limits: **10,000 rows**, **30-second timeout** (configurable via [`api.query_max_rows` and `api.query_timeout_seconds`](../reference/configuration.md#api-section) in `project.yml`)
+- Requires authentication (API key or session)
+- Every query is audit-logged
+
+**Example with curl:**
+
+```bash
+curl -X POST https://your-dango-instance.com/api/query \
+  -H "Authorization: Bearer dango_ak_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"sql": "SELECT * FROM marts.fct_daily_sales LIMIT 100"}'
+```
+
+**Example with Python:**
+
+```python
+import requests
+
+response = requests.post(
+    "https://your-dango-instance.com/api/query",
+    headers={"Authorization": "Bearer dango_ak_your_key_here"},
+    json={"sql": "SELECT count(*) as total FROM raw_stripe.customers"},
+)
+
+data = response.json()
+print(data["columns"])  # Column names
+print(data["rows"])     # Result rows
+```
+
+### IP Allowlisting
+
+For cloud deployments with scheduled scripts from known IPs, restrict access to specific addresses:
+
+```bash
+# Allow a single IP
+dango remote firewall allow-ip 203.0.113.42
+
+# Allow a CIDR range
+dango remote firewall allow-ip 203.0.113.0/24
+
+# Remove restrictions (allow all traffic)
+dango remote firewall allow-all
+```
+
+This blocks all HTTP/HTTPS traffic except from allowed IPs. Recommended for production instances that only serve dashboards to your office network or receive API calls from known servers.
+
+### Rate Limiting
+
+Built-in rate limiting protects against brute-force attacks and accidental overload from scripts:
+
+| Endpoint Group | Default Limit | Window |
+|---------------|--------------|--------|
+| Login (`/api/auth/login`) | 10 requests | 60 seconds |
+| API (`/api/*`) | 200 requests | 60 seconds |
+
+Localhost traffic is always exempt. Configure limits in `.dango/project.yml`:
+
+```yaml
+auth:
+  rate_limit:
+    api:
+      requests: 100
+      window_seconds: 60
+    login:
+      requests: 5
+      window_seconds: 60
+```
+
+If your script hits rate limits, reduce request frequency or increase the limit.
+
+---
+
+## Notebook Security
+
+Editors with the `notebooks.execute` permission can run arbitrary Python code in Marimo notebooks — including file system access, network requests, and package imports. This is inherent to any notebook environment (same as Jupyter).
+
+For trusted teams (Dango's target audience), this is expected behavior. For instances with untrusted editors, consider restricting notebook access to the admin role only by modifying the role-permission mapping in the codebase.
 
 ---
 

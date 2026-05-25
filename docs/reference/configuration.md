@@ -144,10 +144,24 @@ auth:
 | `rate_limit.trusted_proxies` | list[string] | `[]` | IPs of trusted reverse proxies |
 | `lockout.max_attempts` | integer | `5` | Failed attempts before lockout |
 | `lockout.lockout_minutes` | integer | `15` | Lockout duration in minutes |
+| `password_max_age_days` | integer | `0` (disabled) | Force password change after this many days. `0` disables rotation. When expired, user is redirected to the change-password page on next login. OAuth login bypasses rotation. |
 | `oauth_providers` | dict | `{}` | OAuth login providers (keyed by `google`, `github`) with `client_id` and `client_secret` |
 
 !!! info "Cloud deployment defaults differ"
     During `dango deploy`, the auth section is configured with shorter timeouts for security: `idle_timeout_minutes: 60` and `session_max_days: 30`.
+
+### `api` Section { #api-section }
+
+```yaml
+api:
+  query_max_rows: 10000
+  query_timeout_seconds: 30
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `query_max_rows` | integer | `10000` | Maximum rows returned by `POST /api/query`. Increase for scheduled reporting scripts pulling large datasets. |
+| `query_timeout_seconds` | integer | `30` | Query timeout in seconds. Increase for complex analytical queries. |
 
 ---
 

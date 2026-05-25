@@ -750,6 +750,26 @@ Paste relevant config
 
 ---
 
+## Cloud API Provider IP Blocking
+
+### Symptom
+
+A data source works locally but returns 403 errors when syncing on a cloud deployment.
+
+### Cause
+
+Some API providers (e.g., chess.com) block requests from cloud provider IP ranges (DigitalOcean, AWS, GCP) to prevent scraping. Your local IP is allowed, but your server's IP is not.
+
+### Resolution
+
+- **Try a different data source** for initial cloud testing
+- **Contact the API provider** about allowlisting your server's IP address
+- **Use a residential proxy** if the provider offers no allowlisting mechanism
+
+This is not a Dango issue — it affects any tool making API calls from cloud infrastructure.
+
+---
+
 ## Next Steps
 
 - [Performance](performance.md) - Optimize slow operations

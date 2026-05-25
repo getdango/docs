@@ -200,6 +200,22 @@ Dango follows [NIST SP 800-63B](https://pages.nist.gov/800-63-3/sp800-63b.html) 
 !!! tip "Why No Complexity Rules?"
     NIST research shows complexity requirements lead to weaker passwords (predictable patterns like `Password1!`). Length and avoiding common passwords are more effective.
 
+### Password Rotation
+
+Optionally force periodic password changes with `password_max_age_days` in `.dango/project.yml`:
+
+```yaml
+auth:
+  password_max_age_days: 90  # 0 = disabled (default)
+```
+
+| Setting | Behavior |
+|---------|----------|
+| `0` (default) | Password rotation disabled |
+| `> 0` | User redirected to change-password page on next login after password age exceeds this many days |
+
+OAuth login bypasses password rotation — the identity provider (Google, GitHub) handles credential management for those users.
+
 ---
 
 ## Brute-Force Protection

@@ -294,6 +294,7 @@ nav:
   - Workflows:
     - workflows/index.md
     - Local Development: workflows/local-development.md
+    - Cloud Development: workflows/cloud-development.md
     - dlt Workflows: workflows/dlt-workflows.md
     - dbt Workflows: workflows/dbt-workflows.md
     - Metabase Workflows: workflows/metabase-workflows.md
