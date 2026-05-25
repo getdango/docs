@@ -1041,7 +1041,7 @@ Execute an ad-hoc read-only SQL query against DuckDB.
 2. AST walked to reject write statements (INSERT, UPDATE, DELETE, DROP)
 3. DuckDB connection opened in `read_only` mode
 4. Result limited to 10,000 rows
-5. Response limited to 100 KB
+5. SQL input limited to 100 KB
 6. 30-second query timeout
 
 | Parameter | In | Type | Required | Description |
@@ -1182,7 +1182,6 @@ These routes return HTML pages (not JSON APIs):
 | `/health` | Platform health |
 | `/logs` | Activity logs |
 | `/catalog` | Data catalog |
-| `/monitoring` | Monitoring |
 | `/schedules` | Schedule management |
 | `/notebooks` | Notebook management |
 | `/login` | Login page |

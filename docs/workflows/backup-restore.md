@@ -167,18 +167,18 @@ When deployed to the cloud, Dango provides built-in backup management with Digit
 
 Every `dango remote push` automatically creates a backup on the server before deploying. This ensures you can roll back if a deploy causes issues.
 
-Skip the backup with `--force` (not recommended):
+Override an existing deploy lock with `--force` (not recommended):
 
 ```bash
 # Normal deploy (backup runs automatically)
 dango remote push
 
-# Skip backup (data loss risk if deploy fails)
+# Override deploy lock if another push is stuck
 dango remote push --force
 ```
 
 !!! warning "Use `--force` With Caution"
-    Skipping the pre-deploy backup means there is no rollback point if the deployment introduces data corruption or configuration errors.
+    Only use `--force` if you're certain no other deploy is running. Overriding the lock while another push is in progress can corrupt the deployment.
 
 ### Cloud Backup Commands
 

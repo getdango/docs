@@ -151,6 +151,62 @@ This shows the PID, operation, and start time of the lock holder.
 - In cloud deployments, always use the `:ro` volume mount for Metabase
 - For notebooks, always use Dango's snapshot system instead of connecting directly to the warehouse
 
+## Accessing Your Data from External Tools
+
+DuckDB stores all your data in a single file, making it accessible to any tool that supports DuckDB or SQL. There are three ways to query your data from outside the Dango web UI.
+
+### API Endpoint (Recommended for Remote Access)
+
+`POST /api/query` provides authenticated, audited, rate-limited, read-only access to your warehouse. This is the safest option for scripts and external tools.
+
+```bash
+curl -X POST https://your-dango-instance.com/api/query \
+  -H "Authorization: Bearer dango_ak_your_key_here" \
+  -H "Content-Type: application/json" \
+  -d '{"sql": "SELECT * FROM marts.fct_daily_sales LIMIT 100"}'
+```
+
+```python
+import requests
+
+response = requests.post(
+    "https://your-dango-instance.com/api/query",
+    headers={"Authorization": "Bearer dango_ak_your_key_here"},
+    json={"sql": "SELECT count(*) FROM raw_stripe.customers"},
+)
+
+data = response.json()
+print(data["columns"], data["rows"])
+```
+
+Default limits: 10,000 rows, 30-second timeout. Configurable via [`api.query_max_rows` and `api.query_timeout_seconds`](../reference/configuration.md#api-section) in `project.yml`.
+
+### `dango remote query` (Cloud Ad-Hoc Queries)
+
+For quick ad-hoc queries against a cloud deployment from your local terminal:
+
+```bash
+dango remote query "SELECT count(*) FROM information_schema.tables"
+dango remote query "SELECT * FROM raw_stripe.customers LIMIT 10" --timeout 120
+```
+
+This routes through the API endpoint (authenticated and audited). The `--timeout` flag controls the SSH request timeout; the server-side query timeout is governed by `api.query_timeout_seconds` in `project.yml`.
+
+### Direct File Access (Local Only)
+
+Any tool that supports DuckDB can open the database file directly. This works from Python, R, DBeaver, or any DuckDB-compatible client.
+
+```python
+import duckdb
+
+conn = duckdb.connect("data/warehouse.duckdb", read_only=True)
+df = conn.execute("SELECT * FROM marts.fct_daily_sales").fetchdf()
+conn.close()
+```
+
+!!! danger "Always Use `read_only=True`"
+    Opening DuckDB **without** `read_only=True` acquires an exclusive write lock that blocks all Dango syncs and transformations. This is the #1 cause of "sync stuck" issues. There is no authentication or audit trail with direct file access &mdash; use the API endpoint for anything beyond quick local exploration.
+
 ## Key Points
 
 - DuckDB allows only **one writer** at a time &mdash; all writes are serialized through DbtLock

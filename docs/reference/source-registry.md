@@ -157,7 +157,7 @@ sources:
 
 #### Google Sheets (`google_sheets`) :white_check_mark:{ title="Wizard enabled" }
 
-Load data from Google Sheets (one or more tabs). Requires OAuth setup via `dango oauth google`.
+Load data from Google Sheets (one or more tabs). Requires OAuth setup via `dango oauth setup google`.
 
 ```yaml
 sources:

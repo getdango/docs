@@ -209,7 +209,7 @@ After confirmation, the wizard provisions your server automatically. This takes 
 13. **Save metadata** &mdash; writes server info to `.dango/cloud.yml`
 14. **Start services** &mdash; launches Dango and Metabase via systemd
 15. **Health check** &mdash; verifies the web UI is responding
-16. **Initial sync** &mdash; triggers the first data sync (unless `--skip-initial-sync`)
+16. **Initial sync** &mdash; triggers the first data sync
 
 ```
 Provisioning server...
@@ -247,8 +247,7 @@ dango deploy \
   --region nyc1 \
   --size s-2vcpu-4gb \
   --admin-email admin@yourcompany.com \
-  --admin-password "$DANGO_ADMIN_PASSWORD" \
-  --skip-initial-sync
+  --admin-password "$DANGO_ADMIN_PASSWORD"
 ```
 
 ### CLI Flags
@@ -262,7 +261,6 @@ dango deploy \
 | `--admin-email` | Admin account email | Prompted |
 | `--admin-password` | Admin account password | Auto-generated |
 | `--skip-backups` | Skip automated backup setup (backups require Spaces keys) | Off |
-| `--skip-initial-sync` | Skip first data sync after deploy | Off |
 | `--reconnect` | Reconnect to an existing server | Off |
 | `--ip` | Server IP for `--reconnect` | Prompted |
 | `--byos` | Deploy to existing server (see [BYOS](byos.md)) | Off |

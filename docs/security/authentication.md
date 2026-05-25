@@ -119,7 +119,7 @@ After successful login, Dango creates a session and sets a cookie.
 
 ### Managing Sessions
 
-View and manage your active sessions from the **Account** page (`/account`) in the web UI. You can sign out of individual sessions or all sessions at once.
+View and manage your active sessions from the **Account** page (`/settings/account`) in the web UI. You can sign out of individual sessions or all sessions at once.
 
 ---
 
@@ -139,7 +139,7 @@ API keys provide stateless authentication for scripts and automation.
 
 === "Web UI"
 
-    1. Go to **Account** (`/account`)
+    1. Go to **Account** (`/settings/account`)
     2. Scroll to **API Keys**
     3. Click **Create API Key**
     4. Set a name and optional expiry date
@@ -152,7 +152,7 @@ API keys provide stateless authentication for scripts and automation.
       -H "Cookie: dango_session=..." \
       -H "X-Requested-With: XMLHttpRequest" \
       -H "Content-Type: application/json" \
-      -d '{"name": "ci-deploy", "expires_in_days": 90}'
+      -d '{"name": "ci-deploy", "expires_at": "2026-09-01T00:00:00"}'
     ```
 
 ### Using API Keys
@@ -199,6 +199,22 @@ Dango follows [NIST SP 800-63B](https://pages.nist.gov/800-63-3/sp800-63b.html) 
 
 !!! tip "Why No Complexity Rules?"
     NIST research shows complexity requirements lead to weaker passwords (predictable patterns like `Password1!`). Length and avoiding common passwords are more effective.
+
+### Password Rotation
+
+Optionally force periodic password changes with `password_max_age_days` in `.dango/project.yml`:
+
+```yaml
+auth:
+  password_max_age_days: 90  # 0 = disabled (default)
+```
+
+| Setting | Behavior |
+|---------|----------|
+| `0` (default) | Password rotation disabled |
+| `> 0` | User redirected to change-password page on next login after password age exceeds this many days |
+
+OAuth login bypasses password rotation — the identity provider (Google, GitHub) handles credential management for those users.
 
 ---
 

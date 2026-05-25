@@ -30,7 +30,7 @@ Any TOTP-compatible authenticator app works with Dango:
 ### Step-by-Step
 
 1. Log into the Dango web UI
-2. Go to **Account** (`/account`)
+2. Go to **Account** (`/settings/account`)
 3. Click **Enable Two-Factor Authentication**
 4. Enter your current password to confirm
 5. Scan the QR code with your authenticator app
@@ -99,7 +99,7 @@ TOTP codes are valid for a **30-second window** with a ±1 step tolerance (effec
 
 If you've used some recovery codes or want a fresh set:
 
-1. Go to **Account** (`/account`)
+1. Go to **Account** (`/settings/account`)
 2. Click **Regenerate Recovery Codes**
 3. Enter your current password and a TOTP code to confirm
 4. New codes are generated — **all previous codes are invalidated**
@@ -111,7 +111,7 @@ If you've used some recovery codes or want a fresh set:
 
 To turn off two-factor authentication:
 
-1. Go to **Account** (`/account`)
+1. Go to **Account** (`/settings/account`)
 2. Click **Disable Two-Factor Authentication**
 3. Enter your current password to confirm
 4. 2FA is disabled immediately — future logins require only a password

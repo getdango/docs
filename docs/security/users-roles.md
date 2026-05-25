@@ -192,7 +192,7 @@ Admins can create new users via CLI or web UI. New users receive an invite link 
 
 === "Web UI"
 
-    1. Go to **Admin** → **Users** (`/admin/users`)
+    1. Go to **Admin** → **Users** (`/settings/users`)
     2. Click **Add User**
     3. Enter email and select a role
     4. Copy the invite link and share it with the user

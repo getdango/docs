@@ -114,6 +114,7 @@ auth:
   enabled: true
   idle_timeout_minutes: 1440   # 24 hours
   session_max_days: 365        # 1 year
+  password_max_age_days: 0     # disabled (0 = no forced rotation)
   require_2fa: false
   rate_limit:
     enabled: true
@@ -135,6 +136,7 @@ auth:
 | `enabled` | boolean | `true` | Enable authentication |
 | `idle_timeout_minutes` | integer | `1440` (24h) | Session idle timeout in minutes |
 | `session_max_days` | integer | `365` (1 year) | Maximum session lifetime in days |
+| `password_max_age_days` | integer | `0` (disabled) | Force password change after this many days. `0` disables rotation. When expired, user is redirected to the change-password page on next login. OAuth login bypasses rotation. |
 | `require_2fa` | boolean | `false` | Require all users to set up TOTP 2FA |
 | `rate_limit.enabled` | boolean | `true` | Enable rate limiting |
 | `rate_limit.login.requests` | integer | `10` | Max login attempts per window |
@@ -148,6 +150,19 @@ auth:
 
 !!! info "Cloud deployment defaults differ"
     During `dango deploy`, the auth section is configured with shorter timeouts for security: `idle_timeout_minutes: 60` and `session_max_days: 30`.
+
+### `api` Section { #api-section }
+
+```yaml
+api:
+  query_max_rows: 10000
+  query_timeout_seconds: 30
+```
+
+| Field | Type | Default | Description |
+|-------|------|---------|-------------|
+| `query_max_rows` | integer | `10000` | Maximum rows returned by `POST /api/query`. Increase for scheduled reporting scripts pulling large datasets. |
+| `query_timeout_seconds` | integer | `30` | Query timeout in seconds. Increase for complex analytical queries. |
 
 ---
 
@@ -370,7 +385,7 @@ The generic webhook sends JSON with these fields:
 
 ## `.dango/monitors.yml` { #monitors-yml }
 
-Metric monitoring and alert definitions. Managed via `dango monitor add` or manual editing.
+Metric monitoring and alert definitions. Managed via manual editing.
 
 ### Structure
 

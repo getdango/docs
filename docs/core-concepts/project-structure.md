@@ -815,7 +815,7 @@ Running multiple Dango projects on the same machine:
 **Manage all projects**:
 ```bash
 # Check all running projects
-dango status --all
+dango status
 
 # Stop all projects
 dango stop --all

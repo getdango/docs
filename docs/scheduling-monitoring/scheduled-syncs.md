@@ -248,7 +248,7 @@ Cron expressions use 5 fields:
 
     ```
     GET /api/schedules/{name}/history
-    GET /api/schedules/recent-history
+    GET /api/schedules/history/recent
     ```
 
 ### Status Values
