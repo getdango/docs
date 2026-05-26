@@ -200,8 +200,8 @@ Build dashboards locally, not directly on your cloud Metabase instance:
 1. **Build locally** &mdash; create and iterate on dashboards at `http://localhost:3000`
 2. **Export** &mdash; run `dango metabase save` to export dashboards as YAML to your project repo
 3. **Commit** &mdash; `git add` the saved YAML files and commit. Dashboards are now version-controlled
-4. **Deploy** &mdash; `dango remote push` syncs saved dashboards to the cloud server
-5. **Restore** &mdash; `dango metabase load` on cloud restores dashboards from the repo
+4. **Push** &mdash; `dango remote push` deploys your project to the cloud server
+5. **Restore** &mdash; run `dango metabase load` on the cloud server to import dashboards from the repo
 
 **Why this matters:**
 
