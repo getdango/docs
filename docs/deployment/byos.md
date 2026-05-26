@@ -11,7 +11,7 @@ Your server must meet these requirements:
 | Requirement | Minimum | Recommended |
 |-------------|---------|-------------|
 | **OS** | Ubuntu 22.04 LTS | Ubuntu 22.04 or 24.04 LTS |
-| **RAM** | 2 GB | 4 GB+ |
+| **RAM** | 4 GB | 4 GB+ |
 | **CPU** | 1 vCPU | 2+ vCPU |
 | **Disk** | 20 GB free | 50 GB+ free |
 | **Access** | SSH access (root or sudo) | Root access |
@@ -65,6 +65,9 @@ Testing SSH connection to 203.0.113.50...
 
 !!! note "Non-Ubuntu Warning"
     If the server is not running Ubuntu, the wizard shows a warning but allows you to proceed. Dango is tested on Ubuntu 22.04 and 24.04 &mdash; other distributions may work but are not officially supported.
+
+!!! info "Ubuntu 22.04 vs 24.04"
+    Both versions are fully supported. The SSH service name differs between versions (`sshd` on 22.04, `ssh` on 24.04) &mdash; Dango detects this automatically during setup.
 
 The wizard auto-detects your server's hardware using `nproc` (CPU count) and `free` (RAM) to tune dbt performance settings in `profiles.yml`.
 
@@ -141,6 +144,27 @@ After the wizard validates your SSH connection, the following is installed and c
 
 !!! tip "UFW is BYOS-only"
     DigitalOcean deployments use the DO cloud firewall (managed via API). BYOS deployments install UFW directly on the server since there's no cloud-level firewall to manage.
+
+---
+
+## Cloud Provider Notes
+
+Different providers have different defaults. Keep these in mind when provisioning your server:
+
+| Factor | DigitalOcean | Hetzner | GCP | AWS |
+|--------|-------------|---------|-----|-----|
+| **Default disk** | 80 GB | 40 GB | 10 GB :warning: | Varies by instance |
+| **SSH user** | `root` | `root` | Your username | `ubuntu` |
+| **Root SSH** | Yes | Yes | Disabled by default | Disabled by default |
+| **Min RAM** | 4 GB recommended | 4 GB recommended | 4 GB recommended | 4 GB recommended |
+
+!!! warning "GCP default disk is too small"
+    GCP instances default to 10 GB disk, which is not enough for Dango (DuckDB + Metabase + Docker images). Increase to at least 20 GB when creating the instance.
+
+!!! note "Non-root SSH users"
+    GCP and AWS disable root login by default. Use your cloud username as the SSH user and ensure it has passwordless `sudo` access. The wizard runs setup commands via `sudo`.
+
+**Minimum RAM:** 4 GB. Servers with 2 GB RAM will run but Metabase may crash with out-of-memory errors under load.
 
 ---
 
@@ -259,6 +283,20 @@ Common causes:
 - **Port conflict** &mdash; another service already using port 8800, 80, or 443
 - **Docker not running** &mdash; `sudo systemctl start docker`
 - **Disk full** &mdash; `df -h` to check available space
+
+### Quick recovery
+
+Before SSH-ing in manually, try the built-in recovery commands:
+
+```bash
+# Diagnose and fix common issues (disk, RAM, services, Metabase)
+dango remote repair
+
+# If Metabase is completely broken (SSO loop, H2 corruption)
+dango remote reset-metabase
+```
+
+See [Recovery Commands](remote-management.md#recovery-commands) for details.
 
 ---
 

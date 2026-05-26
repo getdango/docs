@@ -149,7 +149,7 @@ Schema-based classification takes precedence over name-based classification. Thi
 
 - **Profiling is cached** — results persist in SQLite until you re-profile or the table changes
 - **Re-profile after schema changes** — cached stats don't auto-update when columns are added or types change
-- **Lineage comes from the dbt manifest** — run `dbt docs generate` or `dango transform docs` to update it after adding new models
+- **Lineage comes from the dbt manifest** — run `dbt docs generate` or `dango docs` to update it after adding new models
 - **Search returns up to 50 results** — use specific terms for large projects
 - **Raw tables are browsable** — source tables in `raw_*` schemas appear alongside dbt models
 - **PII flags integrate with the catalog** — columns flagged by [PII scanning](pii-scanning.md) show PII indicators in the column list

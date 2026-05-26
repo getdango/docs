@@ -311,6 +311,7 @@ nav:
     - Custom API Integration: guides/custom-api.md
     - Team Setup Guide: guides/team-setup.md
     - Migration from Spreadsheets: guides/spreadsheet-migration.md
+    - PDF Parsing: guides/pdf-parsing.md
 
   # --- TAB 13: REFERENCE ---
   - Reference:

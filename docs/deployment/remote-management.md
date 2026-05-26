@@ -19,6 +19,8 @@ Manage your cloud deployment with `dango remote` commands.
 | `dango remote auth list-users` | List web UI users |
 | `dango remote auth remove-user` | Remove a web UI user |
 | `dango remote auth reset-password` | Reset a user's password |
+| `dango remote repair` | Diagnose and fix common deployment issues |
+| `dango remote reset-metabase` | Reset Metabase to fresh state (SSO/H2 corruption) |
 
 All commands require an active deployment (`.dango/cloud.yml` must exist). They work the same for both DigitalOcean and BYOS deployments &mdash; all communication happens over SSH.
 
@@ -345,6 +347,31 @@ Time                 Commit    Branch  Deployer       Duration  Status
 2026-05-14 10:15:00  e5f6g7h8  main    deploy@local   1m 12s    OK
 2026-05-13 16:45:00  i9j0k1l2  main    deploy@local   38s       FAIL
 ```
+
+---
+
+## Recovery Commands
+
+When things go wrong, these commands fix common issues without SSH access:
+
+### Repair
+
+```bash
+dango remote repair
+```
+
+Diagnoses and fixes common deployment issues: checks disk space, RAM, DNS resolution, restarts services, re-runs Metabase setup if `metabase.yml` is missing, and triggers a Metabase schema scan. **Run this first** when something isn't working.
+
+### Reset Metabase
+
+```bash
+dango remote reset-metabase
+```
+
+Resets Metabase to a fresh state when SSO breaks or the H2 database corrupts. Stops Metabase, removes its Docker volume, restarts it, and lets `dango-web` re-run Metabase setup on next startup. **Does not affect your warehouse data** &mdash; only Metabase's internal state (saved questions, dashboards) is lost. Re-import with `dango metabase load` after reset.
+
+!!! tip "Try repair first"
+    `dango remote repair` fixes most issues. Only use `dango remote reset-metabase` if Metabase is completely broken (SSO loop, database corruption errors, blank screen after login).
 
 ---
 

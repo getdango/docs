@@ -109,7 +109,7 @@ This is the v1.0.0 release — a complete rewrite and expansion of the Dango pla
 - `dango dev` — branch-based dbt development
 - `dango snapshot` — SCD Type 2 snapshots and DuckDB copies
 - `dango upgrade` — in-place version upgrades with migrations
-- `dango webhook` — webhook notification management
+- `dango schedule webhook` — webhook notification management
 - `dango config validate` — configuration validation
 
 **Infrastructure**
