@@ -94,7 +94,7 @@ def supplier_invoices():
 
     ```bash
     dango source add
-    # Select "dlt_native" → enter module path
+    # Select "dlt_native" → enter module name
     ```
 
 4. **Drop PDF files** into `data/invoices/`
