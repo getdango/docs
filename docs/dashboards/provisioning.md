@@ -145,13 +145,13 @@ Verify your Metabase admin email and password. The Metabase admin password was a
 
     ```bash
     # Check which admin email is configured
-    dango user list
+    dango auth list-users
     ```
 
 === "Cloud"
 
     ```bash
-    dango user list
+    dango auth list-users
     # Or check the environment variable
     echo $DANGO_ADMIN_EMAIL
     ```

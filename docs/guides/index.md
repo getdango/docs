@@ -74,6 +74,16 @@ These guides walk through complete workflows using Dango. Each tutorial is desig
 
     [:octicons-arrow-right-24: Start Tutorial](spreadsheet-migration.md)
 
+-   :material-file-pdf-box: **PDF Parsing**
+
+    ---
+
+    Build a custom dlt source to extract data from PDF documents like invoices.
+
+    **Duration**: ~20 minutes
+
+    [:octicons-arrow-right-24: Start Tutorial](pdf-parsing.md)
+
 </div>
 
 ---

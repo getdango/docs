@@ -193,9 +193,28 @@ Then query the mart in Metabase - much faster.
 Good: "Monthly Revenue by Product Category"
 Bad: "Analysis 1" or "test query"
 
-### 4. Version Control Your Dashboards
+### 4. Version-Control Your Dashboards
 
-Use `dango metabase save` to export dashboards as YAML for version control. See [Save & Load](save-load.md).
+Build dashboards locally, not directly on your cloud Metabase instance:
+
+1. **Build locally** &mdash; create and iterate on dashboards at `http://localhost:3000`
+2. **Export** &mdash; run `dango metabase save` to export dashboards as YAML to your project repo
+3. **Commit** &mdash; `git add` the saved YAML files and commit. Dashboards are now version-controlled
+4. **Push** &mdash; `dango remote push` deploys your project to the cloud server. Transfer the `metabase/` directory separately (e.g., `scp -r metabase/ root@server:/srv/dango/project/`)
+5. **Restore** &mdash; run `dango metabase load` on the cloud server to import dashboards from the transferred files
+
+**Why this matters:**
+
+- A cloud server crash or rebuild loses all Metabase state (saved questions, dashboards, collections)
+- Backups cover Metabase, but the git repo is the authoritative source of truth
+- Treat dashboards like code &mdash; review changes, track history, roll back if needed
+
+**If you must build directly on cloud:**
+
+- Run `dango metabase save` immediately after making changes on the cloud instance
+- Pull the saved YAML files back to your local repo and commit them
+
+See [Save & Load](save-load.md) for full details on the export/import workflow.
 
 ---
 

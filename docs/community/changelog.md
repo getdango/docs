@@ -72,7 +72,7 @@ This is the v1.0.0 release — a complete rewrite and expansion of the Dango pla
 **Scheduling (Phase 5)**
 
 - APScheduler-based sync scheduling with cron expressions
-- `dango schedule add/remove/list/pause/resume`
+- `dango schedule add/remove/list/enable/disable`
 - Webhook notifications on sync success, failure, or stale data
 - Configurable stale data thresholds
 - Misfire grace handling for missed schedules
@@ -109,7 +109,7 @@ This is the v1.0.0 release — a complete rewrite and expansion of the Dango pla
 - `dango dev` — branch-based dbt development
 - `dango snapshot` — SCD Type 2 snapshots and DuckDB copies
 - `dango upgrade` — in-place version upgrades with migrations
-- `dango webhook` — webhook notification management
+- `dango schedule webhook` — webhook notification management
 - `dango config validate` — configuration validation
 
 **Infrastructure**

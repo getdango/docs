@@ -33,7 +33,7 @@ pip install getdango
 
 ```bash
 dango --version
-# Output: dango version x.y.z
+# Output: dango, version x.y.z
 ```
 
 ### Create Your First Project
