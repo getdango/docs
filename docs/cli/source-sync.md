@@ -168,6 +168,9 @@ dango source edit chess         # Edit with focus hint
 
 ## Syncing Data
 
+!!! tip "Web UI alternative"
+    You can also trigger syncs from the **Sources** page in the Web UI. Navigate to `http://localhost:8800/sources` and click **Sync Now** on any source. See [Web UI — Sources](../web-ui/sources.md).
+
 ### dango sync
 
 Load data from all sources (or a specific source) into DuckDB.

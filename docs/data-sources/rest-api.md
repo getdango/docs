@@ -20,6 +20,9 @@ The REST API source type connects Dango to any HTTP-based API. Use it for APIs t
 - The API requires non-standard authentication flows
 - You need to call multiple dependent endpoints in sequence
 
+!!! tip "Managing this source in the Web UI"
+    After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
+
 ---
 
 ## Prerequisites

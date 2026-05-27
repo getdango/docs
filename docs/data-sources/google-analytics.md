@@ -17,6 +17,9 @@ Google Analytics loads GA4 reporting data into DuckDB. By default, Dango creates
 !!! note "GA4 only"
     Dango supports **Google Analytics 4 (GA4)** properties only. Universal Analytics (UA) properties are not supported — Google sunset UA in July 2024.
 
+!!! tip "Managing this source in the Web UI"
+    After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
+
 ---
 
 ## Prerequisites

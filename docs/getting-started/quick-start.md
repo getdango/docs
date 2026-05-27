@@ -194,6 +194,18 @@ $ dango start
 
 Your browser should open automatically. If it doesn't, visit `http://localhost:8800` manually. Log in with the admin password you set during `dango init`.
 
+!!! tip "Explore the Web UI"
+    After logging in, you'll see the **Dashboard** page with system health and recent activity. Use the top navigation to explore:
+
+    - **Sources** — view your data sources, trigger syncs, upload CSVs
+    - **Models** — browse and run dbt transformation models
+    - **Schedules** — set up automated sync schedules
+    - **Catalog** — explore your data warehouse tables and columns
+    - **Notebooks** — launch Python notebooks for ad-hoc analysis
+    - **Monitoring** — track data quality and freshness metrics
+
+    See the [Platform Tour](platform-tour.md) for a full walkthrough of each page.
+
 !!! note "Metabase cold start"
     The first time Metabase starts, it takes 2–3 minutes to initialize its database. Subsequent starts are much faster. You can check progress with `docker ps`.
 

@@ -81,7 +81,7 @@
   /* Font sizes - documentation-optimized (smaller than marketing site) */
   --text-xs: 0.75rem;      /* 12px */
   --text-sm: 0.875rem;     /* 14px */
-  --text-base: 0.9375rem;  /* 15px - slightly smaller for readability */
+  --text-base: 0.875rem;   /* 14px - matches dbt/DuckDB/Stripe docs */
   --text-lg: 1.0625rem;    /* 17px */
   --text-xl: 1.125rem;     /* 18px */
   --text-2xl: 1.25rem;     /* 20px */
@@ -312,6 +312,15 @@ h1, h2, h3, h4, h5, h6 {
   .md-typeset h3 {
     font-size: var(--text-base);
   }
+}
+
+/* Fix footer overlapping sidebar */
+.md-footer {
+  z-index: 1;
+}
+
+.md-sidebar {
+  z-index: 2;
 }
 
 /* Clean horizontal rules */
