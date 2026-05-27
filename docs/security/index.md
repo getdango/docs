@@ -22,10 +22,14 @@ Dango implements several security measures automatically:
 
 | Feature | Description |
 |---------|-------------|
+| **Authentication** | Password login with optional 2FA, OAuth (Google/GitHub), API keys |
+| **Role-Based Access Control** | 3 roles (Admin, Editor, Viewer) with 29 named permissions |
+| **Brute-Force Protection** | Account lockout after 5 failed attempts, rate limiting |
+| **Audit Logging** | 44 security event types logged to append-only JSONL |
 | **Credential Storage** | API keys stored in `.dlt/secrets.toml` |
-| **OAuth Tokens** | Tokens stored in `secrets.toml` (optionally encrypted) |
-| **Credential Masking** | Secrets masked in logs |
-| **Local Storage** | Data stays on your machine |
+| **OAuth Tokens** | Auto-refresh for Google; tokens stored securely |
+| **Credential Masking** | Secrets masked in logs and UI |
+| **Cloud Hardening** | SSH key-only, fail2ban, auto-TLS, unattended upgrades |
 
 ### What You Must Do
 
@@ -33,9 +37,11 @@ Security is a shared responsibility:
 
 | Your Responsibility | How |
 |--------------------|-----|
+| **Set strong passwords** | Use a password manager; min 8 chars, avoid common passwords |
+| **Enable 2FA** | Set up TOTP for admin accounts |
 | **Protect API keys** | Never commit to git |
 | **Secure secrets.toml** | Add to .gitignore |
-| **Control access** | Limit who has project access |
+| **Review audit logs** | Check for suspicious activity regularly |
 | **Backup securely** | Encrypt sensitive backups |
 
 ---
@@ -43,6 +49,30 @@ Security is a shared responsibility:
 ## Security Guides
 
 <div class="grid cards" markdown>
+
+-   :material-login: **Authentication**
+
+    ---
+
+    How Dango authentication works: passwords, sessions, and login flows.
+
+    [:octicons-arrow-right-24: Authentication](authentication.md)
+
+-   :material-account-group: **Users & Roles**
+
+    ---
+
+    Manage users with admin, editor, and viewer roles.
+
+    [:octicons-arrow-right-24: Users & Roles](users-roles.md)
+
+-   :material-two-factor-authentication: **Two-Factor Auth**
+
+    ---
+
+    TOTP-based two-factor authentication for enhanced security.
+
+    [:octicons-arrow-right-24: Two-Factor Auth](two-factor.md)
 
 -   :material-key: **Credential Management**
 
@@ -59,6 +89,22 @@ Security is a shared responsibility:
     OAuth token lifecycle and security considerations.
 
     [:octicons-arrow-right-24: OAuth Tokens](oauth.md)
+
+-   :material-shield-lock: **Hardening Guide**
+
+    ---
+
+    Security hardening for production and cloud deployments.
+
+    [:octicons-arrow-right-24: Hardening Guide](hardening.md)
+
+-   :material-text-box-search: **Audit Logging**
+
+    ---
+
+    Track security-relevant events with the audit log.
+
+    [:octicons-arrow-right-24: Audit Logging](audit-logging.md)
 
 -   :material-security: **Best Practices**
 
@@ -88,10 +134,13 @@ Security is a shared responsibility:
 
 ### For Production
 
-- [ ] Change default Metabase password
+- [ ] Enable [two-factor authentication](two-factor.md) for all admin accounts
+- [ ] Configure [session timeouts](authentication.md#session-timeouts) for cloud
+- [ ] Set up [IP restriction](hardening.md#ip-restriction) or Cloudflare proxy
+- [ ] Set a domain for [auto-TLS](hardening.md#caddy-auto-tls)
+- [ ] Review [audit logs](audit-logging.md) regularly
+- [ ] Set up [uptime monitoring](hardening.md#monitoring-integration)
 - [ ] Secure backup storage
-- [ ] Limit access to project directory
-- [ ] Monitor for credential exposure
 
 ---
 
@@ -99,21 +148,21 @@ Security is a shared responsibility:
 
 ### In Scope (This Documentation)
 
-- Credential storage mechanisms
-- OAuth token handling
+- Authentication (passwords, OAuth, API keys, sessions)
+- Two-factor authentication (TOTP)
+- Role-based access control (Admin, Editor, Viewer)
+- Credential storage and OAuth token management
+- Audit logging
+- Cloud hardening (SSH, TLS, fail2ban, firewall)
 - Git security patterns
-- Secrets management
 
 ### Out of Scope
 
-Dango is a local-first MVP. The following are not currently covered:
+The following are not currently covered:
 
-- Network security (Dango runs locally)
-- Database access control (DuckDB is single-user)
 - Enterprise authentication (SSO, LDAP)
-- Audit logging for compliance
-
-These features may be added in future cloud-enabled versions.
+- Row-level security / database access control
+- Network-level DDoS protection (recommend [IP restriction](hardening.md#ip-restriction) or [Cloudflare](hardening.md#cloudflare-proxy))
 
 ---
 
@@ -130,6 +179,7 @@ If you discover a security vulnerability:
 
 ## Next Steps
 
+- [Authentication](authentication.md) - How Dango authentication works
+- [Users & Roles](users-roles.md) - User management and permissions
 - [Credential Management](credentials.md) - How credentials are stored
-- [OAuth Tokens](oauth.md) - Token security details
-- [Best Practices](best-practices.md) - Security recommendations
+- [Hardening Guide](hardening.md) - Production security recommendations

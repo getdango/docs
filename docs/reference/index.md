@@ -12,7 +12,7 @@ Complete technical reference documentation for Dango.
 
     ---
 
-    Complete schemas for all configuration files: `project.yml`, `sources.yml`, `secrets.toml`.
+    Complete schemas for all 13 configuration files: `project.yml`, `sources.yml`, `schedules.yml`, `monitors.yml`, `cloud.yml`, and more.
 
     [:octicons-arrow-right-24: Configuration Reference](configuration.md)
 
@@ -20,9 +20,33 @@ Complete technical reference documentation for Dango.
 
     ---
 
-    REST API documentation for the Dango Web UI with endpoints, parameters, and examples.
+    REST API documentation for 100+ endpoints with authentication, permissions, parameters, and examples.
 
     [:octicons-arrow-right-24: API Reference](api.md)
+
+-   :material-shield-lock-outline: **Permissions Matrix**
+
+    ---
+
+    Complete RBAC reference: 3 roles, 29 permissions across 9 domains, session security, and API key auth.
+
+    [:octicons-arrow-right-24: Permissions Matrix](permissions.md)
+
+-   :material-database-outline: **Source Registry**
+
+    ---
+
+    All 33 data sources with categories, auth types, capabilities, and configuration fields.
+
+    [:octicons-arrow-right-24: Source Registry](source-registry.md)
+
+-   :material-variable: **Environment Variables**
+
+    ---
+
+    All platform, cloud, and source credential environment variables with precedence rules.
+
+    [:octicons-arrow-right-24: Environment Variables](environment-variables.md)
 
 -   :material-console: **CLI Reference**
 
@@ -40,8 +64,16 @@ Complete technical reference documentation for Dango.
 
 | Resource | Description |
 |----------|-------------|
-| [Configuration Reference](configuration.md) | `project.yml`, `sources.yml`, `secrets.toml` schemas |
-| [API Reference](api.md) | REST API endpoints and WebSocket events |
+| [Configuration Reference](configuration.md) | All 13 config file schemas |
+| [API Reference](api.md) | REST API endpoints, WebSocket events, auth |
+| [Permissions Matrix](permissions.md) | Roles, permissions, session security |
+| [Source Registry](source-registry.md) | 33 sources with config details |
+| [Environment Variables](environment-variables.md) | Platform, cloud, and credential variables |
 | [CLI Reference](../cli/cli-reference.md) | All CLI commands and options |
 | [Data Sources](../data-sources/index.md) | Source configuration guides |
 | [Transformations](../transformations/index.md) | dbt model documentation |
+
+## Related
+
+- [Quick Start](../getting-started/quick-start.md) — get started with Dango
+- [FAQ](../faq.md) — frequently asked questions

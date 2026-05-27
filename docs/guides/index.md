@@ -54,6 +54,36 @@ These guides walk through complete workflows using Dango. Each tutorial is desig
 
     [:octicons-arrow-right-24: Start Tutorial](custom-api.md)
 
+-   :material-account-group: **Team Setup**
+
+    ---
+
+    Configure authentication, add team members, and assign roles for shared access.
+
+    **Duration**: ~20 minutes
+
+    [:octicons-arrow-right-24: Start Tutorial](team-setup.md)
+
+-   :material-table-arrow-right: **Migration from Spreadsheets**
+
+    ---
+
+    Move from spreadsheet-based reporting to a proper analytics pipeline.
+
+    **Duration**: ~25 minutes
+
+    [:octicons-arrow-right-24: Start Tutorial](spreadsheet-migration.md)
+
+-   :material-file-pdf-box: **PDF Parsing**
+
+    ---
+
+    Build a custom dlt source to extract data from PDF documents like invoices.
+
+    **Duration**: ~20 minutes
+
+    [:octicons-arrow-right-24: Start Tutorial](pdf-parsing.md)
+
 </div>
 
 ---
@@ -66,6 +96,9 @@ Before starting any tutorial, ensure you have:
 - [x] A Dango project initialized (`dango init`)
 - [x] Docker running (for Metabase)
 - [x] Basic familiarity with SQL
+
+!!! note "Authentication"
+    Dango v1 enables authentication by default. When you run `dango init`, you'll be prompted to set an admin password. All web UI and API access requires login. See [Authentication](../security/authentication.md) for details.
 
 ---
 
@@ -89,6 +122,9 @@ graph LR
     B --> C[Financial Reporting]
     B --> D[Multi-Source]
     D --> E[Custom API]
+    B --> F[Spreadsheet Migration]
+    C --> G[Team Setup]
+    D --> G
 ```
 
 | Experience | Start With |
@@ -96,6 +132,8 @@ graph LR
 | **New to Dango** | [Quick Start](../getting-started/quick-start.md) → E-commerce Tutorial |
 | **Know the basics** | Financial Reporting or Multi-Source |
 | **Advanced user** | Custom API Integration |
+| **Setting up for a team** | [Team Setup](team-setup.md) |
+| **Coming from spreadsheets** | [Migration from Spreadsheets](spreadsheet-migration.md) |
 
 ---
 
@@ -115,3 +153,9 @@ If you get stuck:
 1. Check the [Troubleshooting Guide](../workflows/troubleshooting.md)
 2. Review the relevant section docs (Data Sources, Transformations, etc.)
 3. Ask in [GitHub Discussions](https://github.com/getdango/dango/discussions)
+
+## Related
+
+- [Quick Start](../getting-started/quick-start.md) — get your first pipeline running
+- [Data Sources](../data-sources/index.md) — all supported source types
+- [Workflows](../workflows/index.md) — operational guides and best practices

@@ -37,23 +37,15 @@ Start your Dango platform:
 dango start
 ```
 
-Metabase is available at: **http://localhost:3000**
+Open the Web UI at **http://localhost:8800** and click **"Open Metabase"** in the sidebar. The SSO bridge logs you in automatically.
 
-### Auto-Created Credentials
-
-Dango automatically creates an admin user:
-
-- **Email**: `admin@dango.local`
-- **Password**: `dangolocal123`
-
-!!! tip "Change Password"
-    For production use, change the default password in Account Settings after first login.
+For direct access, Metabase is also available at `http://localhost:3000`. Dango creates a Metabase admin account during first startup with a randomly generated password stored in `.dango/metabase.yml`.
 
 ### First Login
 
-1. Open http://localhost:3000
-2. Login with credentials above
-3. Start querying - DuckDB connection is pre-configured
+1. Open `http://localhost:8800` (Web UI) and click **"Open Metabase"** in the sidebar
+2. You're logged in automatically via SSO bridge
+3. Start querying — DuckDB connection is pre-configured
 
 ---
 
@@ -81,6 +73,9 @@ All Dango data layers are accessible in Metabase:
 | `intermediate` | Your business logic models | `int_customer_orders` |
 | `marts` | Analytics-ready tables | `customer_metrics`, `revenue_by_month` |
 
+!!! note "Schema Visibility"
+    Raw schemas (`raw_*`) are hidden from the Metabase browse UI to keep it clean, but they remain fully accessible via SQL queries. Run `dango metabase refresh` to update schema visibility and descriptions after adding new sources or models. See [Save & Load — Refreshing Schema](save-load.md#refreshing-schema).
+
 **Browse in Metabase**: Home → Browse data → DuckDB
 
 ### Database Sync
@@ -90,6 +85,41 @@ Metabase syncs schema metadata:
 - **On startup**: Full schema scan
 - **Daily**: Automatic re-sync (2 AM default)
 - **Manual**: Admin → Databases → DuckDB → "Sync database schema now"
+
+---
+
+## Single Sign-On (SSO)
+
+Dango provides transparent single sign-on between the Dango web UI and Metabase. Users never need to manage separate Metabase credentials.
+
+### How It Works
+
+1. When a user logs into Dango, their Metabase session is created automatically
+2. Each Dango user gets a corresponding Metabase account with a random password (32-byte, URL-safe)
+3. Passwords are encrypted with Fernet and stored in the auth database — users never see or manage them
+4. On session expiry, the bridge automatically re-creates the Metabase session
+
+### Role Synchronization
+
+Dango roles map to Metabase permission groups:
+
+| Dango Role | Metabase Group | Permissions |
+|-----------|----------------|-------------|
+| Admin | Superuser (Admin) | Full access — manage databases, users, settings |
+| Editor | Dango Editors | View data + create questions (query builder and native SQL) |
+| Viewer | All Users (default) | View data only — no query creation |
+
+Role changes in Dango are automatically synced to Metabase.
+
+### Session Timeouts
+
+=== "Local"
+
+    365-day session, 24-hour idle timeout. Optimized for development workflows where re-authentication is disruptive.
+
+=== "Cloud"
+
+    30-day session, 60-minute idle timeout. Shorter timeouts for shared environments.
 
 ---
 
@@ -277,20 +307,20 @@ For complex queries:
 
     [:octicons-arrow-right-24: SQL Queries Guide](sql-queries.md)
 
--   :material-table-sync: **Transformations**
+-   :material-chart-box: **Dashboard Provisioning**
 
     ---
 
-    Create analytics-ready tables with dbt.
+    Auto-create a pipeline health dashboard with one command.
 
-    [:octicons-arrow-right-24: Transformations](../transformations/index.md)
+    [:octicons-arrow-right-24: Provisioning](provisioning.md)
 
--   :material-book-open-outline: **Metabase Documentation**
+-   :material-content-save: **Save & Load**
 
     ---
 
-    Full Metabase features: visualizations, sharing, users.
+    Version-control dashboards as YAML files.
 
-    [:octicons-arrow-right-24: Metabase Docs](https://www.metabase.com/docs/latest/)
+    [:octicons-arrow-right-24: Save & Load](save-load.md)
 
 </div>

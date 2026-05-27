@@ -2,6 +2,12 @@
 
 Upload and sync CSV files into your data warehouse.
 
+!!! warning "Use Local Files for new projects"
+    The `csv` source type still works but is no longer shown in `dango source add`.
+    For new projects, use [Local Files](local-files/index.md) instead — it supports
+    CSV, JSON, JSONL, and Parquet with file tracking.
+    Existing `type: csv` sources continue to work.
+
 ---
 
 ## Overview
@@ -106,7 +112,7 @@ mkdir -p data/uploads/sales_data
 cp my_sales.csv data/uploads/sales_data/
 
 # Sync
-dango sync --source sales_data
+dango sync sales_data
 ```
 
 ---
@@ -329,7 +335,7 @@ data/uploads/monthly_sales/
 cp sales_2024_05.csv data/uploads/monthly_sales/
 
 # Sync - table now contains Jan through May
-dango sync --source monthly_sales
+dango sync monthly_sales
 ```
 
 The table `raw_monthly_sales.monthly_sales` contains all rows from all months.
@@ -361,7 +367,7 @@ rm data/uploads/product_catalog/products.csv
 cp new_products_export.csv data/uploads/product_catalog/products.csv
 
 # Sync - table reflects only the new file
-dango sync --source product_catalog
+dango sync product_catalog
 ```
 
 ### Regional/Category Files (Combined)
@@ -419,7 +425,7 @@ Dango does not currently support Excel files (.xlsx) directly.
 ```bash
 # Example: save to sales_data directory
 # Then sync
-dango sync --source sales_data
+dango sync sales_data
 ```
 
 !!! tip "Future support"
@@ -553,7 +559,8 @@ data/
 
 ## Next Steps
 
-- **[OAuth Sources](oauth-sources.md)** - Connect to cloud services
+- **[Local Files](local-files/index.md)** - CSV, JSON, JSONL, and Parquet with file tracking (recommended for new projects)
+- **[Adding Sources](adding-sources.md)** - How to add and configure data sources
 - **[Custom Sources](custom-sources.md)** - Build your own integrations
 - **[Transformations](../transformations/index.md)** - Clean and model your CSV data
 - **[Dashboards](../dashboards/index.md)** - Visualize CSV data in Metabase

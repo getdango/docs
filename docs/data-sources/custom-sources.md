@@ -10,33 +10,39 @@ When built-in sources don't fit your needs, create custom sources using Python. 
 
 **Use Cases**:
 
-- Internal APIs
-- REST APIs not in dlt's verified sources
+- Internal APIs not covered by the [REST API](rest-api.md) source type
+- Complex data transformations during ingestion
 - Web scraping
-- Custom data transformation logic
 - Proprietary data formats
-- **Using dlt verified sources not yet in the Dango wizard** (HubSpot, Notion, Asana, etc.)
+- dlt verified sources not yet in the Dango wizard (Notion, Asana, Zendesk, etc.)
 
 ---
 
 ## Using dlt Verified Sources (Advanced)
 
-!!! warning "Untested Configuration"
-    The dlt verified sources below (HubSpot, Notion, Asana, etc.) have not been fully tested with Dango. Configuration patterns are based on dlt documentation and may require adjustments for your use case.
+!!! info "Many sources now have wizard support"
+    The following sources have graduated to full wizard support and no longer need manual `dlt_native` configuration:
 
-Many popular sources like HubSpot, Notion, Asana, and Salesforce are available as [dlt verified sources](https://dlthub.com/docs/dlt-ecosystem/verified-sources/) but not yet in the Dango wizard. You can still use them by configuring them manually via `dlt_native`.
+    - **[HubSpot](hubspot.md)** — `dango source add` > HubSpot
+    - **[Salesforce](salesforce.md)** — `dango source add` > Salesforce
+    - **[Database Sources](database-sources.md)** — PostgreSQL, MongoDB via wizard
+    - **[REST API](rest-api.md)** — any REST API via guided wizard
+
+    Check the [Source Catalog](source-catalog.md) for the full list of wizard-enabled sources.
+
+For dlt verified sources not yet in the Dango wizard, configure them manually via `dlt_native`.
 
 ### Quick Guide
 
 **Step 1: Find the dlt Source**
 
-Browse https://dlthub.com/docs/dlt-ecosystem/verified-sources/ and find your source (e.g., `hubspot`, `notion`, `asana`).
+Browse https://dlthub.com/docs/dlt-ecosystem/verified-sources/ and find your source (e.g., `notion`, `asana`, `zendesk`).
 
 **Step 2: Install the Source**
 
 ```bash
 # Install the specific dlt source
-pip install dlt[hubspot]  # Replace 'hubspot' with your source
+pip install dlt[notion]  # Replace 'notion' with your source
 ```
 
 **Step 3: Configure in sources.yml**
@@ -44,14 +50,15 @@ pip install dlt[hubspot]  # Replace 'hubspot' with your source
 ```yaml
 version: '1.0'
 sources:
-  - name: my_hubspot
+  - name: my_notion
     type: dlt_native
     enabled: true
     dlt_native:
-      source_module: dlt.sources.hubspot  # From dlt verified sources
-      source_function: hubspot            # Function name from docs
+      source_module: dlt.sources.notion
+      source_function: notion_databases
       function_kwargs:
-        api_key: ${HUBSPOT_API_KEY}      # Reference from env/secrets
+        database_ids:
+          - "abc123..."
 ```
 
 **Step 4: Add Credentials**
@@ -59,74 +66,31 @@ sources:
 Create `.dlt/secrets.toml` (gitignored):
 
 ```toml
-[sources.my_hubspot]
-api_key = "your-hubspot-api-key-here"
+[sources.my_notion]
+api_key = "your-notion-integration-token"
 ```
 
 Or use environment variables in `.env`:
 
 ```bash
-HUBSPOT_API_KEY="your-hubspot-api-key-here"
+NOTION_API_KEY="your-notion-integration-token"
 ```
 
 **Step 5: Sync**
 
 ```bash
-dango sync --source my_hubspot
+dango sync my_notion
 ```
-
-### Real Example: HubSpot
-
-Based on the [dlt HubSpot docs](https://dlthub.com/docs/dlt-ecosystem/verified-sources/hubspot), here's a complete configuration:
-
-**1. Install:**
-```bash
-pip install dlt[hubspot]
-```
-
-**2. Configure `.dango/sources.yml`:**
-```yaml
-sources:
-  - name: hubspot_crm
-    type: dlt_native
-    enabled: true
-    dlt_native:
-      source_module: dlt.sources.hubspot
-      source_function: hubspot
-      function_kwargs:
-        api_key: ${HUBSPOT_API_KEY}
-        include_history: false  # Set to true for historical data
-```
-
-**3. Add credentials to `.dlt/secrets.toml`:**
-```toml
-[sources.hubspot_crm]
-api_key = "your-hubspot-private-app-token"
-```
-
-**4. Sync:**
-```bash
-dango sync --source hubspot_crm
-```
-
-**What gets loaded:**
-- `raw_hubspot_crm.contacts`
-- `raw_hubspot_crm.companies`
-- `raw_hubspot_crm.deals`
-- `raw_hubspot_crm.tickets`
-- And more (depends on HubSpot source configuration)
 
 ### Common Manual Sources
 
 | Source | Module | Function | Pip Install |
 |--------|--------|----------|-------------|
-| HubSpot | `dlt.sources.hubspot` | `hubspot` | `pip install dlt[hubspot]` |
-| Notion | `dlt.sources.notion` | `notion` | `pip install dlt[notion]` |
-| Asana | `dlt.sources.asana` | `asana` | `pip install dlt[asana]` |
-| Salesforce | `dlt.sources.salesforce` | `salesforce` | `pip install dlt[salesforce]` |
-| MongoDB | `dlt.sources.mongodb` | `mongodb` | `pip install dlt[mongodb]` |
-| PostgreSQL | `dlt.sources.sql_database` | `sql_database` | `pip install dlt[postgres]` |
+| Notion | `dlt.sources.notion` | `notion_databases` | `pip install dlt[notion]` |
+| Asana | `dlt.sources.asana` | `asana_source` | `pip install dlt[asana]` |
+| Zendesk | `dlt.sources.zendesk` | `zendesk_support` | `pip install dlt[zendesk]` |
 | MySQL | `dlt.sources.sql_database` | `sql_database` | `pip install dlt[mysql]` |
+| SQL Server | `dlt.sources.sql_database` | `sql_database` | `pip install dlt[mssql]` |
 
 !!! tip "Finding Configuration"
     Always check the official dlt docs for each source's specific `function_kwargs` options:
@@ -205,7 +169,7 @@ sources:
 ### Step 3: Sync
 
 ```bash
-dango sync --source my_api
+dango sync my_api
 ```
 
 Dango will:
@@ -285,7 +249,7 @@ sources:
 
 ### Result
 
-After running `dango sync --source ecommerce`:
+After running `dango sync ecommerce`:
 
 - **Raw tables**: `raw_ecommerce.products`, `raw_ecommerce.carts`, `raw_ecommerce.users`
 - **Staging models**: Auto-generated in `dbt/models/staging/`
@@ -387,14 +351,14 @@ MY_API_KEY=your-key-here
 
 Then run:
 ```bash
-dango sync --source my_api
+dango sync my_api
 ```
 
 **Alternative: Environment variable** (current session only):
 
 ```bash
 export MY_API_KEY="your-key-here"
-dango sync --source my_api
+dango sync my_api
 ```
 
 ---
@@ -697,7 +661,7 @@ def get_data():
 
 Run sync to see output:
 ```bash
-dango sync --source my_api
+dango sync my_api
 ```
 
 ---
@@ -799,7 +763,8 @@ Run as standalone dlt script first, then integrate with Dango.
 
 ## Next Steps
 
+- **[REST API](rest-api.md)** - Connect any REST API without writing Python
 - **[Database Sources](database-sources.md)** - Connect to SQL databases
-- **[Built-in Sources](built-in-sources.md)** - See all dlt verified sources
+- **[Source Catalog](source-catalog.md)** - See all wizard-enabled sources
 - **[dlt Documentation](https://dlthub.com/docs)** - Official dlt docs
 - **[Transformations](../transformations/index.md)** - Transform your custom source data

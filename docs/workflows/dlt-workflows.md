@@ -15,16 +15,39 @@ Dango uses [dlt (data load tool)](https://dlthub.com/) under the hood for data i
 
 ---
 
+## How Syncs Work
+
+### Sync Subprocess Model
+
+Every sync runs in an isolated subprocess, whether triggered from the CLI, web UI, or scheduler. This keeps the web server responsive and prevents a failing sync from crashing other services.
+
+```
+dango sync ──► subprocess ──► dlt load ──► post-sync hooks ──► done
+                  │
+                  ├── Acquires DbtLock
+                  ├── Writes progress to .dango/state/sync_status_{id}.json
+                  └── Releases DbtLock on completion
+```
+
+The status file at `.dango/state/sync_status_{id}.json` tracks progress through phases: `starting` → `lock_waiting` → `data_load` → `dbt_started` → `completed` (or `failed`).
+
+### Sync Queuing
+
+DuckDB is a single-writer database — only one process can write at a time. Dango enforces this with `DbtLock`:
+
+| Trigger | Behavior when lock is held |
+|---------|---------------------------|
+| CLI (`dango sync`) | Fails immediately with lock error |
+| Web UI (Sync Now button) | Waits up to 5 minutes for lock, then fails |
+| Scheduler | Waits up to 5 minutes for lock, then fails |
+
+There is no queue. If a sync cannot acquire the lock within the timeout, it fails and must be retried.
+
+See [DuckDB Single-Writer](../core-concepts/duckdb.md) for details on the locking model.
+
+---
+
 ## dlt Pipeline Basics
-
-### How Dango Uses dlt
-
-When you run `dango sync`, Dango:
-
-1. Reads source configuration from `sources.yml`
-2. Creates a dlt pipeline targeting DuckDB
-3. Runs the appropriate dlt source
-4. Stores state in `.dlt/` directory
 
 ### Pipeline State Location
 
@@ -73,8 +96,50 @@ dlt pipeline my_source sync-state
 dlt pipeline my_source drop
 
 # Then sync again
-dango sync --source my_source --full-refresh
+dango sync my_source --full-refresh
 ```
+
+---
+
+## Schema Drift Interaction
+
+After each sync, Dango runs a post-sync hook that detects schema drift — columns removed or column types changed in your source data.
+
+**Additive changes** (new columns) are recorded but don't block anything.
+
+**Breaking changes** (columns removed or types changed) block dbt from running until you accept them:
+
+```bash
+# Check which sources have unresolved drift
+dango governance drift-report
+
+# Accept current schema as new baseline
+dango governance accept my_source
+```
+
+Until you accept breaking drift, dbt transformations are skipped for that source after each sync.
+
+For full details, see [Schema Drift](../scheduling-monitoring/schema-drift.md).
+
+---
+
+## OAuth Pre-Sync Validation
+
+For OAuth-authenticated sources (Google Sheets, Google Analytics, etc.), Dango validates the token before starting a sync.
+
+```bash
+# Check OAuth token status for all sources
+dango oauth check
+```
+
+| Provider | Token refresh | Action needed |
+|----------|--------------|---------------|
+| Google | Automatic (dlt handles refresh) | None — tokens auto-renew |
+| Facebook | Manual every 60 days | Run `dango oauth setup facebook_ads` to re-authenticate |
+
+Tokens expiring within 7 days show a warning but don't block syncs. Expired tokens fail the sync with a clear error message.
+
+For full details, see [OAuth](../security/oauth.md).
 
 ---
 
@@ -85,7 +150,7 @@ dango sync --source my_source --full-refresh
 ```bash
 # Set environment variable for detailed logs
 export RUNTIME__LOG_LEVEL=DEBUG
-dango sync --source problematic_source
+dango sync problematic_source
 ```
 
 ### Check dlt Logs
@@ -298,6 +363,8 @@ for package in load_info.load_packages:
 | "Invalid credentials" | Secrets not configured | Check `.dlt/secrets.toml` |
 | "Schema mismatch" | Source schema changed | Run with `--full-refresh` |
 | "Rate limit exceeded" | API throttling | Add retry configuration |
+| "Database is locked" | Another sync is running | Wait for it to finish or check [DuckDB Locks](troubleshooting.md#duckdb-locks) |
+| "OAuth token expired" | Token needs refresh | Run `dango oauth setup <source>` — see [OAuth Expiry](troubleshooting.md#oauth-token-expiry) |
 
 ### Getting Help
 

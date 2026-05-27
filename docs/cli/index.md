@@ -33,7 +33,7 @@ pip install getdango
 
 ```bash
 dango --version
-# Output: dango version 0.0.5
+# Output: dango, version x.y.z
 ```
 
 ### Create Your First Project
@@ -105,48 +105,90 @@ dango source add --help
 
     [:octicons-arrow-right-24: Init & Start Guide](init-start.md)
 
--   :material-sync: **Sync & Run**
+-   :material-sync: **Source & Sync**
 
     ---
 
-    Data syncing and running transformations.
-
-    - Sync data from sources
-    - Generate staging models
-    - Run dbt transformations
-    - Incremental vs full-refresh
-    - Performance optimization
-    - Troubleshoot failures
-
-    [:octicons-arrow-right-24: Sync & Run Guide](sync-run.md)
-
--   :material-database-outline: **Source Management**
-
-    ---
-
-    CLI commands for managing data sources.
+    Add, manage, and sync data sources from the CLI.
 
     - Add sources interactively
-    - List and inspect sources
-    - Edit configurations
-    - Manage OAuth credentials
-    - Import/export sources
+    - Sync data from sources
+    - Incremental vs full-refresh
+    - Manage source configurations
 
-    [:octicons-arrow-right-24: Source Management](source-management.md)
+    [:octicons-arrow-right-24: Source & Sync](source-sync.md)
 
--   :material-check-circle-outline: **Validation**
+-   :material-cog-transfer: **Transform & Model**
 
     ---
 
-    Validate configuration and troubleshoot issues.
+    Run dbt transformations and manage models.
 
-    - Validate project configuration
-    - Check source connections
-    - Verify database health
-    - Auto-fix common issues
-    - CI/CD integration
+    - Run dbt transformations
+    - Generate staging models
+    - Add/remove custom models
 
-    [:octicons-arrow-right-24: Validation Guide](validation.md)
+    [:octicons-arrow-right-24: Transform & Model](transform-model.md)
+
+-   :material-shield-account: **Auth Commands**
+
+    ---
+
+    Manage authentication, users, and roles.
+
+    - Enable/disable auth
+    - Add and manage users
+    - Role management
+
+    [:octicons-arrow-right-24: Auth Commands](auth-commands.md)
+
+-   :material-key: **OAuth Commands**
+
+    ---
+
+    Set up and manage OAuth connections.
+
+    - Configure OAuth providers
+    - Check token status
+    - Refresh tokens
+
+    [:octicons-arrow-right-24: OAuth Commands](oauth-commands.md)
+
+-   :material-cloud-upload: **Deploy & Remote**
+
+    ---
+
+    Deploy to cloud and manage remote servers.
+
+    - Deploy to DigitalOcean or BYOS
+    - Push config to remote
+    - Remote management commands
+
+    [:octicons-arrow-right-24: Deploy & Remote](deploy-remote.md)
+
+-   :material-clock-outline: **Schedule Commands**
+
+    ---
+
+    Configure scheduled syncs and webhooks.
+
+    - Add/remove schedules
+    - Configure webhooks
+    - View execution history
+
+    [:octicons-arrow-right-24: Schedule Commands](schedule-commands.md)
+
+-   :material-dots-horizontal: **Other Commands**
+
+    ---
+
+    Validate, cleanup, upgrade, info, and more.
+
+    - Configuration validation
+    - Database cleanup
+    - Version management
+
+    [:octicons-arrow-right-24: Other Commands](other-commands.md)
 
 </div>
 
@@ -172,7 +214,7 @@ Load and transform data:
 
 ```bash
 dango sync                  # Sync all sources
-dango sync --source stripe  # Sync specific source
+dango sync stripe           # Sync specific source
 dango generate              # Auto-generate staging
 dango run                   # Run dbt transformations
 dango run --select marts.*  # Run specific models
@@ -186,8 +228,8 @@ Configure data sources:
 dango source add            # Add new source (wizard)
 dango source list           # List all sources
 dango source remove name    # Remove source
-dango auth list             # List OAuth credentials
-dango auth refresh name     # Refresh OAuth token
+dango oauth list            # List OAuth credentials
+dango oauth refresh name    # Refresh OAuth token
 ```
 
 ### Platform Control
@@ -197,8 +239,8 @@ Start and stop services:
 ```bash
 dango start                 # Start all services
 dango stop                  # Stop all services
-dango restart               # Restart platform
-dango start --no-metabase   # Skip Metabase
+dango stop --all            # Stop ALL projects' containers
+dango serve                 # Production mode (foreground)
 ```
 
 ### Database Operations
@@ -215,8 +257,7 @@ dango db clean              # Remove orphaned tables
 Generate dbt documentation:
 
 ```bash
-dango docs                  # Generate and serve docs
-dango docs --port 8082      # Custom port
+dango docs                  # Generate dbt docs
 ```
 
 ---
@@ -286,13 +327,13 @@ duckdb data/warehouse.duckdb "SELECT * FROM marts.my_metric LIMIT 10"
 
 ```bash
 # Single source
-dango sync --source stripe_payments
+dango sync stripe_payments
 
-# Multiple sources
-dango sync --source stripe --source google_sheets
+# Full refresh
+dango sync stripe_payments --full-refresh
 
-# All except one
-dango sync --exclude old_source
+# Backfill last 7 days
+dango sync stripe_payments --backfill 7d
 ```
 
 ### Run Specific Models
@@ -342,7 +383,7 @@ set -e
 echo "Starting daily sync at $(date)"
 
 # Validate configuration
-dango validate --strict
+dango validate
 
 # Sync all sources
 dango sync
@@ -393,21 +434,23 @@ dango sync || {
 echo "Success!"
 ```
 
-### Parallel Execution
+### Sequential Execution
+
+DuckDB enforces a [single-writer constraint](../core-concepts/duckdb.md) — only one process can write to the database at a time. Run syncs sequentially, not in parallel:
 
 ```bash
 #!/bin/bash
+set -e
 
-# Sync sources in parallel
-dango sync --source stripe &
-dango sync --source google_sheets &
-dango sync --source sales_data &
-
-# Wait for all to complete
-wait
+# Sync sources sequentially (DuckDB allows only one writer at a time)
+dango sync stripe
+dango sync google_sheets
+dango sync sales_data
 
 echo "All syncs complete"
 ```
+
+See [Performance Tuning](../workflows/performance.md#single-writer-constraint) for more on optimizing sync execution.
 
 ---
 
@@ -435,13 +478,13 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install Dango
         run: pip install getdango
 
       - name: Validate Configuration
-        run: dango validate --strict
+        run: dango validate
         env:
           STRIPE_API_KEY: ${{ secrets.STRIPE_API_KEY }}
 
@@ -481,7 +524,7 @@ validate:
   stage: validate
   script:
     - pip install getdango
-    - dango validate --strict
+    - dango validate
 
 sync:
   stage: sync
@@ -522,7 +565,7 @@ Set environment variables for credentials:
 STRIPE_API_KEY=sk_live_abc123...
 GOOGLE_CREDENTIALS=/path/to/credentials.json
 POSTGRES_URL=postgresql://user:pass@host:5432/db
-FACEBOOK_ACCESS_TOKEN=EAA...
+HUBSPOT_API_KEY=pat-na1-abc123...
 ```
 
 **Load in shell**:
@@ -634,13 +677,13 @@ Choose the right interface for your task:
 
     [:octicons-arrow-right-24: Init & Start Guide](init-start.md)
 
--   :material-sync: **Sync & Run**
+-   :material-sync: **Source & Sync**
 
     ---
 
-    Master data syncing and transformation workflows.
+    Master data syncing and source management workflows.
 
-    [:octicons-arrow-right-24: Sync & Run Guide](sync-run.md)
+    [:octicons-arrow-right-24: Source & Sync](source-sync.md)
 
 -   :material-view-dashboard: **Web UI Alternative**
 

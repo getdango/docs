@@ -19,7 +19,10 @@ Create a revenue dashboard in 5 minutes.
 
 ### Step 1: Create a Question
 
-1. Open Metabase: http://localhost:3000
+1. Open the Web UI at `http://localhost:8800` and click **Open Metabase** in the sidebar (SSO bridge handles login automatically)
+
+    Alternatively, access Metabase directly at `http://localhost:3000`. Check `.dango/metabase.yml` for credentials.
+
 2. Click **"+ New"** → **"Question"**
 3. Select **"DuckDB"** database
 4. Choose table: `marts.customer_metrics` (or any marts table)
@@ -153,6 +156,9 @@ dango run
 
 No additional steps needed - Metabase queries live data.
 
+!!! tip "Instant Monitoring Dashboard"
+    Run `dango dashboard provision` to auto-create a "Data Pipeline Health" dashboard with sync status, test results, data freshness, and row count trends. See [Dashboard Provisioning](provisioning.md).
+
 ---
 
 ## Best Practices
@@ -186,6 +192,29 @@ Then query the mart in Metabase - much faster.
 
 Good: "Monthly Revenue by Product Category"
 Bad: "Analysis 1" or "test query"
+
+### 4. Version-Control Your Dashboards
+
+Build dashboards locally, not directly on your cloud Metabase instance:
+
+1. **Build locally** &mdash; create and iterate on dashboards at `http://localhost:3000`
+2. **Export** &mdash; run `dango metabase save` to export dashboards as YAML to your project repo
+3. **Commit** &mdash; `git add` the saved YAML files and commit. Dashboards are now version-controlled
+4. **Push** &mdash; `dango remote push` deploys your project to the cloud server. Transfer the `metabase/` directory separately (e.g., `scp -r metabase/ root@server:/srv/dango/project/`)
+5. **Restore** &mdash; run `dango metabase load` on the cloud server to import dashboards from the transferred files
+
+**Why this matters:**
+
+- A cloud server crash or rebuild loses all Metabase state (saved questions, dashboards, collections)
+- Backups cover Metabase, but the git repo is the authoritative source of truth
+- Treat dashboards like code &mdash; review changes, track history, roll back if needed
+
+**If you must build directly on cloud:**
+
+- Run `dango metabase save` immediately after making changes on the cloud instance
+- Pull the saved YAML files back to your local repo and commit them
+
+See [Save & Load](save-load.md) for full details on the export/import workflow.
 
 ---
 
@@ -227,6 +256,22 @@ Sync the database schema:
 
     [:octicons-arrow-right-24: SQL Queries Guide](sql-queries.md)
 
+-   :material-chart-box: **Dashboard Provisioning**
+
+    ---
+
+    Auto-create a pipeline health dashboard.
+
+    [:octicons-arrow-right-24: Provisioning](provisioning.md)
+
+-   :material-content-save: **Save & Load**
+
+    ---
+
+    Version-control dashboards as YAML.
+
+    [:octicons-arrow-right-24: Save & Load](save-load.md)
+
 -   :material-chart-box-outline: **Metabase Overview**
 
     ---
@@ -234,21 +279,5 @@ Sync the database schema:
     Metabase configuration in Dango.
 
     [:octicons-arrow-right-24: Metabase Overview](metabase-overview.md)
-
--   :material-table-sync: **Transformations**
-
-    ---
-
-    Create analytics-ready tables with dbt.
-
-    [:octicons-arrow-right-24: Transformations](../transformations/index.md)
-
--   :material-book-open-outline: **Metabase Documentation**
-
-    ---
-
-    Full dashboard features: sharing, parameters, embedding.
-
-    [:octicons-arrow-right-24: Metabase Docs](https://www.metabase.com/docs/latest/dashboards/introduction)
 
 </div>

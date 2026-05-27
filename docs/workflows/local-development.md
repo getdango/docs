@@ -13,7 +13,17 @@ my-analytics/
 ├── .dango/                  # Dango state (auto-generated)
 │   ├── sources.yml          # Source configurations
 │   ├── project.yml          # Project settings
-│   └── logs/                # Sync logs
+│   ├── cloud.yml            # Cloud deployment config (after deploy)
+│   ├── pii-overrides.yml    # PII scan overrides
+│   ├── auth.db              # Authentication database
+│   ├── logs/                # Sync and audit logs
+│   ├── state/               # Runtime state files
+│   │   ├── dbt.lock         # DbtLock file lock
+│   │   ├── dbt.lock.json    # Lock holder metadata
+│   │   └── sync_status_*.json  # Sync progress
+│   ├── dev/                 # Dev mode artifacts (dango dev)
+│   │   └── warehouse_dev.duckdb
+│   └── snapshots/           # DuckDB read-only snapshots
 ├── .dlt/                    # dlt configuration
 │   ├── config.toml          # dlt settings
 │   └── secrets.toml         # Credentials (DO NOT COMMIT)
@@ -25,11 +35,44 @@ my-analytics/
 │   │   ├── staging/         # Auto-generated staging models
 │   │   ├── intermediate/    # Your intermediate models
 │   │   └── marts/           # Your mart models
+│   ├── snapshots/           # SCD Type 2 snapshot definitions
 │   ├── macros/
 │   ├── tests/
 │   └── dbt_project.yml
 └── metabase-data/           # Metabase state (if using Docker)
 ```
+
+---
+
+## Port Configuration
+
+Dango uses four ports for its services:
+
+| Service | Default Port | Description |
+|---------|-------------|-------------|
+| Web UI / API | `8800` | Dango dashboard and REST API |
+| Metabase | `3000` | Metabase BI dashboard |
+| dbt Docs | `8081` | dbt documentation server |
+| Marimo | `7805` | Marimo notebook server |
+
+Override any port in `.dango/project.yml`:
+
+```yaml
+# .dango/project.yml
+platform:
+  port: 8800
+  metabase_port: 3000
+  dbt_docs_port: 8081
+  marimo_port: 7805
+```
+
+If a port is already in use, check what process holds it:
+
+```bash
+lsof -i :8800
+```
+
+See [Troubleshooting > Port Conflicts](troubleshooting.md#port-conflicts) for resolution steps.
 
 ---
 
@@ -68,6 +111,7 @@ dbt/
 │   └── marts/              # Final tables for dashboards
 │       ├── fct_daily_sales.sql
 │       └── dim_products.sql
+├── snapshots/              # SCD Type 2 snapshots
 ├── macros/                 # Reusable SQL snippets
 ├── tests/                  # Data quality tests
 ├── seeds/                  # Static lookup data
@@ -97,7 +141,7 @@ dango source add csv
 
 # Add OAuth source (e.g., Google Sheets)
 dango source add google_sheets
-dango auth google_sheets
+dango oauth setup google_sheets
 ```
 
 ### 3. Sync Data
@@ -107,7 +151,7 @@ dango auth google_sheets
 dango sync
 
 # Sync specific source
-dango sync --source my_csv_data
+dango sync my_csv_data
 ```
 
 ### 4. Develop Transformations
@@ -119,8 +163,8 @@ dango sync --source my_csv_data
 # Run transformations
 dango run
 
-# Or run specific model during development
-cd dbt && dbt run --select my_model
+# Or use dev mode for safe iteration
+dango dev
 ```
 
 ### 5. Build Dashboards
@@ -129,9 +173,86 @@ cd dbt && dbt run --select my_model
 # Access Metabase
 open http://localhost:3000
 
-# Or use dango web
+# Or use the Dango web UI
 dango web
 ```
+
+---
+
+## Safe Development with `dango dev`
+
+The `dango dev` command creates a copy of your database and runs dbt against it, so your production data is never at risk during development.
+
+```bash
+# Run dbt against a dev copy of your database
+dango dev
+
+# Compare row counts between dev and production
+dango dev --diff
+
+# Clean up dev artifacts
+dango dev clean
+```
+
+Dev mode copies `data/warehouse.duckdb` to `.dango/dev/warehouse_dev.duckdb` and runs all transformations against that copy. Your production database is untouched.
+
+For full details, see [Dev Workflow](../transformations/dev-workflow.md).
+
+---
+
+## Snapshots (SCD Type 2)
+
+Track how your data changes over time with snapshots:
+
+```bash
+# Add a snapshot definition (interactive wizard)
+dango snapshot add
+
+# List configured snapshots
+dango snapshot list
+
+# Run all snapshots
+dango snapshot run
+
+# Create a read-only DuckDB copy for notebooks
+dango snapshot db
+```
+
+Snapshots generate dbt snapshot SQL files in `dbt/snapshots/` and use SCD Type 2 to track historical changes.
+
+For full details, see [Snapshots](../transformations/snapshots.md).
+
+---
+
+## Guard Rails
+
+Dango includes safety checks that warn you about potentially confusing situations.
+
+### Cloned Project Warning
+
+When you clone a project from git and run `dango start`, Dango detects that configuration exists but no data has been synced yet:
+
+> This looks like a cloned project. Run `dango sync` to load data before starting.
+
+### Cloud Deployment Warning
+
+If your project is deployed to the cloud, starting it locally shows a warning:
+
+> This project is deployed to {target}. Starting locally will run a SEPARATE instance. Your cloud server is unaffected.
+
+This requires confirmation to proceed. Skip the prompt with `--yes`:
+
+```bash
+dango start --yes
+```
+
+### Deploy Safety Flags
+
+When deploying with `dango remote push`:
+
+- `--force` — override an existing deploy lock (use with caution)
+- `--allow-dirty` — deploy with uncommitted changes
+- `--allow-branch` — deploy from a non-main branch
 
 ---
 
@@ -159,7 +280,7 @@ For faster development cycles:
 ```bash
 # 1. Make changes to CSV or source config
 # 2. Sync immediately (skip watcher debounce)
-dango sync --source my_source
+dango sync my_source
 
 # 3. Run only affected models
 cd dbt && dbt run --select my_model+
@@ -178,10 +299,8 @@ Create separate configurations for different environments:
     ```yaml
     # .dango/project.yml (development)
     name: my-analytics-dev
-    version: "0.0.5"
-
-    # Use local data
-    web_port: 8800
+    platform:
+      port: 8800
     ```
 
 === "Production"
@@ -189,10 +308,9 @@ Create separate configurations for different environments:
     ```yaml
     # .dango/project.yml (production)
     name: my-analytics-prod
-    version: "0.0.5"
-
     # Different port to avoid conflicts
-    web_port: 8801
+    platform:
+      port: 8801
     ```
 
 ### Using Environment Variables

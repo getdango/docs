@@ -55,6 +55,22 @@ sequenceDiagram
 - **Auto-refresh**: Dango automatically refreshes expired tokens
 - **Token expiry warnings**: Web UI shows when tokens need renewal
 
+### Token Expiry by Provider
+
+| Provider | Token Type | Lifetime | Refresh |
+|----------|-----------|----------|---------|
+| **Google** (Sheets, GA4, Ads) | Access token | 1 hour | Auto-refresh via refresh token |
+| | Refresh token | Indefinite | No expiry — stored permanently |
+| **Facebook Ads** | Short-lived token | ~1 hour | Exchanged for long-lived at setup |
+| | Long-lived token | **60 days** | **Manual re-auth required** |
+| **GitHub** | Personal Access Token | Indefinite | Not OAuth — no refresh needed |
+
+!!! warning "Facebook tokens expire every 60 days"
+    Facebook does **not** support automatic token refresh. You must re-authenticate every 60 days by running `dango oauth facebook_ads`. Set a **45-day calendar reminder** to avoid sync failures. If you stored your App ID and App Secret during setup, Dango can extend the token without a full re-auth flow.
+
+!!! tip "Google testing-mode tokens expire in 7 days"
+    If your Google Cloud OAuth app is in **"Testing"** status (not published), refresh tokens expire after 7 days. To avoid this, publish your OAuth app or move it to **"In production"** status in the Google Cloud Console. Published apps with limited scopes (like Sheets read-only) do not require Google verification.
+
 ---
 
 ## Quick Start: Google Sheets
@@ -90,8 +106,8 @@ sources:
     type: google_sheets
     enabled: true
     google_sheets:
-      spreadsheet_url: "https://docs.google.com/spreadsheets/d/1ABC..."
-      get_sheets:
+      spreadsheet_url_or_id: "https://docs.google.com/spreadsheets/d/1ABC..."
+      range_names:
         - "Sheet1"
         - "Sales Data"
 ```
@@ -109,10 +125,12 @@ project_id = "your-project"
 ### Step 4: Sync
 
 ```bash
-dango sync --source my_google_sheets
+dango sync my_google_sheets
 ```
 
 Data loads into `raw_my_google_sheets` schema in DuckDB.
+
+See the [Google Sheets Guide](google-sheets.md) for the full setup walkthrough.
 
 ---
 
@@ -133,8 +151,8 @@ Data loads into `raw_my_google_sheets` schema in DuckDB.
       - deviceCategory
     metrics:
       - sessions
-      - pageviews
-      - conversions
+      - totalUsers
+      - bounceRate
 ```
 
 **Setup**:
@@ -145,6 +163,8 @@ dango source add
 # Enter GA4 property ID when prompted
 ```
 
+See the [Google Analytics Guide](google-analytics.md) for the full setup walkthrough.
+
 ### Facebook Ads
 
 ```yaml
@@ -152,10 +172,9 @@ dango source add
   type: facebook_ads
   enabled: true
   facebook_ads:
-    account_id: "act_123456789"
-    start_date: "2024-01-01"
-    include_deleted: false
-    access_token_env: "FACEBOOK_ACCESS_TOKEN"
+    account_id: "123456789"
+    access_token_env: "FB_ACCESS_TOKEN"
+    initial_load_past_days: 30
 ```
 
 **Setup**:
@@ -165,6 +184,8 @@ dango source add
 # Follow OAuth flow (requires Facebook Business account)
 # Select Ad Account when prompted
 ```
+
+See the [Facebook Ads Guide](facebook-ads.md) for the full setup walkthrough.
 
 ### HubSpot (via dlt_native)
 
@@ -190,7 +211,7 @@ pip install "dlt[hubspot]"
 # api_key = "your-hubspot-api-key"
 
 # Sync
-dango sync --source crm_data
+dango sync crm_data
 ```
 
 See [Custom Sources](custom-sources.md) for detailed dlt_native setup.
@@ -243,13 +264,13 @@ Edit `.dango/sources.yml`:
   type: google_sheets  # or facebook_ads, google_analytics, etc.
   enabled: true
   google_sheets:
-    spreadsheet_url: "https://docs.google.com/spreadsheets/d/..."
+    spreadsheet_url_or_id: "https://docs.google.com/spreadsheets/d/..."
 ```
 
 ### Step 4: Authenticate
 
 ```bash
-dango sync --source custom_oauth_source
+dango sync custom_oauth_source
 ```
 
 On first sync, browser opens for OAuth. After authentication, refresh token is saved to `.dlt/secrets.toml`.
@@ -368,7 +389,7 @@ jobs:
           SOURCES__GOOGLE_SHEETS__CREDENTIALS__CLIENT_ID: ${{ secrets.GS_CLIENT_ID }}
           SOURCES__GOOGLE_SHEETS__CREDENTIALS__CLIENT_SECRET: ${{ secrets.GS_CLIENT_SECRET }}
         run: |
-          dango sync --source my_google_sheets
+          dango sync my_google_sheets
 ```
 
 ---
@@ -496,7 +517,17 @@ For security:
 
 ## Next Steps
 
-- **[Built-in Sources](built-in-sources.md)** - See all available dlt sources
+**Individual Source Guides:**
+
+- **[Google Sheets](google-sheets.md)** - Spreadsheet data with OAuth
+- **[Google Analytics](google-analytics.md)** - GA4 traffic and engagement data
+- **[Google Ads](google-ads.md)** - Campaign performance with GAQL queries
+- **[Facebook Ads](facebook-ads.md)** - Ad performance with 60-day token lifecycle
+- **[GitHub](github.md)** - Repository data with Personal Access Token
+
+**General:**
+
+- **[Source Catalog](source-catalog.md)** - See all available dlt sources
 - **[Custom Sources](custom-sources.md)** - Build OAuth sources for custom APIs
-- **[Web UI](../web-ui/managing-sources.md)** - Manage OAuth sources visually
+- **[Web UI](../web-ui/sources.md)** - Manage OAuth sources visually
 - **[Troubleshooting](../getting-started/troubleshooting.md)** - Common OAuth issues

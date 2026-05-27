@@ -37,12 +37,9 @@ Start the Dango platform:
 dango start
 ```
 
-Open Metabase: **http://localhost:3000**
+Open Metabase through the Web UI: **http://localhost:8800** → click **"Open Metabase"** in the sidebar (SSO bridge handles login automatically).
 
-**Auto-created credentials**:
-
-- Email: `admin@dango.local`
-- Password: `dangolocal123`
+For direct access at `http://localhost:3000`, check credentials in `.dango/metabase.yml` (randomly generated during setup).
 
 ### Your First Dashboard
 
@@ -167,7 +164,7 @@ Or wait for the daily automatic sync (2 AM default).
 After syncing a data source:
 
 ```bash
-dango sync --source stripe_payments
+dango sync stripe_payments
 ```
 
 View raw data in Metabase:

@@ -76,12 +76,71 @@ FROM raw_stripe_payments.charges
 LIMIT 5;
 ```
 
+### dlt Internal Tables
+
+In addition to your data tables, each raw schema contains internal tables used by dlt for tracking:
+
+| Table | Purpose |
+|-------|---------|
+| `_dlt_loads` | Records each pipeline run (load ID, status, timestamp). Use this to audit when data was loaded. |
+| `_dlt_pipeline_state` | Stores pipeline state for incremental loading (cursors, last values). Do not modify this table. |
+| `_dlt_version` | Schema version tracking for automatic schema evolution. |
+
+These tables are managed automatically. You can query `_dlt_loads` to check when the last successful sync occurred:
+
+```sql
+SELECT schema_name, status, inserted_at
+FROM raw_stripe._dlt_loads
+ORDER BY inserted_at DESC
+LIMIT 5;
+```
+
 ### Data Loading
 
 Raw tables store data as-loaded from sources:
 - dlt handles incremental loading where supported
 - Use `dango sync --full-refresh` to reload all data if needed
-- Deduplication can be applied in staging layer
+- Deduplication is applied during ingestion (see below)
+
+---
+
+## Deduplication Strategies
+
+Dango supports four deduplication strategies that control how duplicate records are handled during ingestion. Configure this per source in `sources.yml`:
+
+```yaml
+sources:
+  - name: orders
+    type: csv
+    csv:
+      deduplication_strategy: latest_only
+      primary_key: order_id
+      timestamp_column: updated_at
+```
+
+### Strategy Reference
+
+| Strategy | Behavior | Use When |
+|----------|----------|----------|
+| **`none`** | No deduplication. All records are kept, including duplicates. | Data is pre-deduplicated or duplicates are acceptable. |
+| **`latest_only`** | Keeps only the most recent record per primary key (based on timestamp column). | You want current state only (e.g., latest customer info). |
+| **`append_only`** | Appends all new records. No updates or deletes. | You need a complete event log (e.g., transactions, clicks). |
+| **`scd_type2`** | Slowly Changing Dimension Type 2. Tracks historical changes with `valid_from`/`valid_to` columns. | You need full change history (e.g., price changes, status transitions). |
+
+!!! tip "Choosing a strategy"
+    - Start with **`latest_only`** for most dimension tables (customers, products)
+    - Use **`append_only`** for event/fact tables (orders, page views)
+    - Use **`scd_type2`** only when you need to query historical state at a point in time
+    - Use **`none`** for one-time loads or pre-processed data
+
+### Schema Naming Conventions
+
+Raw schemas follow the pattern `raw_{source_name}`:
+
+- Source named `stripe` → schema `raw_stripe`
+- Source named `my_google_sheets` → schema `raw_my_google_sheets`
+
+Table names within the schema come from the source (e.g., the Stripe source creates `charges`, `customers`, `subscriptions`).
 
 ---
 
@@ -268,7 +327,7 @@ Let's trace how Stripe payment data flows through all layers:
 
 **dlt loads data**:
 ```bash
-dango sync --source stripe_payments
+dango sync stripe_payments
 ```
 
 **Tables created**:
@@ -433,6 +492,7 @@ FROM staging.stg_stripe_payments__charges;
 
 ## Next Steps
 
-- **[CLI Overview](cli-overview.md)** - Learn commands for managing data layers
+- **[DuckDB & Single-Writer](duckdb.md)** - How the database lock works
 - **[Project Structure](project-structure.md)** - See where these layers live in the file system
+- **[Deduplication](../data-sources/deduplication.md)** - Deep dive into deduplication strategies
 - **[Transformations](../transformations/index.md)** - Deep dive into dbt model development

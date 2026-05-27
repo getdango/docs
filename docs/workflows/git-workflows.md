@@ -21,7 +21,9 @@ Using Git with Dango projects requires care:
 |---------------|--------|
 | `.dango/sources.yml` | Source configurations |
 | `.dango/project.yml` | Project settings |
-| `dbt/` | Transformation models |
+| `.dango/cloud.yml` | Cloud deployment config |
+| `.dango/pii-overrides.yml` | PII scan overrides |
+| `dbt/` | Transformation models, snapshots, tests |
 | `.dlt/config.toml` | dlt settings (no secrets) |
 | `.dango/metabase/` | Dashboard definitions |
 
@@ -31,6 +33,8 @@ Using Git with Dango projects requires care:
 # Always commit
 git add .dango/sources.yml
 git add .dango/project.yml
+git add .dango/cloud.yml
+git add .dango/pii-overrides.yml
 git add dbt/
 git add .dlt/config.toml
 git add .dango/metabase/
@@ -48,6 +52,10 @@ git add .dango/metabase/
 | `data/` | Raw data files and database |
 | `metabase-data/` | Metabase internal state |
 | `.dango/logs/` | Log files |
+| `.dango/state/` | Runtime state (locks, sync status) |
+| `.dango/dev/` | Dev mode artifacts |
+| `.dango/snapshots/` | DuckDB read-only snapshots |
+| `.dango/auth.db` | Authentication database |
 | `dbt/target/` | Compiled dbt artifacts |
 | `dbt/logs/` | dbt logs |
 
@@ -73,13 +81,19 @@ data/
 *.parquet
 *.csv
 
+# === DANGO STATE ===
+.dango/logs/
+.dango/state/
+.dango/dev/
+.dango/snapshots/
+.dango/auth.db
+
 # === METABASE ===
 metabase-data/
 metabase.db/
 
 # === LOGS ===
 *.log
-.dango/logs/
 dbt/logs/
 
 # === COMPILED/GENERATED ===
@@ -108,6 +122,81 @@ backups/
 
 ---
 
+## CI/CD Integration
+
+### Validating in CI
+
+Run lightweight validation in your CI pipeline to catch configuration and dbt syntax errors before merging:
+
+```bash
+# Validate Dango configuration (no Docker/DuckDB needed)
+dango config validate
+
+# Parse dbt models (checks SQL syntax, ref resolution)
+cd dbt && dbt parse
+```
+
+These commands don't require a running database or Docker — they validate structure and syntax only.
+
+### GitHub Actions Example
+
+```yaml
+# .github/workflows/validate.yml
+name: Validate Dango Project
+
+on:
+  pull_request:
+    paths:
+      - '.dango/**'
+      - 'dbt/**'
+      - '.dlt/config.toml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dango
+        run: pip install getdango
+
+      - name: Validate configuration
+        run: dango config validate
+
+      - name: Validate dbt models
+        run: cd dbt && dbt parse
+```
+
+`dango init` can generate this workflow file for you.
+
+---
+
+## Git Guardrails
+
+Before deploying with `dango remote push`, Dango runs git safety checks:
+
+1. **Branch check** — warns if you're not on the expected branch (default: `main`)
+2. **Dirty working tree** — warns if there are uncommitted changes
+3. **Detached HEAD** — warns if HEAD is detached
+
+Override these checks when needed:
+
+```bash
+# Deploy from a non-main branch
+dango remote push --allow-branch
+
+# Deploy with uncommitted changes
+dango remote push --allow-dirty
+```
+
+These flags are intentionally explicit — deploying from a feature branch or with uncommitted changes is allowed but requires conscious acknowledgment.
+
+---
+
 ## Repository Structure
 
 ### Recommended Layout
@@ -117,17 +206,20 @@ my-analytics/
 ├── .gitignore              # MUST HAVE
 ├── README.md               # Project documentation
 ├── .dango/
-│   ├── sources.yml         # ✅ Commit
-│   └── project.yml         # ✅ Commit
+│   ├── sources.yml         # Commit
+│   ├── project.yml         # Commit
+│   ├── cloud.yml           # Commit
+│   └── pii-overrides.yml   # Commit
 ├── .dlt/
-│   ├── config.toml         # ✅ Commit
-│   └── secrets.toml        # ❌ DO NOT COMMIT
-├── dbt/                    # ✅ Commit entire directory
+│   ├── config.toml         # Commit
+│   └── secrets.toml        # DO NOT COMMIT
+├── dbt/                    # Commit entire directory
 │   ├── models/
+│   ├── snapshots/
 │   ├── macros/
 │   ├── tests/
 │   └── dbt_project.yml
-└── data/                   # ❌ DO NOT COMMIT
+└── data/                   # DO NOT COMMIT
 ```
 
 ### Initial Setup

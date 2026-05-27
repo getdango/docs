@@ -912,7 +912,7 @@ fi
 # Run full pipeline with tests
 
 # Sync data (auto-generates staging templates)
-dango sync --source stripe_payments
+dango sync stripe_payments
 
 # Run transformations
 dango run
@@ -927,6 +927,7 @@ echo "Pipeline complete"
 
 ## Next Steps
 
+- **[Dev Workflow](dev-workflow.md)** - Run tests safely against a dev copy of your database
 - **[dbt Basics](dbt-basics.md)** - Learn dbt fundamentals
 - **[Custom Models](custom-models.md)** - Build testable marts
 - **[Staging Models](staging-models.md)** - Understand the foundation

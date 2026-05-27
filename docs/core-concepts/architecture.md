@@ -16,7 +16,7 @@ Dango integrates four production-grade open-source tools into a unified platform
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                    dlt (Data Load Tool)                     │
-│  • 30+ sources (60+ via dlt_native)  • OAuth  • Incremental │
+│  • 33 sources  • OAuth  • Incremental  • Deduplication     │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -26,12 +26,17 @@ Dango integrates four production-grade open-source tools into a unified platform
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                   dbt (Transformations)                     │
-│  • Auto-generated staging  • Custom SQL models             │
+│  • Auto-generated staging  • Custom SQL  • Snapshots       │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │              Visualization & Management Layer               │
-│  Metabase (BI) • Web UI (Monitoring) • dbt-docs            │
+│  Metabase (BI) • Web UI • Notebooks (Marimo) • dbt-docs    │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│              Platform Services                              │
+│  Auth • Scheduling • Monitoring • Governance • Cloud Deploy │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -287,14 +292,14 @@ Create charts, dashboards, and share with your team.
 
 ## Tech Stack Details
 
-### Core Tools (as of Dango v0.0.5)
+### Core Tools
 
 | Tool | Version | Purpose | Language |
 |------|---------|---------|----------|
-| **dlt** | 0.4.x | Data ingestion | Python |
-| **dbt** | 1.7.x | SQL transformations | Python + SQL |
-| **DuckDB** | 0.10.x | Analytics database | C++ |
-| **Metabase** | 0.49.x | Business intelligence | Java/Clojure |
+| **dlt** | 1.24.x | Data ingestion | Python |
+| **dbt** | 1.10.x | SQL transformations | Python + SQL |
+| **DuckDB** | 1.5.x | Analytics database | C++ |
+| **Metabase** | 0.59.x | Business intelligence | Java/Clojure |
 
 ### Dango Components
 
@@ -348,7 +353,7 @@ dango stop
 
 ## Local vs. Cloud Architecture
 
-### Current (Local)
+### Local
 
 ```
 ┌─────────────────────────────────────┐
@@ -356,26 +361,55 @@ dango stop
 │  ┌──────────────────────────────┐  │
 │  │  DuckDB (data/warehouse.db)  │  │
 │  │  FastAPI (port 8800)         │  │
+│  │  File Watcher (auto-sync)    │  │
 │  │  Docker (Metabase, dbt-docs) │  │
 │  └──────────────────────────────┘  │
 └─────────────────────────────────────┘
 ```
 
-### Future (Cloud)
+### Cloud
 
 ```
 ┌─────────────────────────────────────┐
-│        Cloud Infrastructure         │
+│      Cloud Server (DO / BYOS)       │
 │  ┌──────────────────────────────┐  │
-│  │  DuckDB or Snowflake/BigQuery│  │
-│  │  FastAPI (Cloud Run/Fargate) │  │
-│  │  Metabase (managed instance) │  │
-│  │  Orchestrator (Airflow/Prefect)│
+│  │  Caddy (HTTPS, reverse proxy)│  │
+│  │  DuckDB (warehouse.duckdb)   │  │
+│  │  FastAPI (single worker)     │  │
+│  │  APScheduler (cron/interval) │  │
+│  │  Docker (Metabase :ro mount) │  │
 │  └──────────────────────────────┘  │
 └─────────────────────────────────────┘
 ```
 
-The same `.dango/` configuration files work in both environments.
+The same `.dango/` configuration files work in both environments. See [Local vs Cloud](local-vs-cloud.md) for detailed behavioral differences.
+
+---
+
+## Module Dependency Hierarchy
+
+Dango's codebase is organized into four dependency levels. Higher levels can import from lower levels, but never the reverse.
+
+| Level | Role | Modules |
+|-------|------|---------|
+| **L0** (base) | No internal imports | `config/`, `utils/`, `security/`, `migrations/`, `templates/` |
+| **L1** (core) | Imports L0 only | `oauth/`, `ingestion/`, `transformation/`, `auth/`, `governance/`, `notebooks/`, `analysis/` |
+| **L2** (platform) | Imports L0-L1 | `platform/` (scheduling, cloud, local), `web/`, `visualization/` |
+| **L3** (ui) | Imports any level | `cli/` |
+
+**Import rules:**
+
+1. **Downward only** — higher levels import lower levels, never reverse
+2. **Same-level OK** — as long as there are no circular dependencies
+3. **Lazy imports** — used sparingly for orchestration in the ingestion runner
+
+??? info "Key modules added in v1"
+    - **`auth/`** — Password + 2FA + API key authentication, 3 roles (admin/editor/viewer), 29 permissions, Metabase SSO bridge
+    - **`governance/`** — Schema drift detection (breaking/additive), PII scanning (Presidio + spaCy)
+    - **`analysis/`** — Custom monitoring metrics, 6 comparison types, drill-down analysis
+    - **`notebooks/`** — Marimo notebook management, DuckDB snapshots, file locking
+    - **`platform/scheduling/`** — Cron/interval schedules, webhook notifications, execution history
+    - **`platform/cloud/`** — DigitalOcean + BYOS deployment, SSH management, remote operations
 
 ---
 
@@ -438,5 +472,6 @@ dango start          # Launch platform
 ## Next Steps
 
 - **[Data Layers](data-layers.md)** - Learn how data is organized across schemas
-- **[CLI Overview](cli-overview.md)** - Master the command-line interface
+- **[DuckDB & Single-Writer](duckdb.md)** - Understand the single-writer constraint
 - **[Project Structure](project-structure.md)** - Understand the directory layout
+- **[Local vs Cloud](local-vs-cloud.md)** - Differences between deployment modes

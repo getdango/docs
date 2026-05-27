@@ -1,79 +1,49 @@
 # Database Sources
 
-Connect to PostgreSQL, MySQL, SQLite, SQL Server, and other databases.
-
-!!! warning "Experimental"
-    Database sources have not been fully tested with Dango. The configuration patterns below are expected to work based on dlt's `sql_database` source, but may require adjustments for your specific use case.
+Connect to PostgreSQL, MySQL, MongoDB, SQLite, SQL Server, and other databases.
 
 ---
 
 ## Overview
 
-Dango supports SQL databases through dlt's `sql_database` source. Load tables directly from any SQLAlchemy-supported database into DuckDB.
+Dango supports SQL and NoSQL databases as data sources. **PostgreSQL** and **MongoDB** have full wizard support — set them up with `dango source add`. Other databases (MySQL, SQLite, SQL Server, Snowflake, BigQuery) use the manual `dlt_native` approach with dlt's `sql_database` source.
 
 **Supported Databases**:
 
-- PostgreSQL
-- MySQL / MariaDB
-- SQLite
-- Microsoft SQL Server
-- Oracle
-- Snowflake
-- BigQuery
-- Redshift
-- And any SQLAlchemy-compatible database
+| Database | Setup Method |
+|----------|-------------|
+| PostgreSQL | Wizard (`dango source add`) |
+| MongoDB | Wizard (`dango source add`) |
+| MySQL / MariaDB | Manual (`dlt_native`) |
+| SQLite | Manual (`dlt_native`) |
+| Microsoft SQL Server | Manual (`dlt_native`) |
+| Snowflake | Manual (`dlt_native`) |
+| BigQuery | Manual (`dlt_native`) |
+| Any SQLAlchemy-compatible | Manual (`dlt_native`) |
 
 ---
 
 ## Quick Start: PostgreSQL
 
-!!! note "Community Feedback Welcome"
-    If you successfully connect a database using these instructions, please share your experience on [GitHub Discussions](https://github.com/getdango/dango/discussions) to help improve this documentation.
+PostgreSQL is a wizard-enabled source. The wizard handles configuration and credential setup.
 
-### Step 1: Install Dependencies
+### Via Wizard (Recommended)
 
 ```bash
-# Activate your project's virtual environment
-source venv/bin/activate
-
-# Install dlt sql_database extras + PostgreSQL driver
-pip install "dlt[sql_database]" psycopg2-binary
+dango source add
 ```
 
-**Drivers by database**:
-
-| Database | Driver Package |
-|----------|---------------|
-| PostgreSQL | `psycopg2-binary` |
-| MySQL | `pymysql` |
-| SQLite | (built into Python) |
-| SQL Server | `pyodbc` |
-| Oracle | `cx_oracle` |
-| Snowflake | `snowflake-sqlalchemy` |
-| BigQuery | `sqlalchemy-bigquery` |
-
-### Step 2: Configure Credentials
-
-Add credentials to `.dlt/secrets.toml` (gitignored):
-
-```toml
-[sources.sql_database.credentials]
-drivername = "postgresql"
-database = "mydb"
-username = "myuser"
-password = "mypassword"
-host = "localhost"
-port = 5432
+```
+? Select a data source: PostgreSQL
+? Source name: my_postgres
+? Environment variable for connection URL [POSTGRES_CREDENTIALS]: POSTGRES_CREDENTIALS
+? Schema (default: public): public
+? Table names (comma-separated, or blank for all): customers, orders, products
 ```
 
-**Alternative: Connection string**
+The wizard creates your source configuration and prompts you to add the connection URL to `.env`.
 
-```toml
-[sources.sql_database]
-credentials = "postgresql://myuser:mypassword@localhost:5432/mydb"
-```
-
-### Step 3: Add Source to sources.yml
+### Via Configuration File
 
 Edit `.dango/sources.yml`:
 
@@ -81,189 +51,252 @@ Edit `.dango/sources.yml`:
 version: '1.0'
 sources:
   - name: my_postgres
+    type: postgres
+    enabled: true
+    description: Production PostgreSQL database
+    generic_config:
+      credentials_env: POSTGRES_CREDENTIALS
+      schema: public
+      table_names:
+        - customers
+        - orders
+        - products
+```
+
+!!! note "Why `generic_config` instead of `postgres`?"
+    PostgreSQL and MongoDB use `generic_config` as the YAML key because they share a common configuration model. Sources with dedicated config models (like Stripe, HubSpot) use their type name as the key.
+
+=== "Local"
+
+    Store the connection URL in `.env`:
+    ```bash
+    # .env (gitignored)
+    POSTGRES_CREDENTIALS=postgresql://myuser:mypassword@localhost:5432/mydb
+    ```
+
+=== "Cloud"
+
+    Set the connection URL on the remote server:
+    ```bash
+    dango remote env set POSTGRES_CREDENTIALS "postgresql://myuser:mypassword@dbhost:5432/mydb"
+    ```
+
+### First Sync
+
+```bash
+dango sync my_postgres
+```
+
+Data loads into `raw_my_postgres` schema in DuckDB:
+
+```sql
+SELECT * FROM raw_my_postgres.customers LIMIT 10;
+```
+
+### Connection URL Format
+
+```
+postgresql://username:password@host:port/database
+```
+
+Examples:
+
+```bash
+# Local database
+POSTGRES_CREDENTIALS=postgresql://myuser:mypassword@localhost:5432/mydb
+
+# Remote database with SSL
+POSTGRES_CREDENTIALS=postgresql://myuser:mypassword@db.example.com:5432/mydb?sslmode=require
+
+# AWS RDS
+POSTGRES_CREDENTIALS=postgresql://admin:secret@mydb.abc123.us-east-1.rds.amazonaws.com:5432/mydb
+```
+
+---
+
+## Quick Start: MongoDB
+
+MongoDB is a wizard-enabled source. It supports document collections with automatic schema flattening.
+
+### Via Wizard (Recommended)
+
+```bash
+dango source add
+```
+
+```
+? Select a data source: MongoDB
+? Source name: my_mongo
+? Environment variable for connection URL [MONGODB_CONNECTION_URL]: MONGODB_CONNECTION_URL
+? Database name: mydb
+? Collection names (comma-separated, or blank for all): users, events, products
+? Enable parallel collection loading? No
+```
+
+### Via Configuration File
+
+Edit `.dango/sources.yml`:
+
+```yaml
+version: '1.0'
+sources:
+  - name: my_mongo
+    type: mongodb
+    enabled: true
+    description: MongoDB application database
+    generic_config:
+      connection_url_env: MONGODB_CONNECTION_URL
+      database: mydb
+      collection_names:
+        - users
+        - events
+        - products
+      parallel: false
+```
+
+=== "Local"
+
+    Store the connection URL in `.env`:
+    ```bash
+    # .env (gitignored)
+    MONGODB_CONNECTION_URL=mongodb://myuser:mypassword@localhost:27017/mydb
+    ```
+
+=== "Cloud"
+
+    Set the connection URL on the remote server:
+    ```bash
+    dango remote env set MONGODB_CONNECTION_URL "mongodb+srv://myuser:mypassword@cluster.mongodb.net/mydb"
+    ```
+
+### First Sync
+
+```bash
+dango sync my_mongo
+```
+
+Data loads into `raw_my_mongo` schema in DuckDB:
+
+```sql
+SELECT * FROM raw_my_mongo.users LIMIT 10;
+```
+
+### Connection URL Format
+
+```
+mongodb://username:password@host:port/database
+mongodb+srv://username:password@cluster.mongodb.net/database
+```
+
+### Parallel Loading
+
+For large databases with many collections, enable parallel loading for faster syncs:
+
+```yaml
+generic_config:
+  connection_url_env: MONGODB_CONNECTION_URL
+  database: mydb
+  parallel: true
+```
+
+!!! note "MongoDB document flattening"
+    MongoDB documents are nested JSON. dlt flattens nested objects into columns using `__` separators. For example, `address.city` becomes `address__city`.
+
+---
+
+## Other Databases (Manual dlt_native Setup)
+
+MySQL, SQLite, SQL Server, Snowflake, BigQuery, and other SQLAlchemy-compatible databases use the `dlt_native` source type with dlt's `sql_database` source.
+
+### Step 1: Install Dependencies
+
+```bash
+# Activate your project's virtual environment
+source venv/bin/activate
+
+# Install dlt sql_database extras + database driver
+pip install "dlt[sql_database]" psycopg2-binary    # PostgreSQL
+pip install "dlt[sql_database]" pymysql             # MySQL
+pip install "dlt[sql_database]" pyodbc              # SQL Server
+pip install "dlt[sql_database]"                     # SQLite (built-in)
+pip install "dlt[sql_database]" snowflake-sqlalchemy # Snowflake
+pip install "dlt[sql_database]" sqlalchemy-bigquery  # BigQuery
+```
+
+### Step 2: Configure Credentials
+
+Add credentials to `.dlt/secrets.toml` (gitignored):
+
+=== "MySQL"
+
+    ```toml
+    [sources.sql_database.credentials]
+    drivername = "mysql+pymysql"
+    database = "mydb"
+    username = "root"
+    password = "secret"
+    host = "localhost"
+    port = 3306
+    ```
+
+=== "SQLite"
+
+    ```toml
+    [sources.sql_database]
+    credentials = "sqlite:///path/to/database.db"
+    ```
+
+=== "SQL Server"
+
+    ```toml
+    [sources.sql_database.credentials]
+    drivername = "mssql+pyodbc"
+    database = "mydb"
+    username = "sa"
+    password = "YourPassword123"
+    host = "localhost"
+    port = 1433
+    query = { driver = "ODBC Driver 17 for SQL Server" }
+    ```
+
+=== "Snowflake"
+
+    ```toml
+    [sources.sql_database.credentials]
+    drivername = "snowflake"
+    username = "myuser"
+    password = "mypassword"
+    host = "myaccount.snowflakecomputing.com"
+    database = "mydb"
+    query = { warehouse = "COMPUTE_WH", role = "ANALYST" }
+    ```
+
+### Step 3: Add Source to sources.yml
+
+```yaml
+version: '1.0'
+sources:
+  - name: my_mysql
     type: dlt_native
     enabled: true
-    description: PostgreSQL database
+    description: MySQL production database
     dlt_native:
       source_module: sql_database
       source_function: sql_database
       function_kwargs:
-        schema: "public"
+        schema: "mydb"
         table_names:
-          - customers
-          - orders
-          - products
+          - users
+          - transactions
 ```
 
-**Note**: Credentials are NOT in this file - they're read from `.dlt/secrets.toml`.
+!!! note "Credentials location"
+    For `dlt_native` database sources, credentials go in `.dlt/secrets.toml` (not `.env`). The `sources.yml` file only contains non-sensitive configuration.
 
-### Step 4: Sync Data
+### Step 4: Sync
 
 ```bash
-dango sync --source my_postgres
-```
-
-### Step 5: Verify
-
-Data is loaded into `raw_my_postgres` schema in DuckDB:
-
-```bash
-# Start platform
-dango start
-
-# Query in Metabase
-SELECT * FROM raw_my_postgres.customers LIMIT 10;
-```
-
----
-
-## Configuration Reference
-
-### Required Parameters
-
-| Parameter | Value | Description |
-|-----------|-------|-------------|
-| `source_module` | `sql_database` | Always use `sql_database` for database sources |
-| `source_function` | `sql_database` | Always use `sql_database` |
-
-### Optional Parameters (in function_kwargs)
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `schema` | `None` | Database schema to read from (e.g., `"public"`) |
-| `table_names` | All tables | List of specific tables to sync |
-| `chunk_size` | `50000` | Rows per batch |
-| `backend` | `"sqlalchemy"` | Processing backend: `sqlalchemy`, `pyarrow`, `pandas`, `connectorx` |
-| `reflection_level` | `"full"` | Schema detail: `minimal`, `full`, `full_with_precision` |
-
----
-
-## Database-Specific Examples
-
-### MySQL
-
-**.dlt/secrets.toml**:
-```toml
-[sources.sql_database.credentials]
-drivername = "mysql+pymysql"
-database = "mydb"
-username = "root"
-password = "secret"
-host = "localhost"
-port = 3306
-```
-
-**.dango/sources.yml**:
-```yaml
-- name: my_mysql
-  type: dlt_native
-  enabled: true
-  description: MySQL production database
-  dlt_native:
-    source_module: sql_database
-    source_function: sql_database
-    function_kwargs:
-      schema: "mydb"
-      table_names:
-        - users
-        - transactions
-```
-
-**Install driver**:
-```bash
-pip install pymysql
-```
-
-### SQLite
-
-**.dlt/secrets.toml**:
-```toml
-[sources.sql_database]
-credentials = "sqlite:///path/to/database.db"
-```
-
-**.dango/sources.yml**:
-```yaml
-- name: my_sqlite
-  type: dlt_native
-  enabled: true
-  dlt_native:
-    source_module: sql_database
-    source_function: sql_database
-    function_kwargs:
-      table_names:
-        - customers
-        - orders
-```
-
-**No driver needed** - SQLite support is built into Python.
-
-### SQL Server
-
-**.dlt/secrets.toml**:
-```toml
-[sources.sql_database.credentials]
-drivername = "mssql+pyodbc"
-database = "mydb"
-username = "sa"
-password = "YourPassword123"
-host = "localhost"
-port = 1433
-query = { driver = "ODBC Driver 17 for SQL Server" }
-```
-
-**.dango/sources.yml**:
-```yaml
-- name: my_sqlserver
-  type: dlt_native
-  enabled: true
-  dlt_native:
-    source_module: sql_database
-    source_function: sql_database
-    function_kwargs:
-      schema: "dbo"
-      table_names:
-        - Customers
-        - Orders
-```
-
-**Install driver**:
-```bash
-pip install pyodbc
-# Also install ODBC driver: https://docs.microsoft.com/en-us/sql/connect/odbc/
-```
-
-### Snowflake
-
-**.dlt/secrets.toml**:
-```toml
-[sources.sql_database.credentials]
-drivername = "snowflake"
-username = "myuser"
-password = "mypassword"
-host = "myaccount.snowflakecomputing.com"
-database = "mydb"
-query = { warehouse = "COMPUTE_WH", role = "ANALYST" }
-```
-
-**.dango/sources.yml**:
-```yaml
-- name: my_snowflake
-  type: dlt_native
-  enabled: true
-  dlt_native:
-    source_module: sql_database
-    source_function: sql_database
-    function_kwargs:
-      schema: "PUBLIC"
-      table_names:
-        - customers
-        - orders
-```
-
-**Install driver**:
-```bash
-pip install snowflake-sqlalchemy
+dango sync my_mysql
 ```
 
 ---
@@ -274,11 +307,17 @@ pip install snowflake-sqlalchemy
 
 Omit `table_names` to load all tables:
 
-```yaml
-function_kwargs:
-  schema: "public"
-  # No table_names specified = load all tables
-```
+=== "Wizard (PostgreSQL/MongoDB)"
+
+    Leave the table/collection names blank when prompted.
+
+=== "Manual (dlt_native)"
+
+    ```yaml
+    function_kwargs:
+      schema: "public"
+      # No table_names specified = load all tables
+    ```
 
 ### Multiple Schemas
 
@@ -286,25 +325,21 @@ Create separate sources for each schema:
 
 ```yaml
 - name: public_tables
-  type: dlt_native
+  type: postgres
   enabled: true
-  dlt_native:
-    source_module: sql_database
-    source_function: sql_database
-    function_kwargs:
-      schema: "public"
+  generic_config:
+    credentials_env: POSTGRES_CREDENTIALS
+    schema: public
 
 - name: analytics_tables
-  type: dlt_native
+  type: postgres
   enabled: true
-  dlt_native:
-    source_module: sql_database
-    source_function: sql_database
-    function_kwargs:
-      schema: "analytics"
+  generic_config:
+    credentials_env: POSTGRES_CREDENTIALS
+    schema: analytics
 ```
 
-### Performance Tuning
+### Performance Tuning (dlt_native)
 
 ```yaml
 function_kwargs:
@@ -315,17 +350,22 @@ function_kwargs:
 
 ### SSL Connections
 
-**.dlt/secrets.toml**:
-```toml
-[sources.sql_database]
-credentials = "postgresql://user:pass@host:5432/db?sslmode=require"
+Include SSL parameters in your connection URL:
+
+```bash
+# .env (PostgreSQL with SSL)
+POSTGRES_CREDENTIALS=postgresql://user:pass@host:5432/db?sslmode=require
+
+# Or in .dlt/secrets.toml
+# [sources.sql_database]
+# credentials = "postgresql://user:pass@host:5432/db?sslmode=require"
 ```
 
 ---
 
 ## Incremental Loading
 
-### Date-Based Incremental
+### Date-Based Incremental (dlt_native)
 
 Load only rows added/updated since last sync:
 
@@ -359,7 +399,7 @@ function_kwargs:
 
 ### Full Table Load (Default)
 
-By default, `sql_database` performs a **full table load**:
+By default, database sources perform a **full table load**:
 
 - Entire table is read from source database
 - Loaded into DuckDB with `replace` disposition
@@ -383,7 +423,7 @@ With incremental configuration:
 
 ### Custom SQL Not Supported
 
-`sql_database` loads full tables - you cannot specify WHERE clauses or custom SQL.
+`sql_database` loads full tables — you cannot specify WHERE clauses or custom SQL.
 
 **Workarounds**:
 
@@ -435,11 +475,10 @@ GRANT SELECT ON ALL TABLES IN SCHEMA public TO dango_reader;
 
 ### 2. Never Commit Credentials
 
-`.dlt/secrets.toml` is automatically gitignored. Verify:
+`.dlt/secrets.toml` and `.env` are automatically gitignored. Verify:
 
 ```bash
-cat .gitignore | grep secrets
-# Should show: .dlt/secrets.toml
+cat .gitignore | grep -E "secrets|\.env"
 ```
 
 ### 3. Limit Table Access
@@ -455,67 +494,15 @@ table_names:
 
 ### 4. Use SSL/TLS
 
-For production databases:
-
-```toml
-credentials = "postgresql://user:pass@host:5432/db?sslmode=require"
-```
+For production databases, always use SSL connections.
 
 ### 5. Rotate Credentials Regularly
 
-Update `.dlt/secrets.toml` when rotating database passwords.
-
----
-
-## Comparison: Database Source vs. Other Methods
-
-| Feature | Database Source | CSV Export | Custom dlt |
-|---------|----------------|------------|------------|
-| Setup | Medium | Simple | Complex |
-| Incremental | Yes | No | Yes |
-| Custom SQL | No (views only) | N/A | Yes |
-| Real-time | No (scheduled) | No | Configurable |
-| Best for | Standard tables | One-time loads | Complex queries |
-
----
-
-## How This Differs from Standard dlt
-
-| Aspect | Standard dlt | Dango |
-|--------|-------------|-------|
-| Setup | `dlt init sql_database duckdb` | `dango init` |
-| Config | Python script | `.dango/sources.yml` (YAML) |
-| Credentials | `.dlt/secrets.toml` | `.dlt/secrets.toml` (same!) |
-| Run | `python my_pipeline.py` | `dango sync --source X` |
-| dbt | Manual setup | Auto-generates staging models |
-
-**Why the difference?**
-
-Dango uses YAML configuration to:
-- Avoid writing Python for standard use cases
-- Make configuration version-controllable
-- Keep secrets separate from config
-- Auto-generate dbt boilerplate
+Update `.env` or `.dlt/secrets.toml` when rotating database passwords.
 
 ---
 
 ## Troubleshooting
-
-### "No module named 'sqlalchemy'"
-
-Install dlt sql_database extras:
-
-```bash
-pip install "dlt[sql_database]"
-```
-
-### "Could not import source module: sql_database"
-
-The `sql_database` source requires extras:
-
-```bash
-pip install "dlt[sql_database]"
-```
 
 ### Connection Refused
 
@@ -523,46 +510,50 @@ Check:
 1. Database is running and accessible
 2. Host/port are correct
 3. Firewall allows connections
-4. Credentials in `.dlt/secrets.toml` are correct
+4. Credentials are correct
 
 Test connection:
 ```bash
 # PostgreSQL
-psql -h localhost -U myuser -d mydb
+psql "postgresql://myuser:mypassword@localhost:5432/mydb"
 
 # MySQL
 mysql -h localhost -u root -p mydb
+
+# MongoDB
+mongosh "mongodb://myuser:mypassword@localhost:27017/mydb"
+```
+
+### "No module named 'sqlalchemy'" (dlt_native only)
+
+Install dlt sql_database extras:
+
+```bash
+pip install "dlt[sql_database]"
 ```
 
 ### "Relation does not exist"
 
 Check:
-1. `schema` parameter matches database schema
-2. `table_names` lists tables that exist
+1. Schema name matches database schema (e.g., `public` for PostgreSQL)
+2. `table_names` lists tables that actually exist
 3. User has SELECT permission on tables
-
-List tables:
-```sql
--- PostgreSQL
-SELECT tablename FROM pg_tables WHERE schemaname = 'public';
-
--- MySQL
-SHOW TABLES;
-```
 
 ### Slow Performance
 
 Try:
-1. Increase `chunk_size`: `100000`
+1. Increase `chunk_size`: `100000` (dlt_native)
 2. Use `backend: "pyarrow"` (faster than SQLAlchemy)
 3. Enable incremental loading for large tables
-4. Create indexes on cursor columns (for incremental)
+4. Limit `table_names` to only needed tables
 
 ---
 
 ## Next Steps
 
+- **[Adding Sources](adding-sources.md)** - Full wizard walkthrough
 - **[Custom Sources](custom-sources.md)** - Write custom SQL with Python
-- **[Built-in Sources](built-in-sources.md)** - See all available dlt sources
+- **[Source Catalog](source-catalog.md)** - See all available sources
+- **[Sync Modes](sync-modes.md)** - Incremental vs. full refresh
 - **[Transformations](../transformations/index.md)** - Transform database data with dbt
-- **[dlt sql_database docs](https://dlthub.com/docs/dlt-ecosystem/verified-sources/sql_database)** - Official dlt documentation
+- [dlt sql_database docs](https://dlthub.com/docs/dlt-ecosystem/verified-sources/sql_database) - Official dlt documentation
