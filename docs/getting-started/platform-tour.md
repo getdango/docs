@@ -38,7 +38,7 @@ Manage all your data sources. View sync status, trigger manual syncs with **Sync
 
 **Route:** `/models`
 
-Browse your dbt transformation models. See which models are available, their status, and run individual models on demand. This is the web equivalent of `dango transform run`.
+Browse your dbt transformation models. See which models are available, their status, and run individual models on demand. This is the web equivalent of `dango run`.
 
 :material-arrow-right: [Models page details](../web-ui/models.md)
 
@@ -46,7 +46,7 @@ Browse your dbt transformation models. See which models are available, their sta
 
 **Route:** `/schedules`
 
-View and manage automated sync schedules. See which sources have schedules, their cron expressions, next run times, and execution history. Toggle schedules on/off without touching the CLI.
+View automated sync schedules. See which sources have schedules, their cron expressions, next run times, and execution history. Manually trigger runs from the UI. Schedule configuration (adding, editing, removing) is managed via the CLI.
 
 :material-arrow-right: [Schedules page details](../web-ui/schedules.md)
 

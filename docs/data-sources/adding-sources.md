@@ -268,9 +268,9 @@ The edit command validates YAML syntax before saving.
 
 ## Managing Sources
 
-=== "CLI"
+### List Sources
 
-    ### List Sources
+=== "CLI"
 
     ```bash
     # Show all sources with status
