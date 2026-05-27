@@ -13,6 +13,9 @@ Sync payment data from Stripe into your data warehouse.
 | **Default Endpoints** | Charge, Customer, Subscription |
 | **dlt Package** | `stripe_analytics` |
 
+!!! tip "Managing this source in the Web UI"
+    After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
+
 ---
 
 ## Prerequisites

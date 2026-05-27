@@ -22,6 +22,9 @@ CSV sources in Dango provide a simple way to load flat files into DuckDB with au
 - Support for multiple delimiters
 - Header row handling
 
+!!! tip "Managing this source in the Web UI"
+    After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
+
 ---
 
 ## How CSV Loading Works

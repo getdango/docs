@@ -14,6 +14,9 @@ Connect Google Sheets spreadsheets as a data source using OAuth 2.0.
 
 Google Sheets loads spreadsheet data into DuckDB. Each selected sheet/tab becomes a separate table. Column names come from the spreadsheet header row.
 
+!!! tip "Managing this source in the Web UI"
+    After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
+
 ---
 
 ## Prerequisites

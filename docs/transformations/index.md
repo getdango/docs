@@ -54,6 +54,9 @@ graph LR
 
 ---
 
+!!! tip "Web UI"
+    You can browse and run transformation models from the **Models** page in the Web UI at `http://localhost:8800/models`. See model status, run individual models on demand, and view results. See [Web UI — Models](../web-ui/models.md).
+
 ## Quick Start
 
 ### End-to-End Example

@@ -14,6 +14,9 @@ Connect Google Ads as a data source using OAuth 2.0.
 
 Google Ads loads campaign performance data into DuckDB using GAQL (Google Ads Query Language). By default, Dango creates 5 tables covering campaigns, ad groups, keywords, ads, and search terms.
 
+!!! tip "Managing this source in the Web UI"
+    After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
+
 ---
 
 ## Prerequisites

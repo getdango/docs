@@ -8,6 +8,9 @@ Automate data syncs with cron schedules so your warehouse stays fresh without ma
     - At least one data source configured (`dango source add`)
     - `dango start` running (local) or cloud deployment active
 
+!!! tip "Web UI"
+    You can view schedules and trigger runs from the **Schedules** page in the Web UI at `http://localhost:8800/schedules`. See execution history, next run times, and manually trigger schedules. Schedule configuration is CLI-only. See [Web UI — Schedules](../web-ui/schedules.md).
+
 ## Quick Start
 
 1. **Add a schedule:**

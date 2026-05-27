@@ -17,6 +17,9 @@ Connect Facebook Ads as a data source using OAuth 2.0.
 
 Facebook Ads loads campaign data and performance insights into DuckDB. By default, Dango loads campaigns, ads, ad sets, and daily performance insights.
 
+!!! tip "Managing this source in the Web UI"
+    After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
+
 ---
 
 ## Prerequisites

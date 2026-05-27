@@ -21,6 +21,9 @@ Dango supports SQL and NoSQL databases as data sources. **PostgreSQL** and **Mon
 | BigQuery | Manual (`dlt_native`) |
 | Any SQLAlchemy-compatible | Manual (`dlt_native`) |
 
+!!! tip "Managing this source in the Web UI"
+    After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
+
 ---
 
 ## Quick Start: PostgreSQL

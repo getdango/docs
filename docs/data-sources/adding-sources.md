@@ -270,15 +270,28 @@ The edit command validates YAML syntax before saving.
 
 ### List Sources
 
-```bash
-# Show all sources with status
-dango source list
+=== "CLI"
 
-# Show only enabled sources
-dango source list --enabled-only
-```
+    ```bash
+    # Show all sources with status
+    dango source list
 
-Output includes source name, type, enabled status, last sync time, and row count.
+    # Show only enabled sources
+    dango source list --enabled-only
+    ```
+
+    Output includes source name, type, enabled status, last sync time, and row count.
+
+=== "Web UI"
+
+    Navigate to the **Sources** page at `http://localhost:8800/sources` to manage your sources visually. From there you can:
+
+    - View all sources with sync status, row counts, and last sync time
+    - Trigger a manual sync with the **Sync Now** button
+    - Upload CSV files directly
+    - Click into any source for detailed sync history
+
+    See [Web UI — Sources](../web-ui/sources.md) for details.
 
 ### Disable a Source
 

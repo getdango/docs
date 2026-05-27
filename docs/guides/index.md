@@ -1,16 +1,19 @@
-# Guides & Tutorials
+# Guides & Workflows
 
-Practical, end-to-end tutorials for real-world analytics use cases.
+Practical tutorials and operational workflows for Dango.
 
 ---
 
 ## Overview
 
-These guides walk through complete workflows using Dango. Each tutorial is designed to be followed from start to finish, demonstrating realistic data scenarios.
+This section has two parts:
+
+- **[Workflows](../workflows/index.md)** — operational guides for day-to-day work: local and cloud development, dlt/dbt/Metabase workflows, backup & restore, performance tuning, and troubleshooting.
+- **Tutorials** (below) — end-to-end walkthroughs for real-world analytics use cases, designed to be followed start to finish.
 
 ---
 
-## Available Tutorials
+## Tutorials
 
 <div class="grid cards" markdown>
 
