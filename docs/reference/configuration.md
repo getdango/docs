@@ -103,7 +103,7 @@ platform:
 | `auto_dbt` | boolean | `true` | Auto-run dbt after sync completes |
 | `debounce_seconds` | integer | `600` | Seconds to wait before triggering auto-sync (10 min) |
 | `dbt_coalesce_seconds` | integer | `10` | Seconds to wait before dbt run (coalesces multiple syncs) |
-| `workers` | integer | `null` | Uvicorn worker count (`null` = 1 local, auto-detect cloud vCPUs) |
+| `workers` | integer | `null` | Uvicorn worker count (`null` = 1). Single worker is the default for both local and cloud. |
 | `watch_patterns` | list[string] | `["*.csv", "*.json", "*.jsonl", "*.ndjson", "*.parquet"]` | Glob patterns for file watch |
 | `watch_directories` | list[string] | `["data/uploads"]` | Directories to watch (relative to project root) |
 

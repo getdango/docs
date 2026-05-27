@@ -8,19 +8,46 @@ Manage your cloud deployment with `dango remote` commands.
 
 | Command | Description |
 |---------|-------------|
+| **Deploy & Sync** | |
 | `dango remote push` | Push local config and dbt files to server |
 | `dango remote rollback` | Restore from a backup |
+| `dango remote sync SOURCE` | Trigger a data sync on the remote server |
+| **Monitoring** | |
 | `dango remote status` | Show server status, services, and resources |
 | `dango remote logs` | View service logs |
+| `dango remote history` | View deployment history |
 | `dango remote ssh` | Open interactive SSH session |
 | `dango remote query "SQL"` | Run a read-only SQL query on the warehouse |
-| `dango remote history` | View deployment history |
-| `dango remote auth add-user` | Add a web UI user |
-| `dango remote auth list-users` | List web UI users |
-| `dango remote auth remove-user` | Remove a web UI user |
-| `dango remote auth reset-password` | Reset a user's password |
+| **Server Operations** | |
+| `dango remote upgrade` | Upgrade Dango on the remote server |
+| `dango remote resize` | Resize the server (change CPU/RAM) |
+| `dango remote migrate` | Migrate to a new server (new droplet for disk/region changes) |
 | `dango remote repair` | Diagnose and fix common deployment issues |
 | `dango remote reset-metabase` | Reset Metabase to fresh state (SSO/H2 corruption) |
+| **Firewall** | |
+| `dango remote firewall list` | Show current firewall rules |
+| `dango remote firewall allow-ip IP` | Restrict ports 80/443 to a specific IP |
+| `dango remote firewall allow-all` | Revert ports 80/443 to public |
+| **Domain** | |
+| `dango remote domain set DOMAIN` | Configure HTTPS with Let's Encrypt |
+| `dango remote domain remove` | Revert to IP-only HTTP |
+| **Environment Variables** | |
+| `dango remote env set K=V` | Set an environment variable |
+| `dango remote env get K` | Display a variable (value masked) |
+| `dango remote env list` | List all variables (values masked) |
+| `dango remote env delete K` | Remove a variable |
+| **Backups** | |
+| `dango remote backup` | Create an on-demand backup |
+| `dango remote backup list` | List local and Spaces backups |
+| `dango remote backup enable` | Enable daily scheduled backups |
+| `dango remote backup disable` | Disable daily scheduled backups |
+| `dango remote backup download` | Download a backup from Spaces |
+| `dango remote backup restore` | Restore from a Spaces backup |
+| **User Management** | |
+| `dango remote auth add-user` | Create a new user on the remote server |
+| `dango remote auth list-users` | List all users |
+| `dango remote auth remove-user` | Remove a user |
+| `dango remote auth reset-password` | Reset a user's password |
 
 All commands require an active deployment (`.dango/cloud.yml` must exist). They work the same for both DigitalOcean and BYOS deployments &mdash; all communication happens over SSH.
 

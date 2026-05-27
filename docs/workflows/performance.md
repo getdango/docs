@@ -265,18 +265,11 @@ dbt run --threads 4
 
 ---
 
-## Multi-Worker Considerations
+## Single-Worker Architecture
 
-When running Dango with multiple uvicorn workers (cloud deployments use this by default), be aware of these characteristics:
+Cloud deployments run Dango with a **single uvicorn worker**. This is intentional &mdash; `ws_manager` (the WebSocket connection manager) is an in-process singleton, so multi-worker mode would break real-time sync progress broadcasting. The `workers` config option exists for advanced use but defaults to 1.
 
-- **`app.state` is not shared across workers** — each worker has its own instance of in-memory state
-- **Scheduler runs in one worker only** — the lifespan context starts the scheduler, but only the first worker's scheduler is active
-- **WebSocket connections are per-worker** — a client connected to worker A won't receive broadcasts from worker B
-
-Dango handles this automatically with a file-based sync status watcher that runs in every worker. Each worker monitors `.dango/state/sync_status_*.json` files for changes and broadcasts updates to its own WebSocket clients.
-
-??? info "How Multi-Worker Sync Broadcasting Works"
-    Each worker runs a background `sync_status_watcher()` task that polls status files by mtime. When a status file changes, the worker broadcasts the update to its connected WebSocket clients. A `_locally_polled` set prevents duplicate broadcasts for syncs that the worker itself launched.
+If you need to handle more concurrent HTTP connections, scale vertically (resize the server) or put a CDN/reverse proxy in front of Caddy for static assets.
 
 ---
 

@@ -437,6 +437,16 @@ dango remote domain remove
 
 ## Backups
 
+### dango remote backup
+
+Trigger an on-demand backup on the server.
+
+```bash
+dango remote backup
+```
+
+---
+
 ### dango remote backup list
 
 List backups on the server and in Spaces.
@@ -556,6 +566,24 @@ Reset a user's password on the remote server. Generates a new temporary password
 
 ```bash
 dango remote auth reset-password EMAIL
+```
+
+### dango remote repair
+
+Diagnose and repair common cloud deployment issues. Checks disk, RAM, DNS, restarts services, re-runs Metabase setup if `metabase.yml` is missing, and triggers a Metabase schema scan.
+
+```bash
+dango remote repair
+```
+
+---
+
+### dango remote reset-metabase
+
+Reset Metabase to a fresh state without losing warehouse data. Stops Metabase, removes its Docker volume (H2 database), restarts it, and lets `dango-web` re-run Metabase setup on next startup.
+
+```bash
+dango remote reset-metabase
 ```
 
 ---

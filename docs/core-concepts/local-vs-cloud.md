@@ -12,7 +12,7 @@ This page covers the key differences so you know what to expect in each environm
 | **Authentication** | Enabled (can disable) | Required (always enabled) |
 | **Session idle timeout** | 24 hours (default) | 60 minutes (recommended) |
 | **Session max lifetime** | 365 days (default) | 30 days (recommended) |
-| **Web server** | Uvicorn (single worker) | Uvicorn (multi-worker) behind Caddy |
+| **Web server** | Uvicorn (single worker) | Uvicorn (single worker) behind Caddy |
 | **HTTPS** | No (localhost only) | Yes (auto-TLS via Let's Encrypt) |
 | **File watcher** | Yes (auto-sync on file changes) | No |
 | **Notebook idle timeout** | 2 hours | 1 hour |
@@ -71,7 +71,7 @@ You can change these in your authentication configuration. Cloud deployments wil
 
     Caddy handles TLS certificate provisioning and renewal automatically. If no domain is configured, the server is accessible via IP address over HTTP.
 
-    Uvicorn runs with **multiple workers** in cloud mode. This means `app.state` is not shared across workers &mdash; the scheduler runs in only one worker (via the lifespan context), and WebSocket connections are per-worker.
+    Uvicorn runs with a **single worker** in cloud mode. This ensures WebSocket broadcasting works correctly &mdash; `ws_manager` is an in-process singleton, so all connected clients receive real-time sync progress updates without cross-worker coordination.
 
 ## File Watcher
 
@@ -160,7 +160,7 @@ The idle check runs every 5 minutes. When a notebook times out, any unsaved work
 
 ## Cloud Detection
 
-Dango determines whether it's running in cloud mode by checking for `.dango/cloud.yml` with a `droplet_ip` value. If this file exists and contains a server IP, cloud-specific behaviors activate (stricter security warnings, shorter notebook timeouts, multi-worker uvicorn).
+Dango determines whether it's running in cloud mode by checking for `.dango/cloud.yml` with a `droplet_ip` value. If this file exists and contains a server IP, cloud-specific behaviors activate (stricter security warnings, shorter notebook timeouts).
 
 ## Key Points
 

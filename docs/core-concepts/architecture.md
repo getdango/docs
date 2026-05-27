@@ -375,7 +375,7 @@ dango stop
 │  ┌──────────────────────────────┐  │
 │  │  Caddy (HTTPS, reverse proxy)│  │
 │  │  DuckDB (warehouse.duckdb)   │  │
-│  │  FastAPI (multi-worker)      │  │
+│  │  FastAPI (single worker)     │  │
 │  │  APScheduler (cron/interval) │  │
 │  │  Docker (Metabase :ro mount) │  │
 │  └──────────────────────────────┘  │

@@ -81,21 +81,19 @@ Choose your droplet size based on your data volume and performance needs.
 
 | Tier | Slug | vCPU | RAM | Disk | Price |
 |------|------|------|-----|------|-------|
-| Budget | `s-1vcpu-2gb` | 1 | 2 GB | 50 GB | $12/mo |
 | **Standard** (default) | `s-2vcpu-4gb` | 2 | 4 GB | 80 GB | **$24/mo** |
 | Performance | `s-4vcpu-8gb` | 4 | 8 GB | 160 GB | $48/mo |
 
-!!! warning "Budget Tier"
-    The budget tier ($12/mo) has only 2 GB RAM. Metabase may be slow on this tier, especially with complex dashboards or large datasets. Use it for testing or small projects with minimal transformation.
+!!! info "Minimum 4 GB RAM"
+    Dango requires at least 4 GB RAM. Servers with 2 GB RAM cause Metabase out-of-memory crashes.
 
 You can also enter a custom DigitalOcean slug (e.g., `s-8vcpu-16gb`) if you need more resources.
 
 ```
 Select server size:
-  [1] Budget   - $12/mo  (1 vCPU, 2 GB RAM, 50 GB disk)
-  [2] Standard - $24/mo  (2 vCPU, 4 GB RAM, 80 GB disk) [default]
-  [3] Performance - $48/mo (4 vCPU, 8 GB RAM, 160 GB disk)
-  [4] Custom slug
+  [1] Standard - $24/mo  (2 vCPU, 4 GB RAM, 80 GB disk) [default]
+  [2] Performance - $48/mo (4 vCPU, 8 GB RAM, 160 GB disk)
+  [3] Custom slug
 ```
 
 ### Step 4: Admin Account
