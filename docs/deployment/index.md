@@ -14,8 +14,8 @@ Dango offers two deployment paths. Both result in the same server setup &mdash; 
 | **Prerequisites** | DO account + API token | Ubuntu 22.04+ server with SSH access |
 | **Cloud firewall** | Managed by Dango (`dango remote firewall`) | You manage (UFW installed automatically) |
 | **Automated backups** | DO Spaces (optional, ~$5/mo) | Not included (manual snapshots) |
-| **Server destruction** | `dango remote destroy` removes everything | Your responsibility |
-| **Cost** | $12&ndash;$48/mo (droplet) + optional backups | Your server costs |
+| **Server destruction** | `dango deploy destroy` removes everything | Your responsibility |
+| **Cost** | $24&ndash;$48/mo (droplet) + optional backups | Your server costs |
 | **Best for** | Quick setup, no existing infrastructure | AWS, GCP, Hetzner, on-premise, etc. |
 
 ## Quick Start
@@ -51,7 +51,7 @@ Both paths set up the same server environment: Python venv, DuckDB warehouse, db
 | `dango remote status` | Check server health and service status |
 | `dango remote logs` | View server logs |
 | `dango remote ssh` | Open an SSH session to the server |
-| `dango remote destroy` | Destroy DigitalOcean droplet (irreversible) |
+| `dango deploy destroy` | Destroy DigitalOcean droplet (irreversible) |
 
 ## After Deployment
 

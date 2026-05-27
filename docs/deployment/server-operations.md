@@ -101,7 +101,6 @@ Change the server's CPU, RAM, and disk allocation.
 
     Available tiers:
     Tier          Slug            vCPUs  RAM    Disk    Price
-    Budget        s-1vcpu-2gb     1      2 GB   50 GB   $12/mo
     Standard      s-2vcpu-4gb     2      4 GB   80 GB   $24/mo
     Performance   s-4vcpu-8gb     4      8 GB   160 GB  $48/mo
 

@@ -125,7 +125,7 @@ See [OAuth](../security/oauth.md) for full provider details.
 
 ### Symptom
 
-`dango remote setup` or `dango remote push` fails partway through.
+`dango deploy` or `dango remote push` fails partway through.
 
 ### Cause
 
@@ -381,13 +381,11 @@ The web UI shows stale data, sync progress doesn't update in real time, or you s
 
 ### Cause
 
-WebSocket connections can drop due to network interruptions, proxy timeouts, or multi-worker deployment characteristics.
+WebSocket connections can drop due to network interruptions or proxy timeouts.
 
 ### Resolution
 
 **Refresh the browser.** This re-establishes the WebSocket connection and fetches the latest state.
-
-**Multi-worker limitation:** In multi-worker uvicorn deployments (used on cloud), WebSocket connections are per-worker. A sync launched by worker A broadcasts progress to worker A's clients. Worker B's clients receive updates via a file-based watcher (with slight delay). If real-time updates seem inconsistent, refresh the page.
 
 **Proxy/reverse proxy timeout:** If using Caddy or nginx in front of Dango, ensure WebSocket upgrade headers are passed through. Dango's default Caddy configuration handles this automatically.
 

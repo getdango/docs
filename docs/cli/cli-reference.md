@@ -864,6 +864,8 @@ dango remote resize [SIZE]            # Resize server
 dango remote migrate [OPTIONS]        # Migrate to new server
 dango remote history [OPTIONS]        # Show deploy history
 dango remote sync SOURCE [OPTIONS]    # Trigger remote sync
+dango remote repair                   # Diagnose and fix issues
+dango remote reset-metabase           # Reset Metabase to fresh state
 ```
 
 ### Environment variables

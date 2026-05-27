@@ -116,7 +116,7 @@ This is the v1.0.0 release — a complete rewrite and expansion of the Dango pla
 
 - DuckDB version alignment checks (startup + pre-commit hook)
 - Process separation — syncs run in subprocesses to prevent lock contention
-- Multi-worker uvicorn support for cloud deployments
+- Single-worker uvicorn for cloud deployments (WebSocket compatibility)
 - Smoke test suite (100+ checks)
 
 #### Breaking Changes from v0.1.0

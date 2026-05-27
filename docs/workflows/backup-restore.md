@@ -318,7 +318,7 @@ For full cloud backup details, see [Cloud Backups](../deployment/backups.md).
 
 If the cloud server is lost:
 
-1. Provision a new server: `dango remote setup`
+1. Provision a new server: `dango deploy`
 2. Restore from the latest Spaces backup: `dango remote backup restore`
 3. Verify services are healthy: `dango remote status`
 4. Check data: `dango remote logs`

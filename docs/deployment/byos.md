@@ -108,7 +108,7 @@ The BYOS wizard installs and configures Dango on your server. It does **not** ma
 | Configure fail2ban, unattended-upgrades | Yes | Yes |
 | Cloud firewall (DO API) | Yes | No &mdash; installs UFW instead |
 | Automated backups (DO Spaces) | Yes | No &mdash; use manual snapshots |
-| `dango remote destroy` | Yes (destroys droplet) | No &mdash; you manage the server |
+| `dango deploy destroy` | Yes (destroys droplet) | No &mdash; you manage the server |
 | `dango remote firewall` | Yes (DO cloud firewall) | No &mdash; manage UFW directly |
 | DNS/domain setup | Yes | Yes |
 | HTTPS via Caddy | Yes | Yes |
@@ -164,7 +164,7 @@ Different providers have different defaults. Keep these in mind when provisionin
 !!! note "Non-root SSH users"
     GCP and AWS disable root login by default. Use your cloud username as the SSH user and ensure it has passwordless `sudo` access. The wizard runs setup commands via `sudo`.
 
-**Minimum RAM:** 4 GB. Servers with 2 GB RAM will run but Metabase may crash with out-of-memory errors under load.
+**Minimum RAM:** 4 GB. Servers with 2 GB RAM cause Metabase out-of-memory crashes and are not supported.
 
 ---
 
