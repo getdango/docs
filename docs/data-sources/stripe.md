@@ -8,9 +8,9 @@ Sync payment data from Stripe into your data warehouse.
 |---------|---------|
 | **Auth** | API Key (`sk_test_` or `sk_live_`) |
 | **Env Variable** | `STRIPE_API_KEY` |
-| **Incremental** | Yes |
+| **Incremental** | No (full refresh every sync) |
 | **Date Range** | Yes (default: last 90 days) |
-| **Default Endpoints** | Charge, Customer, Subscription |
+| **Default Endpoints** | Charge, Customer, Subscription, Invoice, Product, Price |
 | **dlt Package** | `stripe_analytics` |
 
 !!! tip "Managing this source in the Web UI"
@@ -50,9 +50,9 @@ dango source add
   [x] Charge
   [x] Customer
   [x] Subscription
-  [ ] Invoice
-  [ ] Product
-  [ ] Price
+  [x] Invoice
+  [x] Product
+  [x] Price
   [ ] PaymentIntent
 ```
 
@@ -75,6 +75,9 @@ sources:
         - Charge
         - Customer
         - Subscription
+        - Invoice
+        - Product
+        - Price
       start_date: "2024-01-01"  # Optional: defaults to 90 days ago
 ```
 
@@ -110,9 +113,9 @@ dango sync stripe
 | `Charge` | Payment charges (default) |
 | `Customer` | Customer records (default) |
 | `Subscription` | Active and past subscriptions (default) |
-| `Invoice` | Invoices sent to customers |
-| `Product` | Product catalog entries |
-| `Price` | Pricing configurations |
+| `Invoice` | Invoices sent to customers (default) |
+| `Product` | Product catalog entries (default) |
+| `Price` | Pricing configurations (default) |
 | `PaymentIntent` | Payment intent objects |
 
 ### Date Range Options
@@ -165,7 +168,7 @@ LIMIT 10;
 
 ## Sync Behavior
 
-- **Incremental**: Yes — the `start_date` / `end_date` parameters control the date range fetched.
+- **Incremental**: No — every sync is a full refresh within the date range.
 - **Write disposition**: `replace` — the full dataset within the date range is reloaded on each sync.
 - **First sync**: Loads all data within the date range. Large Stripe accounts (100k+ charges) may take 10-20 minutes.
 

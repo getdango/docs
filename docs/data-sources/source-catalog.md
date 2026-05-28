@@ -39,7 +39,7 @@ Sources for local files, generic APIs, and advanced dlt integrations.
 | Source | Display Name | Auth | Incremental | Wizard | Notes |
 |--------|-------------|------|-------------|--------|-------|
 | `local_files` | File Import (CSV, JSON, Parquet) | None | Yes | Yes | [Local Files Guide](local-files/index.md) |
-| `rest_api` | REST API (Generic) | API Key | Yes | Yes | Connect to any REST API — [REST API Guide](rest-api.md) |
+| `rest_api` | REST API (Generic) | API Key | Varies | Yes | Connect to any REST API — [REST API Guide](rest-api.md) |
 | `dlt_native` | dlt Native (Advanced) | None | Varies | Yes | Bring any dlt source — [Custom Sources Guide](custom-sources.md) |
 | `csv` | CSV Files | None | Yes | No | **Hidden** — use `local_files` instead |
 | `filesystem` | Files & Cloud Storage | None | No | No | **Hidden** — use `local_files` for local files |
@@ -55,7 +55,7 @@ Sources for advertising platforms, analytics tools, and marketing data.
 | `google_sheets` | Google Sheets | OAuth | No | Yes | [Google Sheets Guide](google-sheets.md) |
 | `facebook_ads` | Facebook Ads | OAuth | Yes | Yes | [Facebook Ads Guide](facebook-ads.md) |
 | `google_analytics` | Google Analytics 4 | OAuth | Yes | Yes | [Google Analytics Guide](google-analytics.md) |
-| `google_ads` | Google Ads | OAuth | No | Yes | [Google Ads Guide](google-ads.md) |
+| `google_ads` | Google Ads | OAuth | Yes | Yes | [Google Ads Guide](google-ads.md) |
 | `airtable` | Airtable | API Key | No | Yes | Bases and tables |
 | `mux` | Mux | API Key | Partial | Yes | Video analytics |
 | `matomo` | Matomo | API Key | Yes | No | **Coming Soon** |
@@ -85,7 +85,7 @@ Sources for payment processors and online stores.
 
 | Source | Display Name | Auth | Incremental | Wizard | Notes |
 |--------|-------------|------|-------------|--------|-------|
-| `stripe` | Stripe | API Key | Partial | Yes | [Stripe Guide](stripe.md) — charges, customers, subscriptions |
+| `stripe` | Stripe | API Key | No | Yes | [Stripe Guide](stripe.md) — charges, customers, subscriptions |
 | `shopify` | Shopify | OAuth | — | No | **Coming Soon** — pending OAuth flow update |
 
 ---
@@ -127,8 +127,8 @@ Sources for relational and document databases.
 
 | Source | Display Name | Auth | Incremental | Wizard | Notes |
 |--------|-------------|------|-------------|--------|-------|
-| `postgres` | PostgreSQL | Basic | Yes | Yes | Full table or incremental loading |
-| `mongodb` | MongoDB | Basic | Yes | Yes | Collections with optional filtering |
+| `postgres` | PostgreSQL | Basic | No | Yes | Full table loading (incremental available via dlt_native config) |
+| `mongodb` | MongoDB | Basic | No | Yes | Full collection loading (incremental available via dlt_native config) |
 
 !!! note "Other databases"
     Connect to MySQL, SQL Server, and other databases via the `dlt_native` source type using dlt's [sql_database](https://dlthub.com/docs/dlt-ecosystem/verified-sources/sql_database) source. See [Database Sources](database-sources.md).

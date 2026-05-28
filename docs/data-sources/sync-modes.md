@@ -34,7 +34,7 @@ dango sync stripe_prod
 
 ### Lookback Window
 
-Some sources support a **lookback window** that re-fetches recent data to catch late-arriving records. For example, Google Ads attribution data can update for up to 30 days after the initial event.
+Some sources support a **lookback window** that re-fetches recent data to catch late-arriving records. For example, Google Ads attribution data can update for up to 90 days after the initial click (depending on your attribution model and conversion action settings).
 
 When a source has `lookback_days` configured in the registry, incremental syncs automatically extend the fetch window back by that many days. This is handled transparently — no configuration needed.
 

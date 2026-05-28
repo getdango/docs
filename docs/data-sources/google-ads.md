@@ -112,74 +112,10 @@ sources:
     description: Google Ads campaign performance
     google_ads:
       start_date: "2024-01-01"
-      queries:
-        - name: campaign_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, campaign.name, campaign.status,
-              campaign.advertising_channel_type,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.conversions_value, metrics.ctr,
-              metrics.average_cpc, metrics.average_cpm
-            FROM campaign
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-
-        - name: ad_group_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, campaign.name,
-              ad_group.id, ad_group.name, ad_group.status,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.conversions_value, metrics.ctr,
-              metrics.average_cpc
-            FROM ad_group
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-
-        - name: keyword_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, campaign.name,
-              ad_group.id, ad_group.name,
-              ad_group_criterion.keyword.text,
-              ad_group_criterion.keyword.match_type,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.ctr, metrics.average_cpc
-            FROM keyword_view
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-
-        - name: ad_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, ad_group.id,
-              ad_group_ad.ad.id, ad_group_ad.ad.name,
-              ad_group_ad.ad.type, ad_group_ad.status,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.ctr
-            FROM ad_group_ad
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-
-        - name: search_term_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, campaign.name,
-              ad_group.id, ad_group.name,
-              search_term_view.search_term,
-              search_term_view.status,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.ctr, metrics.average_cpc
-            FROM search_term_view
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
 ```
+
+!!! note "Default queries are written to `.dlt/config.toml`"
+    When you add a Google Ads source, Dango writes 6 default GAQL queries (campaign_stats, ad_group_stats, keyword_stats, ad_stats, search_term_stats, geographic_stats) with all compatible fields to `.dlt/config.toml`. You do not need to specify queries in `sources.yml` unless you want to override the defaults. See the [Tables Loaded](#tables-loaded) section for what's included.
 
 ### .dlt/secrets.toml
 

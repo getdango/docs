@@ -107,56 +107,10 @@ sources:
     google_analytics:
       property_id: "123456789"
       start_date: "90daysAgo"
-      queries:
-        - name: traffic
-          dimensions:
-            - date
-            - sessionSource
-            - sessionMedium
-            - sessionCampaignName
-            - deviceCategory
-          metrics:
-            - sessions
-            - engagedSessions
-            - totalUsers
-            - newUsers
-            - averageSessionDuration
-            - bounceRate
-
-        - name: pages
-          dimensions:
-            - date
-            - pagePath
-            - pageTitle
-          metrics:
-            - screenPageViews
-            - totalUsers
-            - userEngagementDuration
-            - sessions
-
-        - name: landing_pages
-          dimensions:
-            - date
-            - landingPage
-            - sessionSource
-            - sessionMedium
-            - deviceCategory
-          metrics:
-            - sessions
-            - totalUsers
-            - engagedSessions
-            - bounceRate
-
-        - name: geo
-          dimensions:
-            - date
-            - country
-            - city
-          metrics:
-            - sessions
-            - totalUsers
-            - engagedSessions
 ```
+
+!!! note "Default queries are written to `.dlt/config.toml`"
+    When you add a Google Analytics source, Dango writes 6 default queries (traffic, pages, landing_pages, geo, events, conversions) with their full dimensions and metrics to `.dlt/config.toml`. You do not need to specify queries in `sources.yml` unless you want to override the defaults. See the [Tables Loaded](#tables-loaded) section for what's included.
 
 ### .dlt/secrets.toml
 

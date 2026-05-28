@@ -9,13 +9,13 @@ Connect GitHub repositories as a data source using a Personal Access Token.
 | Feature | Details |
 |---------|---------|
 | **Auth** | API Key (Personal Access Token) |
-| **Incremental** | Yes (cursor-based) |
+| **Incremental** | No (full refresh) |
 | **Category** | Development |
 
 !!! note "Not OAuth"
     GitHub uses a **Personal Access Token (PAT)** for authentication, not an OAuth browser flow. No browser redirect is needed — you paste your token directly during setup.
 
-GitHub loads repository data into DuckDB including issues, pull requests, comments, and reactions.
+GitHub loads repository data into DuckDB including issues and pull requests (with embedded reactions and comments).
 
 !!! tip "Managing this source in the Web UI"
     After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
@@ -109,10 +109,8 @@ GitHub data loads into the `raw_{source_name}` schema using dlt's `github_reacti
 
 | Table | Description |
 |-------|-------------|
-| `issues` | All issues (open and closed) |
-| `pull_requests` | All pull requests |
-| `comments` | Issue and PR comments |
-| `reactions` | Reactions on issues, PRs, and comments |
+| `issues` | All issues (open and closed) with reactions and comments |
+| `pull_requests` | All pull requests with reactions and comments |
 
 ```sql
 -- Example: query open issues
@@ -126,9 +124,9 @@ LIMIT 10;
 
 ## Sync Behavior
 
-- **Incremental** — dlt tracks a cursor and only fetches new/updated records after the first sync
-- First sync loads all historical data for the repository
-- Subsequent syncs are fast, fetching only changes since the last sync
+- **Full refresh** — all issues and pull requests are reloaded on every sync (write disposition: `replace`)
+- Each sync loads all historical data for the repository
+- The `github_reactions` source function fetches issues and PRs with their embedded reactions and comments
 
 ---
 
