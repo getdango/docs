@@ -157,6 +157,13 @@ SELECT * FROM raw_my_google_sheets.sales_data LIMIT 10;
 - **Full reload** every sync — all data is replaced, not appended
 - No incremental loading (the Sheets API does not support change tracking)
 - All rows from the selected sheets are fetched on every sync
+- Schema drift is automatically detected after each sync — column additions, removals, and type changes are tracked. See `dango governance drift-report` for details.
+
+!!! warning "Row and cell limits"
+    - Google Sheets API has a **1 million cell** limit per request (rows x columns)
+    - Sheets with **100,000+ rows** may be slow or time out during sync
+    - For large datasets, consider exporting to CSV and using the [CSV source](csv-files.md) instead
+    - Empty sheets and sheets with only a header row are automatically skipped
 
 !!! tip "Deduplication"
     Since Google Sheets uses full reload, consider using `latest_only` dedup mode if you add the source to a schedule. See [Deduplication](deduplication.md) for details.
