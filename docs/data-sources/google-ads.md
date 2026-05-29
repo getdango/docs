@@ -9,10 +9,10 @@ Connect Google Ads as a data source using OAuth 2.0.
 | Feature | Details |
 |---------|---------|
 | **Auth** | OAuth 2.0 |
-| **Incremental** | No (GAQL re-queries date ranges) |
+| **Incremental** | Yes (merge + 90-day lookback) |
 | **Category** | Marketing & Analytics |
 
-Google Ads loads campaign performance data into DuckDB using GAQL (Google Ads Query Language). By default, Dango creates 5 tables covering campaigns, ad groups, keywords, ads, and search terms.
+Google Ads loads campaign performance data into DuckDB using GAQL (Google Ads Query Language). By default, Dango creates 6 tables covering campaigns, ad groups, keywords, ads, search terms, and geographic performance.
 
 !!! tip "Managing this source in the Web UI"
     After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
@@ -112,74 +112,10 @@ sources:
     description: Google Ads campaign performance
     google_ads:
       start_date: "2024-01-01"
-      queries:
-        - name: campaign_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, campaign.name, campaign.status,
-              campaign.advertising_channel_type,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.conversions_value, metrics.ctr,
-              metrics.average_cpc, metrics.average_cpm
-            FROM campaign
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-
-        - name: ad_group_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, campaign.name,
-              ad_group.id, ad_group.name, ad_group.status,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.conversions_value, metrics.ctr,
-              metrics.average_cpc
-            FROM ad_group
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-
-        - name: keyword_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, campaign.name,
-              ad_group.id, ad_group.name,
-              ad_group_criterion.keyword.text,
-              ad_group_criterion.keyword.match_type,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.ctr, metrics.average_cpc
-            FROM keyword_view
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-
-        - name: ad_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, ad_group.id,
-              ad_group_ad.ad.id, ad_group_ad.ad.name,
-              ad_group_ad.ad.type, ad_group_ad.status,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.ctr
-            FROM ad_group_ad
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-
-        - name: search_term_stats
-          query: >
-            SELECT
-              segments.date,
-              campaign.id, campaign.name,
-              ad_group.id, ad_group.name,
-              search_term_view.search_term,
-              search_term_view.status,
-              metrics.impressions, metrics.clicks,
-              metrics.cost_micros, metrics.conversions,
-              metrics.ctr, metrics.average_cpc
-            FROM search_term_view
-            WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
 ```
+
+!!! note "Default queries are written to `.dlt/config.toml`"
+    When you add a Google Ads source, Dango writes 6 default GAQL queries (campaign_stats, ad_group_stats, keyword_stats, ad_stats, search_term_stats, geographic_stats) with all compatible fields to `.dlt/config.toml`. You do not need to specify queries in `sources.yml` unless you want to override the defaults. See the [Tables Loaded](#tables-loaded) section for what's included.
 
 ### .dlt/secrets.toml
 
@@ -198,15 +134,16 @@ customer_id = "1234567890"
 
 ## Tables Loaded
 
-Dango creates 5 tables by default in the `raw_{source_name}` schema:
+Dango creates 6 tables by default in the `raw_{source_name}` schema:
 
 | Table | Key Columns |
 |-------|------------|
-| `campaign_stats` | date, campaign name/status/type, impressions, clicks, cost_micros, conversions, CTR, CPC, CPM |
-| `ad_group_stats` | date, campaign, ad group name/status, impressions, clicks, cost_micros, conversions, CTR, CPC |
-| `keyword_stats` | date, campaign, ad group, keyword text/match type, impressions, clicks, cost_micros, conversions |
-| `ad_stats` | date, campaign, ad group, ad name/type/status, impressions, clicks, cost_micros, conversions |
+| `campaign_stats` | date, campaign name/status/type/bidding strategy, impressions, clicks, cost_micros, conversions, conversions_value, CTR, CPC, CPM, search impression share, search rank lost impression share |
+| `ad_group_stats` | date, campaign, ad group name/status/type, impressions, clicks, cost_micros, conversions, CTR, CPC |
+| `keyword_stats` | date, campaign, ad group, keyword text/match type, Quality Score, impressions, clicks, cost_micros, conversions, search impression share |
+| `ad_stats` | date, campaign name, ad group name, ad name/type/status, impressions, clicks, cost_micros, conversions, conversions_value, CTR |
 | `search_term_stats` | date, campaign, ad group, search term, impressions, clicks, cost_micros, conversions |
+| `geographic_stats` | date, campaign, country/location type, impressions, clicks, cost_micros, conversions |
 
 ```sql
 -- Example: query campaign performance
@@ -221,35 +158,40 @@ LIMIT 10;
 
 ### Custom GAQL Queries
 
-??? info "Adding custom GAQL queries"
-    You can add additional GAQL queries to the `queries` array in `sources.yml`. Each query becomes a separate table.
+You can add additional GAQL queries to the `queries` array in `.dlt/config.toml`. Each query becomes a separate table.
 
-    ```yaml
-    queries:
-      # ... default queries above ...
+```toml
+[[sources.google_ads.queries]]
+resource_name = "audience_stats"
+query = """
+  SELECT
+    segments.date,
+    campaign.id, campaign.name,
+    metrics.impressions, metrics.clicks
+  FROM campaign_audience_view
+  WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
+"""
+```
 
-      - name: audience_stats
-        query: >
-          SELECT
-            segments.date,
-            campaign.id, campaign.name,
-            metrics.impressions, metrics.clicks
-          FROM campaign_audience_view
-          WHERE segments.date BETWEEN '{start_date}' AND '{end_date}'
-    ```
+The `{start_date}` and `{end_date}` placeholders are replaced automatically by Dango.
 
-    Use the [Google Ads Query Builder](https://developers.google.com/google-ads/api/fields/v17/overview_query_builder) to construct and validate GAQL queries.
+!!! warning "GAQL field compatibility"
+    Not all metrics and segments can be combined in a single GAQL query. Common issues:
 
-    The `{start_date}` and `{end_date}` placeholders are replaced automatically by Dango based on your sync configuration.
+    - **`search_impression_share`** is only available on `campaign` and `keyword_view`, not on `ad_group_ad`
+    - **`segments.device`** cannot be combined with `geographic_view`
+    - **Quality Score** fields are only available on `keyword_view`
+
+    Use the [Google Ads Query Builder](https://developers.google.com/google-ads/api/fields/v17/overview_query_builder) to validate field combinations before adding queries. If a query has incompatible fields, Dango will show the error with the query name and GAQL text.
 
 ---
 
 ## Sync Behavior
 
-- GAQL queries **re-query the full date range** on each sync — not truly incremental
-- `lookback_days: 3` — re-fetches the last 3 days to capture attribution changes
-- Google Ads attribution can change for up to **30 days** after a click (depending on your attribution model). Consider increasing `lookback_days` if you need more accurate attribution data.
-- First sync loads data from `start_date` to today
+- **Incremental** with `lookback_days: 90` — each sync re-fetches the last 90 days and merges (upserts by primary key) to capture conversion attribution changes. Older data is preserved.
+- `start_date` controls the **first sync only** — it determines how far back to load initially. Subsequent syncs re-load the 90-day lookback window regardless of `start_date`.
+- To reload all history, use `dango sync --full-refresh`
+- Google Ads conversion attribution can change for up to **90 days** after a click (depending on your attribution model and conversion action settings)
 
 ---
 

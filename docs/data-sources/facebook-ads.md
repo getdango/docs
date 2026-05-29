@@ -15,7 +15,7 @@ Connect Facebook Ads as a data source using OAuth 2.0.
 | **Incremental** | Yes (date-based with lookback) |
 | **Category** | Marketing & Analytics |
 
-Facebook Ads loads campaign data and performance insights into DuckDB. By default, Dango loads campaigns, ads, ad sets, and daily performance insights.
+Facebook Ads loads campaign data and performance insights into DuckDB. By default, Dango loads all 6 resources: campaigns, ads, ad sets, ad creatives, leads, and daily performance insights.
 
 !!! tip "Managing this source in the Web UI"
     After setup, manage this source from the **Sources** page in the Web UI (`http://localhost:8800/sources`). Trigger syncs, view history, and monitor status without using the CLI. See [Web UI — Sources](../web-ui/sources.md).
@@ -143,9 +143,9 @@ FB_ACCESS_TOKEN=EAABs...long-lived-token...
 | `campaigns` | Yes | Campaign metadata (name, status, objective) |
 | `ads` | Yes | Individual ad metadata |
 | `ad_sets` | Yes | Ad set targeting and budget |
+| `ad_creatives` | Yes | Creative assets and copy |
+| `leads` | Yes | Lead form submissions |
 | `facebook_insights` | Yes | Daily performance metrics |
-| `ad_creatives` | No | Creative assets and copy |
-| `leads` | No | Lead form submissions |
 
 ### Default Tables Loaded
 
@@ -176,7 +176,7 @@ The `facebook_insights` table includes key metrics:
 
 ## Sync Behavior
 
-- **Incremental** with `lookback_days: 3` — re-fetches the last 3 days to capture attribution updates
+- **Incremental** with `attribution_window_days_lag: 28` — re-fetches the last 28 days to capture attribution updates (Facebook's dlt source default is 7 days; Dango sets 28 to cover the full attribution window)
 - First sync loads the past **30 days** of insights (configurable via `initial_load_past_days`)
 - Facebook retains insights data for **37 months**
 - Entity data (campaigns, ads, ad_sets) is fully reloaded each sync

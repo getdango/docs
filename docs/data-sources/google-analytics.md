@@ -12,7 +12,7 @@ Connect Google Analytics 4 as a data source using OAuth 2.0.
 | **Incremental** | Yes (date-based with lookback) |
 | **Category** | Marketing & Analytics |
 
-Google Analytics loads GA4 reporting data into DuckDB. By default, Dango creates 4 tables covering traffic, pages, landing pages, and geography. You can add custom queries for additional reports.
+Google Analytics loads GA4 reporting data into DuckDB. By default, Dango creates 6 tables covering traffic, pages, landing pages, geography, events, and conversions. You can add custom queries for additional reports.
 
 !!! note "GA4 only"
     Dango supports **Google Analytics 4 (GA4)** properties only. Universal Analytics (UA) properties are not supported — Google sunset UA in July 2024.
@@ -107,56 +107,10 @@ sources:
     google_analytics:
       property_id: "123456789"
       start_date: "90daysAgo"
-      queries:
-        - name: traffic
-          dimensions:
-            - date
-            - sessionSource
-            - sessionMedium
-            - sessionCampaignName
-            - deviceCategory
-          metrics:
-            - sessions
-            - engagedSessions
-            - totalUsers
-            - newUsers
-            - averageSessionDuration
-            - bounceRate
-
-        - name: pages
-          dimensions:
-            - date
-            - pagePath
-            - pageTitle
-          metrics:
-            - screenPageViews
-            - totalUsers
-            - userEngagementDuration
-            - sessions
-
-        - name: landing_pages
-          dimensions:
-            - date
-            - landingPage
-            - sessionSource
-            - sessionMedium
-            - deviceCategory
-          metrics:
-            - sessions
-            - totalUsers
-            - engagedSessions
-            - bounceRate
-
-        - name: geo
-          dimensions:
-            - date
-            - country
-            - city
-          metrics:
-            - sessions
-            - totalUsers
-            - engagedSessions
 ```
+
+!!! note "Default queries are written to `.dlt/config.toml`"
+    When you add a Google Analytics source, Dango writes 6 default queries (traffic, pages, landing_pages, geo, events, conversions) with their full dimensions and metrics to `.dlt/config.toml`. You do not need to specify queries in `sources.yml` unless you want to override the defaults. See the [Tables Loaded](#tables-loaded) section for what's included.
 
 ### .dlt/secrets.toml
 
@@ -172,14 +126,16 @@ project_id = "dango-oauth"
 
 ## Tables Loaded
 
-Dango creates 4 tables by default in the `raw_{source_name}` schema:
+Dango creates 6 tables by default in the `raw_{source_name}` schema:
 
 | Table | Dimensions | Metrics |
 |-------|-----------|---------|
-| `traffic` | date, sessionSource, sessionMedium, sessionCampaignName, deviceCategory | sessions, engagedSessions, totalUsers, newUsers, averageSessionDuration, bounceRate |
-| `pages` | date, pagePath, pageTitle | screenPageViews, totalUsers, userEngagementDuration, sessions |
-| `landing_pages` | date, landingPage, sessionSource, sessionMedium, deviceCategory | sessions, totalUsers, engagedSessions, bounceRate |
-| `geo` | date, country, city | sessions, totalUsers, engagedSessions |
+| `traffic` | date, sessionSource, sessionMedium, sessionCampaignName, sessionDefaultChannelGroup, deviceCategory, operatingSystem, browser | sessions, engagedSessions, totalUsers, newUsers, averageSessionDuration, bounceRate |
+| `pages` | date, pagePath, pageTitle, sessionSource, sessionMedium, deviceCategory | screenPageViews, totalUsers, userEngagementDuration, sessions, bounceRate |
+| `landing_pages` | date, landingPage, sessionSource, sessionMedium, sessionCampaignName, sessionDefaultChannelGroup, deviceCategory | sessions, totalUsers, engagedSessions, bounceRate, averageSessionDuration |
+| `geo` | date, country, city, language, deviceCategory | sessions, totalUsers, engagedSessions, bounceRate |
+| `events` | date, eventName, sessionSource, sessionMedium, deviceCategory | eventCount, totalUsers, eventCountPerUser, sessions |
+| `conversions` | date, sessionSource, sessionMedium, sessionCampaignName, sessionDefaultChannelGroup, deviceCategory | conversions, totalRevenue, totalUsers, sessions, engagedSessions |
 
 ```sql
 -- Example: query traffic data
@@ -191,41 +147,65 @@ LIMIT 10;
 
 ### Custom Queries
 
-??? info "Adding custom dimension/metric queries"
-    You can add additional queries to the `queries` array in `sources.yml`. Each query becomes a separate table.
+!!! warning "Changing dimensions requires a full refresh"
+    GA4 uses incremental loading — dimensions are part of the primary key for deduplication. If you add, remove, or reorder dimensions after the first sync, you **must** run a full refresh:
 
-    ```yaml
-    queries:
-      # ... default queries above ...
-
-      - name: events
-        dimensions:
-          - date
-          - eventName
-        metrics:
-          - eventCount
-          - totalUsers
-
-      - name: demographics
-        dimensions:
-          - date
-          - userAgeBracket
-          - userGender
-        metrics:
-          - totalUsers
-          - sessions
+    ```bash
+    dango sync website_analytics --full-refresh
     ```
 
-    See the [GA4 Dimensions & Metrics Explorer](https://ga-dev-tools.google/ga4/dimensions-metrics-explorer/) for available fields.
+    Without a full refresh, old rows with the old dimension combinations will remain alongside new rows with the new dimensions, causing duplicates or missing data.
+
+    **Plan your dimensions carefully before the first sync.** The defaults cover 90-95% of analytics use cases.
+
+#### Step-by-Step: Editing Queries
+
+1. **Find your config file**: Open `.dlt/config.toml` in your project root. The default queries are written here when you add the source.
+
+2. **Understand the structure**: Each query has a `resource_name` (becomes the table name), `dimensions` (up to 9), and `metrics` (up to 10).
+
+    ```toml
+    [[sources.google_analytics.queries]]
+    resource_name = "my_custom_table"
+    dimensions = ["date", "eventName", "sessionSource"]
+    metrics = ["eventCount", "totalUsers"]
+    ```
+
+3. **Check compatibility**: Not all dimensions and metrics can be combined. Use the [GA4 Dimensions & Metrics Explorer](https://ga-dev-tools.google/ga4/dimensions-metrics-explorer/) to verify.
+
+4. **GA4 API limits**:
+    - Maximum **9 dimensions** per query (Dango validates this before sending)
+    - Maximum **10 metrics** per query
+    - Some dimensions are incompatible with certain metrics
+
+5. **Add a new query**: Append a new `[[sources.google_analytics.queries]]` block to your config:
+
+    ```toml
+    [[sources.google_analytics.queries]]
+    resource_name = "demographics"
+    dimensions = ["date", "userAgeBracket", "userGender", "deviceCategory"]
+    metrics = ["totalUsers", "sessions", "engagedSessions"]
+    ```
+
+6. **Sync**: New queries create new tables automatically. No full refresh needed for **new** tables (only for dimension changes to **existing** tables).
+
+    ```bash
+    dango sync website_analytics
+    ```
+
+See the [GA4 Dimensions & Metrics Explorer](https://ga-dev-tools.google/ga4/dimensions-metrics-explorer/) for all available fields.
 
 ---
 
 ## Sync Behavior
 
-- **Incremental** with `lookback_days: 2` — each sync re-fetches the last 2 days to capture late-arriving data, then loads new days since the last sync
-- First sync loads data from `start_date` to today
+- **Incremental** with `lookback_days: 7` — each sync deletes and re-fetches the last 7 days to capture GA4 data corrections, then loads new days since the last sync
+- First sync loads data from `start_date` to yesterday
+- `start_date` only affects the **first sync** — subsequent syncs use dlt's incremental state. To reload history, use `dango sync --full-refresh`
 - Data is **aggregated** (not event-level) — each row is a dimension combination with summed metrics
-- GA4 may take 24-48 hours to finalize data for a given day
+
+!!! info "24-48 hour data finalization delay"
+    GA4 data takes 24-48 hours (sometimes up to 72 hours) to fully process. Yesterday's data may be incomplete. The 7-day lookback window automatically re-fetches recent data on each sync to capture corrections as they finalize.
 
 ---
 

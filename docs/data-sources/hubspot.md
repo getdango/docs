@@ -9,7 +9,7 @@ Sync CRM data from HubSpot into your data warehouse.
 | **Auth** | API Key (Private App Token) |
 | **Env Variable** | `HUBSPOT_API_KEY` |
 | **Incremental** | Yes |
-| **Default Resources** | contacts, companies, deals, tickets |
+| **Default Resources** | contacts, companies, deals, tickets, products, quotes, owners, properties, pipelines_deals, pipelines_tickets |
 | **dlt Package** | `hubspot` |
 
 !!! tip "Managing this source in the Web UI"
@@ -58,12 +58,12 @@ dango source add
   [x] companies
   [x] deals
   [x] tickets
-  [ ] products
-  [ ] quotes
-  [ ] owners
-  [ ] properties
-  [ ] pipelines_deal
-  [ ] pipelines_ticket
+  [x] products
+  [x] quotes
+  [x] owners
+  [x] properties
+  [x] pipelines_deals
+  [x] pipelines_tickets
 ```
 
 ### Via Configuration File
@@ -84,6 +84,12 @@ sources:
         - companies
         - deals
         - tickets
+        - products
+        - quotes
+        - owners
+        - properties
+        - pipelines_deals
+        - pipelines_tickets
 ```
 
 === "Local"
@@ -119,14 +125,14 @@ dango sync hubspot
 | `companies` | Company records | Yes |
 | `deals` | Deal/opportunity records | Yes |
 | `tickets` | Support tickets | Yes |
-| `products` | Product catalog | No |
-| `quotes` | Sales quotes | No |
-| `owners` | HubSpot users/owners | No |
-| `properties` | Custom property definitions | No |
-| `pipelines_deal` | Deal pipeline stages | No |
-| `pipelines_ticket` | Ticket pipeline stages | No |
+| `products` | Product catalog | Yes |
+| `quotes` | Sales quotes | Yes |
+| `owners` | HubSpot users/owners | Yes |
+| `properties` | Custom property definitions | Yes |
+| `pipelines_deals` | Deal pipeline stages | Yes |
+| `pipelines_tickets` | Ticket pipeline stages | Yes |
 
-To sync all available resources:
+All 10 resources are synced by default. To sync a subset, specify only the resources you want:
 
 ```yaml
 hubspot:
@@ -136,12 +142,6 @@ hubspot:
     - companies
     - deals
     - tickets
-    - products
-    - quotes
-    - owners
-    - properties
-    - pipelines_deal
-    - pipelines_ticket
 ```
 
 ---

@@ -9,7 +9,7 @@ Sync CRM objects from Salesforce into your data warehouse.
 | **Auth** | Username + Password + Security Token |
 | **Credentials** | `.dlt/secrets.toml` (not `.env`) |
 | **Incremental** | Yes |
-| **Default Resources** | account, contact, lead, opportunity, campaign |
+| **Default Resources** | account, contact, lead, opportunity, campaign, task, event, sf_user, user_role, product_2, opportunity_line_item, opportunity_contact_role, campaign_member, pricebook_2, pricebook_entry |
 | **dlt Package** | `salesforce` |
 
 !!! tip "Managing this source in the Web UI"
@@ -55,11 +55,16 @@ dango source add
   [x] lead
   [x] opportunity
   [x] campaign
-  [ ] task
-  [ ] event
-  [ ] sf_user
-  [ ] user_role
-  [ ] product_2
+  [x] task
+  [x] event
+  [x] sf_user
+  [x] user_role
+  [x] product_2
+  [x] opportunity_line_item
+  [x] opportunity_contact_role
+  [x] campaign_member
+  [x] pricebook_2
+  [x] pricebook_entry
 ```
 
 The wizard stores credentials in `.dlt/secrets.toml` (gitignored).
@@ -82,6 +87,16 @@ sources:
         - lead
         - opportunity
         - campaign
+        - task
+        - event
+        - sf_user
+        - user_role
+        - product_2
+        - opportunity_line_item
+        - opportunity_contact_role
+        - campaign_member
+        - pricebook_2
+        - pricebook_entry
 ```
 
 Add credentials to `.dlt/secrets.toml` (gitignored):
@@ -128,13 +143,20 @@ dango sync salesforce
 | `lead` | Sales lead records | Yes |
 | `opportunity` | Deal/opportunity records | Yes |
 | `campaign` | Marketing campaign records | Yes |
-| `task` | Task/activity records | No |
-| `event` | Calendar event records | No |
-| `sf_user` | Salesforce user records | No |
-| `user_role` | User role definitions | No |
-| `product_2` | Product catalog records | No |
+| `task` | Task/activity records | Yes |
+| `event` | Calendar event records | Yes |
+| `sf_user` | Salesforce user records | Yes |
+| `user_role` | User role definitions | Yes |
+| `product_2` | Product catalog records | Yes |
+| `opportunity_line_item` | Opportunity line items (products on deals) | Yes |
+| `opportunity_contact_role` | Contact roles on opportunities | Yes |
+| `campaign_member` | Campaign membership records | Yes |
+| `pricebook_2` | Price book definitions | Yes |
+| `pricebook_entry` | Price book entries (product prices) | Yes |
 
-### Full Configuration Example
+### Subset Configuration Example
+
+All 15 resources are synced by default. To sync a subset, specify only the resources you want:
 
 ```yaml
 version: '1.0'
@@ -142,7 +164,7 @@ sources:
   - name: salesforce
     type: salesforce
     enabled: true
-    description: Full Salesforce CRM sync
+    description: Core Salesforce CRM objects only
     salesforce:
       resources:
         - account
@@ -150,9 +172,6 @@ sources:
         - lead
         - opportunity
         - campaign
-        - task
-        - event
-        - sf_user
 ```
 
 ---
@@ -173,6 +192,11 @@ Data loads into the `raw_{source_name}` schema:
 | sf_user | `raw_salesforce.sf_user` |
 | user_role | `raw_salesforce.user_role` |
 | product_2 | `raw_salesforce.product_2` |
+| opportunity_line_item | `raw_salesforce.opportunity_line_item` |
+| opportunity_contact_role | `raw_salesforce.opportunity_contact_role` |
+| campaign_member | `raw_salesforce.campaign_member` |
+| pricebook_2 | `raw_salesforce.pricebook_2` |
+| pricebook_entry | `raw_salesforce.pricebook_entry` |
 
 Query example:
 
