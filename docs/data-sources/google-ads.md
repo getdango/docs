@@ -9,7 +9,7 @@ Connect Google Ads as a data source using OAuth 2.0.
 | Feature | Details |
 |---------|---------|
 | **Auth** | OAuth 2.0 |
-| **Incremental** | Yes (append + 90-day lookback) |
+| **Incremental** | Yes (merge + 90-day lookback) |
 | **Category** | Marketing & Analytics |
 
 Google Ads loads campaign performance data into DuckDB using GAQL (Google Ads Query Language). By default, Dango creates 6 tables covering campaigns, ad groups, keywords, ads, search terms, and geographic performance.
@@ -138,10 +138,10 @@ Dango creates 6 tables by default in the `raw_{source_name}` schema:
 
 | Table | Key Columns |
 |-------|------------|
-| `campaign_stats` | date, campaign name/status/type/bidding strategy, impressions, clicks, cost_micros, conversions, CTR, CPC, CPM, search impression share |
+| `campaign_stats` | date, campaign name/status/type/bidding strategy, impressions, clicks, cost_micros, conversions, conversions_value, CTR, CPC, CPM, search impression share, search rank lost impression share |
 | `ad_group_stats` | date, campaign, ad group name/status/type, impressions, clicks, cost_micros, conversions, CTR, CPC |
 | `keyword_stats` | date, campaign, ad group, keyword text/match type, Quality Score, impressions, clicks, cost_micros, conversions, search impression share |
-| `ad_stats` | date, campaign, ad group, ad name/type/status, impressions, clicks, cost_micros, conversions |
+| `ad_stats` | date, campaign name, ad group name, ad name/type/status, impressions, clicks, cost_micros, conversions, conversions_value, CTR |
 | `search_term_stats` | date, campaign, ad group, search term, impressions, clicks, cost_micros, conversions |
 | `geographic_stats` | date, campaign, country/location type, impressions, clicks, cost_micros, conversions |
 
@@ -188,7 +188,7 @@ The `{start_date}` and `{end_date}` placeholders are replaced automatically by D
 
 ## Sync Behavior
 
-- **Incremental** with `lookback_days: 90` — each sync deletes and re-fetches the last 90 days to capture conversion attribution changes, then appends fresh data. Older data is preserved.
+- **Incremental** with `lookback_days: 90` — each sync re-fetches the last 90 days and merges (upserts by primary key) to capture conversion attribution changes. Older data is preserved.
 - `start_date` controls the **first sync only** — it determines how far back to load initially. Subsequent syncs re-load the 90-day lookback window regardless of `start_date`.
 - To reload all history, use `dango sync --full-refresh`
 - Google Ads conversion attribution can change for up to **90 days** after a click (depending on your attribution model and conversion action settings)

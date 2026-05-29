@@ -176,7 +176,7 @@ The `facebook_insights` table includes key metrics:
 
 ## Sync Behavior
 
-- **Incremental** with `lookback_days: 28` — re-fetches the last 28 days to capture attribution updates
+- **Incremental** with `attribution_window_days_lag: 28` — re-fetches the last 28 days to capture attribution updates (Facebook's dlt source default is 7 days; Dango sets 28 to cover the full attribution window)
 - First sync loads the past **30 days** of insights (configurable via `initial_load_past_days`)
 - Facebook retains insights data for **37 months**
 - Entity data (campaigns, ads, ad_sets) is fully reloaded each sync
