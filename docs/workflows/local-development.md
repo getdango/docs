@@ -337,9 +337,6 @@ api_key = "${STRIPE_API_KEY}"
 ```bash
 # Check all configurations
 dango validate
-
-# Check specific source
-dango validate --source my_source
 ```
 
 ### Test Sync

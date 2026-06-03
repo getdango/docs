@@ -57,8 +57,10 @@ Every backup includes:
 | **Auth** | `.dango/auth.db` |
 | **Configuration** | `.dango/project.yml`, `.dango/sources.yml`, `.dango/cloud.yml`, `.dango/metabase.yml` |
 | **Audit log** | `.dango/logs/audit.jsonl` |
-| **Credentials** | `.dlt/secrets.toml` |
-| **dbt** | `dbt/profiles.yml` |
+| **Credentials** | `.dlt/secrets.toml`, `.env` |
+| **dbt** | `dbt/profiles.yml`, `dbt/dbt_project.yml`, `dbt/packages.yml`, `dbt/models/` (all models), `dbt/macros/`, `dbt/seeds/` |
+| **Custom sources** | `custom_sources/` (entire directory) |
+| **Seed data** | `data/seeds/` |
 | **dlt pipelines** | `.dlt/pipelines/` (entire directory) |
 | **Metabase** | H2 database files (`metabase.db.mv.db`, `metabase.db.trace.db`) from Docker volume |
 

@@ -23,7 +23,7 @@ Transform your raw data into analytics-ready models using dbt, manage custom mod
 
 ### dango run
 
-Run dbt models. All dbt run arguments are passed through to dbt.
+Run dbt models and tests. Wraps `dbt build` — all dbt arguments are passed through.
 
 ```bash
 dango run [DBT_ARGS]...

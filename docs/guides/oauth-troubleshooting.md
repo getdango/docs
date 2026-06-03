@@ -75,6 +75,12 @@ This is a one-time step per authorization.
 http://localhost:8080/callback
 ```
 
+If using the Web UI OAuth flow instead of the CLI, add this URI instead:
+
+```
+http://localhost:8800/api/oauth/callback
+```
+
 ### "Port 8080 already in use"
 
 **Cause:** A previous OAuth attempt didn't release the callback port.

@@ -87,6 +87,10 @@ data/
 .dango/dev/
 .dango/snapshots/
 .dango/auth.db
+.dango/scheduler.db
+
+# === DLT STATE ===
+.dlt/pipelines/
 
 # === METABASE ===
 metabase-data/

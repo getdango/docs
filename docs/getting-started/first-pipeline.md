@@ -57,12 +57,14 @@ my-analytics/
 dango source add
 ```
 
-The interactive wizard walks you through:
+The interactive wizard walks you through setup. For Google Sheets, the key prompts are:
 
 1. **Select source type** → choose **Google Sheets**
-2. **OAuth setup** → the wizard opens your browser for Google login
-3. **Spreadsheet URL** → paste the URL of your Google Sheet
-4. **Source name** → give it a name (e.g., `sales_data`)
+2. **Source name** → give it a name (e.g., `sales_data`)
+3. **OAuth setup** → the wizard opens your browser for Google login
+4. **Spreadsheet URL** → paste the URL of your Google Sheet
+
+See [Adding Sources](../data-sources/adding-sources.md) for the full wizard reference.
 
 ### OAuth: What to Expect
 
