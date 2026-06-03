@@ -280,9 +280,9 @@ nav:
       - Git Best Practices: workflows/git-workflows.md
       - Performance: workflows/performance.md
       - Troubleshooting: workflows/troubleshooting.md
-    - Tutorials:
       - OAuth Troubleshooting: guides/oauth-troubleshooting.md
       - Upgrade to b4: guides/upgrade-b4.md
+    - Tutorials:
       - E-commerce Analytics: guides/ecommerce-tutorial.md
       - Financial Reporting: guides/financial-reporting.md
       - Multi-Source Integration: guides/multi-source.md

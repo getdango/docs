@@ -18,7 +18,7 @@ Before creating OAuth credentials, you must configure the OAuth consent screen i
 | **Best for** | Personal projects, small teams | Apps serving external users |
 
 !!! warning "Testing mode tokens expire after 7 days"
-    If your tokens stop working after a week, this is why. Either re-authorize (`dango oauth reset <source>` then `dango source add`) or switch to production mode.
+    If your tokens stop working after a week, this is why. Either re-authorize (`dango oauth refresh <oauth_name>`) or switch to production mode.
 
 ### Setting Up the Consent Screen
 
@@ -96,10 +96,11 @@ dango source add
 **Fix:** Re-authorize the source:
 
 ```bash
-# Reset the OAuth token
-dango oauth reset <source_name>
+# Option A: Refresh the existing token (simplest)
+dango oauth refresh <oauth_name>  # name from `dango oauth list`
 
-# Re-add (re-runs the OAuth flow)
+# Option B: Remove and re-add (if refresh fails)
+dango oauth remove <source_type>  # e.g., google_sheets, google_ads
 dango source add
 # Select the same source type, same configuration
 ```
@@ -108,10 +109,10 @@ dango source add
 
 **Cause:** The OAuth token was granted with fewer scopes than needed (e.g., you authorized Sheets but now want Analytics).
 
-**Fix:** Reset and re-authorize with the correct scopes:
+**Fix:** Remove the credential and re-authorize with the correct scopes:
 
 ```bash
-dango oauth reset <source_name>
+dango oauth remove <source_type>  # e.g., google_sheets
 dango source add
 ```
 
@@ -122,7 +123,7 @@ dango source add
 **Note:** Facebook tokens have a fixed 60-day expiry regardless of app review status. Set a reminder to re-authorize before tokens expire:
 
 ```bash
-dango oauth reset <source_name>
+dango oauth remove facebook_ads
 dango source add
 # Complete the Facebook OAuth flow again
 ```
@@ -136,15 +137,16 @@ When tokens expire or you need to change scopes:
 ### Local
 
 ```bash
-# 1. Reset existing credentials
-dango oauth reset my_google_sheets
+# 1. Try refreshing the token first
+dango oauth refresh <oauth_name>  # name from `dango oauth list`
 
-# 2. Re-run source add (re-triggers OAuth)
+# 2. If refresh fails, remove and re-add
+dango oauth remove <source_type>  # e.g., google_sheets
 dango source add
 # Select the source type and follow the OAuth prompts
 
 # 3. Verify the new token works
-dango sync my_google_sheets
+dango sync <source_name>
 ```
 
 ### Cloud
@@ -191,7 +193,13 @@ To enable:
 dango oauth status
 ```
 
-This shows which sources have valid tokens, when they were last refreshed, and whether they're approaching expiry.
+This shows credentials that are expired or expiring soon, and prompts you to re-authenticate.
+
+For a full diagnostic (client credentials, saved tokens, live validation):
+
+```bash
+dango oauth check
+```
 
 ---
 
@@ -202,7 +210,7 @@ This shows which sources have valid tokens, when they were last refreshed, and w
 | "App not verified" warning | Click Advanced → Go to app (expected) |
 | Token expired after 7 days | Switch consent screen to production mode, or re-authorize |
 | Port 8080 in use | `lsof -ti:8080 \| xargs kill -9` |
-| Wrong scopes | `dango oauth reset <source>` then re-add |
+| Wrong scopes | `dango oauth remove <source_type>` then re-add |
 | Facebook 60-day expiry | Re-authorize before expiry, push to cloud |
 | API not enabled | Enable exact API name in Google Cloud Console |
 | Cloud tokens expired | Re-authorize locally, then `dango remote push` |

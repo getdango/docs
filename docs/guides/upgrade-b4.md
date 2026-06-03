@@ -33,8 +33,8 @@ Column names no longer include type suffixes:
 **Action required:** Run a full refresh for each affected source:
 
 ```bash
-dango sync --full-refresh --source <your_google_ads_source>
-dango sync --full-refresh --source <your_ga4_source>
+dango sync <your_google_ads_source> --full-refresh
+dango sync <your_ga4_source> --full-refresh
 ```
 
 ### 3. GA4 Default Queries Updated
@@ -55,8 +55,8 @@ pip install --upgrade --pre getdango
 dango start
 
 # 3. Full refresh affected sources
-dango sync --full-refresh --source <google_ads_source>
-dango sync --full-refresh --source <ga4_source>
+dango sync <google_ads_source> --full-refresh
+dango sync <ga4_source> --full-refresh
 
 # 4. Update custom dbt models referencing old GA4 column names
 
@@ -115,6 +115,6 @@ dango remote ssh
 # On server:
 cd /srv/dango/project
 source venv/bin/activate
-dango sync --full-refresh --source <google_ads_source>
-dango sync --full-refresh --source <ga4_source>
+dango sync <google_ads_source> --full-refresh
+dango sync <ga4_source> --full-refresh
 ```

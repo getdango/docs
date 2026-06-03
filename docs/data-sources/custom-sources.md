@@ -496,13 +496,14 @@ When writing your own source, choose `merge` write disposition with a primary ke
 
 ### Seed / Manual Data Files
 
-For static reference data (mapping tables, manual inputs), place files in the `seeds/` directory:
+For static reference data (mapping tables, manual inputs), place CSV files in the `dbt/seeds/` directory:
 
 ```
 my-project/
-├── seeds/
-│   ├── region_mapping.csv
-│   └── budget_targets.csv
+├── dbt/
+│   └── seeds/
+│       ├── region_mapping.csv
+│       └── budget_targets.csv
 ```
 
 Reference seed files in dbt models:
@@ -550,7 +551,7 @@ def enriched_data():
 ```
 
 !!! warning "Single-writer constraint"
-    Open DuckDB with `read_only=True` to avoid blocking syncs. Only one process can write to DuckDB at a time.
+    Open DuckDB with `read_only=True` to avoid blocking syncs. Only one process can write to DuckDB at a time. The path `data/warehouse.duckdb` is relative to the project root — run syncs from the project directory.
 
 ### Deploying Custom Sources to Cloud
 

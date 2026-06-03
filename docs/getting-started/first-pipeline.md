@@ -46,32 +46,12 @@ my-analytics/
 ├── .dango/           # Configuration
 ├── .dlt/             # dlt credentials (gitignored)
 ├── dbt/              # Transformation models
-├── data/             # DuckDB warehouse
-└── venv/             # Python environment
+└── data/             # DuckDB warehouse
 ```
 
 ---
 
-## Step 2: Start Dango
-
-```bash
-dango start
-```
-
-This boots the full stack:
-
-- **DuckDB** warehouse (data storage)
-- **Metabase** dashboard server (via Docker)
-- **FastAPI** web server (monitoring UI at `http://localhost:8800`)
-
-!!! info "Background process"
-    On macOS, `dango start` runs in the background. Closing the terminal does **not** stop Dango — the process continues running. Run `dango start` again at any time to check status or restart if needed.
-
-Wait for the "Platform is ready" message before continuing.
-
----
-
-## Step 3: Add a Google Sheets Source
+## Step 2: Add a Google Sheets Source
 
 ```bash
 dango source add
@@ -102,7 +82,7 @@ See the [OAuth Troubleshooting Guide](../guides/oauth-troubleshooting.md) if you
 
 ---
 
-## Step 4: Sync Your Data
+## Step 3: Sync Your Data
 
 ```bash
 dango sync sales_data
@@ -121,6 +101,24 @@ You'll see progress output as each step completes. After sync:
 # Check what was loaded
 dango db status
 ```
+
+---
+
+## Step 4: Start the Platform
+
+```bash
+dango start
+```
+
+This boots the full stack:
+
+- **Metabase** dashboard server (via Docker)
+- **FastAPI** web server (monitoring UI at `http://localhost:8800`)
+
+!!! info "Background process"
+    On macOS, `dango start` runs in the background. Closing the terminal does **not** stop Dango — the process continues running. Run `dango start` again at any time to check status or restart if needed.
+
+Wait for the "Platform is ready" message before continuing.
 
 ---
 
