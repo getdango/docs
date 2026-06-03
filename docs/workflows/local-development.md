@@ -136,12 +136,9 @@ dango start
 ### 2. Add Data Sources
 
 ```bash
-# Add CSV source
-dango source add csv
-
-# Add OAuth source (e.g., Google Sheets)
-dango source add google_sheets
-dango oauth setup google_sheets
+# Add a source (interactive wizard)
+dango source add
+# Select CSV, Google Sheets, Stripe, etc. from the menu
 ```
 
 ### 3. Sync Data
@@ -340,9 +337,6 @@ api_key = "${STRIPE_API_KEY}"
 ```bash
 # Check all configurations
 dango validate
-
-# Check specific source
-dango validate --source my_source
 ```
 
 ### Test Sync

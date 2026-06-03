@@ -87,6 +87,10 @@ data/
 .dango/dev/
 .dango/snapshots/
 .dango/auth.db
+.dango/scheduler.db
+
+# === DLT STATE ===
+.dlt/pipelines/
 
 # === METABASE ===
 metabase-data/
@@ -305,7 +309,7 @@ git pull origin main
 git checkout -b feature/add-stripe-source
 
 # Make changes
-dango source add stripe
+dango source add  # interactive wizard — select Stripe
 git add .dango/sources.yml
 git commit -m "Add Stripe data source"
 

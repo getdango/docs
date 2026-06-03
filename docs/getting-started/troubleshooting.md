@@ -162,6 +162,31 @@ Don't use `sudo` with pip in a virtual environment. Check that you're in a virtu
 
 ## Runtime Issues
 
+### Background Process Behavior (macOS)
+
+On macOS, `dango start` launches background processes that **continue running after you close the terminal**. This is normal — your syncs and schedules keep running.
+
+**Checking if Dango is running:**
+
+```bash
+dango status
+```
+
+**Restarting after closing terminal:**
+
+```bash
+# Just run start again — it detects the existing process
+dango start
+```
+
+**Stopping Dango:**
+
+```bash
+dango stop
+```
+
+---
+
 ### "dango: command not found" (Virtual Environment)
 
 **Solution:**
@@ -467,17 +492,22 @@ Re-authenticate with the OAuth provider:
 # Check which tokens need renewal
 dango oauth status
 
-# Re-authenticate with the source-specific command
-dango oauth google_sheets
+# Option A: Refresh the token (simplest)
+dango oauth refresh <oauth_name>  # name from `dango oauth list`
 
-# Or re-authenticate Facebook Ads
+# Option B: Re-authenticate with provider-specific command
+dango oauth google_sheets
 dango oauth facebook_ads
+
+# Option C: Remove and re-add (if refresh fails)
+dango oauth remove <source_type>  # e.g., google_sheets
+dango source add
 ```
 
 !!! info "Token lifetimes"
     Google tokens are refreshed automatically by dlt. Facebook tokens last 60 days and require manual re-authentication. Run `dango oauth status` periodically to check expiry dates.
 
-See [OAuth Guide](../security/oauth.md) for details on each provider.
+See [OAuth Troubleshooting](../guides/oauth-troubleshooting.md) for detailed setup and error resolution.
 
 ---
 

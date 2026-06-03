@@ -17,6 +17,33 @@ Dango follows [Semantic Versioning](https://semver.org/):
 
 ## Current Version
 
+### v1.0.0b4
+
+*Released: June 2026*
+
+**Status**: Beta 4 — bug fix round
+
+See [Upgrade Notes for b4](../guides/upgrade-b4.md) for breaking changes and upgrade steps.
+
+#### Breaking Changes
+
+- **GA4 column names:** Type suffixes removed (`sessions_integer` → `sessions`, `bounce_rate_float` → `bounce_rate`, etc.). Update custom dbt models referencing old names.
+- **Google Ads / GA4 data types:** `date` columns now DATE (were VARCHAR/TIMESTAMPTZ), `clicks`/`impressions` now INTEGER (were VARCHAR). Requires `--full-refresh` per source.
+- **GA4 default queries:** `events` and `conversions` now include `landingPage` dimension.
+
+#### Fixes
+
+- Scheduler now loads jobs from `schedules.yml` on startup
+- Staging YML files (`sources_*.yml`) no longer overwritten on sync
+- Cloud file sync now includes `custom_sources/` and `seeds/`
+- Backups now include dbt models, custom sources, and `.env`
+- Metabase dashboard export captures all cards
+- Sync failures properly logged as errors with status in sync history
+- OAuth wizard error handling improvements
+- `resolve_install_source()` correctly detects PyPI installs
+
+---
+
 ### v1.0.0
 
 *Released: June 2026*
@@ -190,8 +217,8 @@ pip install --upgrade getdango
 
 ### How Releases Work
 
-1. Features developed on feature branches off `v1`
-2. Merged to `v1` after review
+1. Features developed on feature branches off `main`
+2. Merged to `main` after review
 3. Tagged releases published to PyPI
 4. Release notes added to this changelog
 

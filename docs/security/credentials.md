@@ -43,7 +43,7 @@ For services like Stripe:
 
 ```bash
 # Add via wizard (stored in secrets.toml)
-dango source add stripe
+dango source add  # select Stripe from wizard
 # Enter API key when prompted
 
 # Or configure manually in secrets.toml
@@ -140,7 +140,7 @@ Or use a tool like `direnv` for automatic loading.
 
 ```bash
 # Via wizard (recommended)
-dango source add stripe
+dango source add  # select source type from menu
 
 # Manually edit secrets.toml
 nano .dlt/secrets.toml

@@ -458,6 +458,121 @@ def get_transactions(last_id=dlt.sources.incremental("id")):
         cursor = data[-1]["id"]
 ```
 
+### Lookback Window (Re-fetching Recent Data)
+
+Some APIs retroactively update recent records (e.g., ad attribution, analytics corrections). Use dlt's `lag` parameter with incremental loading to re-fetch a window of recent data on each sync:
+
+```python
+@dlt.resource(
+    name="daily_stats",
+    write_disposition="merge",
+    primary_key=["date", "campaign_id"]
+)
+def get_daily_stats(
+    date_cursor=dlt.sources.incremental("date", lag=7)  # re-fetch last 7 days
+):
+    """Fetch stats, re-fetching recent days for corrections."""
+    start = date_cursor.last_value or "2024-01-01"
+    for row in fetch_stats(start_date=start):
+        yield row
+```
+
+**How `lag` units work:**
+
+The `lag` value units depend on the cursor column's data type:
+
+| Cursor type | `lag` unit | Example |
+|---|---|---|
+| String date (`"2024-01-15"`) | Days | `lag=7` → re-fetch last 7 days |
+| `datetime` / `DateTime` | Seconds | `lag=604800` → re-fetch last 7 days (7 * 86400) |
+| Integer (ID) | Same unit as the ID | `lag=1000` → re-fetch last 1000 IDs |
+
+Dango's built-in sources use `lookback_days` as a configuration parameter and convert internally:
+
+- **Google Ads** (string date cursor): `lag=lookback_days` (days directly)
+- **GA4** (DateTime cursor): `lag=lookback_days * 86400` (converted to seconds)
+
+When writing your own source, choose `merge` write disposition with a primary key so re-fetched rows update in place rather than creating duplicates.
+
+### Seed / Manual Data Files
+
+For static reference data (mapping tables, manual inputs), place CSV files in the `dbt/seeds/` directory:
+
+```
+my-project/
+├── dbt/
+│   └── seeds/
+│       ├── region_mapping.csv
+│       └── budget_targets.csv
+```
+
+Reference seed files in dbt models:
+
+```sql
+-- dbt/models/marts/budget_vs_actual.sql
+SELECT
+    a.campaign_id,
+    a.spend,
+    b.budget
+FROM {{ ref('stg_google_ads__campaign_performance') }} a
+LEFT JOIN {{ ref('budget_targets') }} b ON a.campaign_id = b.campaign_id
+```
+
+Load seed files with:
+
+```bash
+dango run --select resource_type:seed
+```
+
+### Reading from DuckDB
+
+Custom sources can read from the DuckDB warehouse directly — useful for transformations that need existing data:
+
+```python
+import dlt
+import duckdb
+
+@dlt.source
+def enriched_data():
+    @dlt.resource(name="enriched_orders", write_disposition="replace")
+    def enrich():
+        conn = duckdb.connect("data/warehouse.duckdb", read_only=True)
+        orders = conn.execute("""
+            SELECT o.*, c.segment
+            FROM raw_my_api.orders o
+            JOIN raw_my_api.customers c ON o.customer_id = c.id
+        """).fetchall()
+        conn.close()
+
+        for row in orders:
+            yield dict(zip(["order_id", "amount", "customer_id", "segment"], row))
+
+    return [enrich()]
+```
+
+!!! warning "Single-writer constraint"
+    Open DuckDB with `read_only=True` to avoid blocking syncs. Only one process can write to DuckDB at a time. The path `data/warehouse.duckdb` is relative to the project root — run syncs from the project directory.
+
+### Deploying Custom Sources to Cloud
+
+Custom sources in `custom_sources/` are automatically synced to the cloud server when you run:
+
+```bash
+dango remote push
+```
+
+This uploads the `custom_sources/` directory alongside your config and dbt models. On the server, syncs run exactly as they do locally.
+
+If your custom source needs additional Python packages, add them to `requirements.txt` in your project root:
+
+```
+# requirements.txt
+requests>=2.28
+beautifulsoup4>=4.12
+```
+
+These are installed on the server during `dango remote push`.
+
 ---
 
 ## Advanced Patterns
