@@ -300,7 +300,9 @@ If Dango was offline when a schedule was supposed to fire (e.g., laptop was asle
 
 === "Local"
 
-    Schedules run while `dango start` is active. If you close the terminal or your laptop sleeps, schedules pause. Missed runs fire on next startup.
+    Schedules run while `dango start` is active. On macOS, **closing the terminal does not stop Dango** — the process continues in the background. If your laptop sleeps, schedules pause. Missed runs fire when the process wakes.
+
+    If you need to restart Dango after closing the terminal, just run `dango start` again — it will detect and reuse the existing process, or start a new one if needed.
 
 === "Cloud"
 

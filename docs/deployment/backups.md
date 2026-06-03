@@ -4,6 +4,29 @@ Set up automated backups and restore from snapshots.
 
 ---
 
+## Backup vs Save
+
+Dango has two different ways to preserve dashboard state. They serve different purposes:
+
+| | `dango metabase save` | `dango remote backup` |
+|---|---|---|
+| **What it does** | Exports dashboards as YAML files | Creates a full server backup archive |
+| **Where it runs** | Local or cloud | Cloud only |
+| **What's included** | Dashboard/question definitions (Shared collection only) | Database, credentials, config, Metabase DB, dbt models |
+| **Use case** | Version control, sharing configs across projects | Disaster recovery, server migration |
+| **Personal collections** | Not included | Included (full Metabase DB) |
+| **Format** | YAML files in `metabase/` directory | Compressed tar archive |
+
+**When to use which:**
+
+- **Saving dashboard configs to Git** → `dango metabase save` + `git commit`
+- **Protecting against data loss on a server** → `dango remote backup`
+- **Moving to a new server** → `dango remote backup` on old server, `dango remote backup restore` on new server
+
+See [Save & Load (YAML)](../dashboards/save-load.md) for dashboard YAML export details.
+
+---
+
 ## Prerequisites
 
 - [ ] An active deployment via [DigitalOcean](digitalocean.md) or [BYOS](byos.md)

@@ -305,8 +305,8 @@ git pull origin main
 git checkout -b feature/add-stripe-source
 
 # Make changes
-dango source add stripe
-git add .dango/sources.yml
+dango source add  # interactive wizard — select Stripe
+git add .dango/sources.yml .dlt/secrets.toml
 git commit -m "Add Stripe data source"
 
 # Push and create PR

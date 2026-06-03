@@ -161,6 +161,7 @@ nav:
     - What is Dango?: getting-started/what-is-dango.md
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quick-start.md
+    - Your First Pipeline: getting-started/first-pipeline.md
     - Your First Dashboard: getting-started/first-dashboard.md
     - Platform Tour: getting-started/platform-tour.md
     - Troubleshooting: getting-started/troubleshooting.md
@@ -280,6 +281,8 @@ nav:
       - Performance: workflows/performance.md
       - Troubleshooting: workflows/troubleshooting.md
     - Tutorials:
+      - OAuth Troubleshooting: guides/oauth-troubleshooting.md
+      - Upgrade to b4: guides/upgrade-b4.md
       - E-commerce Analytics: guides/ecommerce-tutorial.md
       - Financial Reporting: guides/financial-reporting.md
       - Multi-Source Integration: guides/multi-source.md

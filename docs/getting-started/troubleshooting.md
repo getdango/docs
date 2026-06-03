@@ -162,6 +162,31 @@ Don't use `sudo` with pip in a virtual environment. Check that you're in a virtu
 
 ## Runtime Issues
 
+### Background Process Behavior (macOS)
+
+On macOS, `dango start` launches background processes that **continue running after you close the terminal**. This is normal — your syncs and schedules keep running.
+
+**Checking if Dango is running:**
+
+```bash
+dango status
+```
+
+**Restarting after closing terminal:**
+
+```bash
+# Just run start again — it detects the existing process
+dango start
+```
+
+**Stopping Dango:**
+
+```bash
+dango stop
+```
+
+---
+
 ### "dango: command not found" (Virtual Environment)
 
 **Solution:**
