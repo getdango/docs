@@ -521,7 +521,7 @@ LEFT JOIN {{ ref('budget_targets') }} b ON a.campaign_id = b.campaign_id
 Load seed files with:
 
 ```bash
-dango run --select seeds
+dango run --select resource_type:seed
 ```
 
 ### Reading from DuckDB

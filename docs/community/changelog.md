@@ -217,8 +217,8 @@ pip install --upgrade getdango
 
 ### How Releases Work
 
-1. Features developed on feature branches off `v1`
-2. Merged to `v1` after review
+1. Features developed on feature branches off `main`
+2. Merged to `main` after review
 3. Tagged releases published to PyPI
 4. Release notes added to this changelog
 

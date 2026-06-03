@@ -59,7 +59,7 @@ dango run --full-refresh
 dango run --exclude staging.*
 ```
 
-Any `dbt run` option is supported — see `dbt run --help` for the complete list.
+Any `dbt build` option is supported — see `dbt build --help` for the complete list.
 
 !!! tip
     Run `dango sync` before `dango run` to ensure your raw data is up to date.
