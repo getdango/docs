@@ -85,14 +85,18 @@ No action needed for these — they just work after upgrading:
 After upgrading locally:
 
 ```bash
-# Push updated code to server
+# 1. Push updated code and upgrade the package on the server
 dango remote push
 
-# Full refresh on server (if upgrading from b3)
+# 2. SSH in and upgrade the Dango package
 dango remote ssh
 # On server:
 cd /srv/dango/project
 source venv/bin/activate
+pip install --upgrade --pre getdango
+dango start
+
+# 3. Full refresh affected sources (if upgrading from b3)
 dango sync <google_ads_source> --full-refresh
 dango sync <ga4_source> --full-refresh
 ```

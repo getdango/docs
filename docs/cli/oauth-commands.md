@@ -199,7 +199,7 @@ dango oauth refresh facebook_ads
 
     **Typical lifetime:** 60 days
 
-    Set a reminder to run `dango oauth refresh` before expiry.
+    Set a reminder to run `dango oauth refresh facebook_ads` before expiry.
 
 ---
 

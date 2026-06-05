@@ -106,7 +106,7 @@ dango source add
 
 ```bash
 # Option A: Refresh the existing token (simplest)
-dango oauth refresh <source_type>  # name from `dango oauth list`
+dango oauth refresh <source_type>  # e.g., google_sheets, facebook_ads
 
 # Option B: Remove and re-add (if refresh fails)
 dango oauth remove <source_type>  # e.g., google_sheets, google_ads
@@ -147,7 +147,7 @@ When tokens expire or you need to change scopes:
 
 ```bash
 # 1. Try refreshing the token first
-dango oauth refresh <source_type>  # name from `dango oauth list`
+dango oauth refresh <source_type>  # e.g., google_sheets, facebook_ads
 
 # 2. If refresh fails, remove and re-add
 dango oauth remove <source_type>  # e.g., google_sheets

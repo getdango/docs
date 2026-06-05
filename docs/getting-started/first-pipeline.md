@@ -36,7 +36,7 @@ Create a fresh directory, set up a virtual environment, and install Dango:
 ```bash
 mkdir my-analytics && cd my-analytics
 python3.11 -m venv venv && source venv/bin/activate
-pip install getdango
+pip install --pre getdango
 ```
 
 !!! note "Python version"
@@ -50,7 +50,7 @@ pip install getdango
 dango init
 ```
 
-This creates your project structure and auto-generates an admin password for the Web UI and Metabase. The password is displayed in the terminal output — save it somewhere.
+The wizard prompts for an **admin email**, then auto-generates an admin password for the Web UI and Metabase. The password is displayed in the terminal output — save it somewhere.
 
 Your project structure:
 

@@ -120,19 +120,9 @@ This is one of the main advantages over OAuth — no browser-based re-authentica
 
 ---
 
-## Multiple Sources with Different Credentials
+## Credential Sharing
 
-If you have multiple Google Sheets sources with different service accounts, use source-specific credential sections:
-
-```toml
-[sources.google_sheets.credentials]
-type = "service_account"
-project_id = "project-a"
-private_key = "..."
-client_email = "sa-a@project-a.iam.gserviceaccount.com"
-```
-
-All Google Sheets sources share the same credential section. If you need different credentials per source, use named credential overrides in your `sources.yml` — see [Custom Sources](../data-sources/custom-sources.md) for advanced configuration.
+All sources of the same type share one credential section. For example, if you have two Google Sheets sources, they both use `[sources.google_sheets.credentials]`. This means one service account needs access to all sheets used by those sources.
 
 ---
 
