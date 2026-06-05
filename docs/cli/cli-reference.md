@@ -67,7 +67,7 @@ dango
 │   ├── check                            Validate OAuth config
 │   ├── list                             List all credentials
 │   ├── remove SOURCE_TYPE               Remove a credential
-│   ├── refresh OAUTH_NAME               Re-authenticate
+│   ├── refresh SOURCE_TYPE              Re-authenticate
 │   ├── google_sheets                    Authenticate Google Sheets
 │   ├── google_analytics                 Authenticate Google Analytics
 │   ├── google_ads                       Authenticate Google Ads
@@ -774,7 +774,7 @@ dango oauth remove SOURCE_TYPE
 ### dango oauth refresh
 
 ```bash
-dango oauth refresh OAUTH_NAME
+dango oauth refresh SOURCE_TYPE
 ```
 
 ### Provider-specific commands

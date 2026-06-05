@@ -140,8 +140,8 @@ OAuth Credentials Status:
 ### Refresh Manually
 
 ```bash
-# Force token refresh (use credential name from auth list)
-dango oauth refresh google_sheets_123456789
+# Force token refresh (use source type)
+dango oauth refresh google_sheets
 ```
 
 ### Remove Authorization

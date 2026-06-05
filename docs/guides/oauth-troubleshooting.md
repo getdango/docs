@@ -18,7 +18,7 @@ Before creating OAuth credentials, you must configure the OAuth consent screen i
 | **Best for** | Personal projects, small teams | Apps serving external users |
 
 !!! warning "Testing mode tokens expire after 7 days"
-    If your tokens stop working after a week, this is why. Either re-authorize (`dango oauth refresh <oauth_name>`) or switch to production mode.
+    If your tokens stop working after a week, this is why. Either re-authorize (`dango oauth refresh <source_type>`) or switch to production mode.
 
 ### Setting Up the Consent Screen
 
@@ -55,15 +55,18 @@ To avoid 7-day token expiry:
 
 **What you see:** Google shows "This app isn't verified" with a warning screen.
 
-**Why:** Your OAuth app is in testing mode (or production mode pending verification).
+**Why:** Google shows this warning for any OAuth app that hasn't gone through their verification review process. Since you created this OAuth app yourself in your own Google Cloud Console, it's unverified by default — but that's expected. No third party has access to your data. The OAuth credentials live entirely on your machine, and the app belongs to you.
 
-**Fix:** This is expected and safe for your own data.
+**Fix:** Click through the warning — this is safe for your own data.
 
-1. Click **Advanced** (small text at bottom left)
-2. Click **Go to [your app name] (unsafe)**
-3. Grant the requested permissions
+1. Click **Advanced** (small text at bottom left of the warning screen)
+2. Click **Go to [your app name] (unsafe)** — the link text includes whatever you named your app in the consent screen
+3. Review the permissions Google lists (e.g., "View your Google Sheets spreadsheets") and click **Continue** to grant them
 
-This is a one-time step per authorization.
+This is a one-time step per authorization. You won't see this screen again unless you revoke access and re-authorize.
+
+!!! tip "Want to remove the warning permanently?"
+    Switch your OAuth consent screen to **Production mode** (see [Switching to Production Mode](#switching-to-production-mode) above). This also prevents the 7-day token expiry that applies to testing mode apps.
 
 ### "Access blocked: This app's request is invalid"
 
@@ -103,7 +106,7 @@ dango source add
 
 ```bash
 # Option A: Refresh the existing token (simplest)
-dango oauth refresh <oauth_name>  # name from `dango oauth list`
+dango oauth refresh <source_type>  # name from `dango oauth list`
 
 # Option B: Remove and re-add (if refresh fails)
 dango oauth remove <source_type>  # e.g., google_sheets, google_ads
@@ -144,7 +147,7 @@ When tokens expire or you need to change scopes:
 
 ```bash
 # 1. Try refreshing the token first
-dango oauth refresh <oauth_name>  # name from `dango oauth list`
+dango oauth refresh <source_type>  # name from `dango oauth list`
 
 # 2. If refresh fails, remove and re-add
 dango oauth remove <source_type>  # e.g., google_sheets

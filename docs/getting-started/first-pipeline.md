@@ -20,24 +20,37 @@ By the end of this tutorial, you'll have:
 
 ## Prerequisites
 
-- [x] Dango installed ([Installation Guide](installation.md))
-- [x] Python 3.10+ and Docker Desktop running
+- [x] Python 3.10+ installed (3.11 recommended)
+- [x] Docker Desktop running
 - [x] A Google account with a Google Sheet containing data
-- [x] Virtual environment activated
 
 !!! tip "Don't have a Google Sheet handy?"
     Create one with sample data — any spreadsheet with headers in row 1 works. For example, a sales tracker with columns: `date`, `product`, `quantity`, `revenue`.
 
 ---
 
+## Step 0: Set Up Your Project Directory
+
+Create a fresh directory, set up a virtual environment, and install Dango:
+
+```bash
+mkdir my-analytics && cd my-analytics
+python3.11 -m venv venv && source venv/bin/activate
+pip install getdango
+```
+
+!!! note "Python version"
+    Dango requires Python 3.10 or higher (but below 3.13). We recommend `python3.11`. On macOS, the system `python3` may be too old — use `python3.11` or `python3.12` explicitly.
+
+---
+
 ## Step 1: Initialize Your Project
 
 ```bash
-dango init my-analytics
-cd my-analytics
+dango init
 ```
 
-The wizard asks for an **admin password** — this protects the Web UI and Metabase. Pick something memorable for local development.
+This creates your project structure and auto-generates an admin password for the Web UI and Metabase. The password is displayed in the terminal output — save it somewhere.
 
 Your project structure:
 

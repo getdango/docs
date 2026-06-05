@@ -281,7 +281,9 @@ nav:
       - Performance: workflows/performance.md
       - Troubleshooting: workflows/troubleshooting.md
       - OAuth Troubleshooting: guides/oauth-troubleshooting.md
+      - Service Accounts: guides/service-accounts.md
       - Upgrade to b4: guides/upgrade-b4.md
+      - Upgrade to b6: guides/upgrade-b6.md
     - Tutorials:
       - E-commerce Analytics: guides/ecommerce-tutorial.md
       - Financial Reporting: guides/financial-reporting.md

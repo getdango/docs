@@ -366,7 +366,7 @@ dbt run --select +customer_metrics
 dbt run --select marts.*
 ```
 
-**Note**: Use `dbt` directly for advanced options. Dango's `dango run` is equivalent to `dbt run --profiles-dir dbt --project-dir dbt`.
+**Note**: Use `dbt` directly for advanced options. Dango's `dango run` is equivalent to `dbt build --profiles-dir dbt --project-dir dbt`.
 
 ---
 

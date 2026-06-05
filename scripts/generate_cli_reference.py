@@ -296,7 +296,7 @@ TREE_ARGS: dict[str, str] = {
     "auth.unlock": "EMAIL",
     "oauth.setup": "{google|facebook}",
     "oauth.remove": "SOURCE_TYPE",
-    "oauth.refresh": "OAUTH_NAME",
+    "oauth.refresh": "SOURCE_TYPE",
     "remote.query": "SQL",
     "remote.resize": "[SIZE]",
     "remote.sync": "SOURCE",
@@ -858,7 +858,7 @@ COMMAND_METADATA: dict[str, dict] = {
 
     },
     "oauth.refresh": {
-        "usage_block": "dango oauth refresh OAUTH_NAME",
+        "usage_block": "dango oauth refresh SOURCE_TYPE",
 
     },
     "oauth.google_sheets": {
