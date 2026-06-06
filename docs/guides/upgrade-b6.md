@@ -1,6 +1,6 @@
 # Upgrade Notes: v1.0.0b6
 
-What changed since b3, what breaks, and how to upgrade. If you already upgraded to b4, these breaking changes were already handled — you can upgrade to b6 with just `pip install --upgrade --pre getdango` and `dango start`.
+What changed since b3, what breaks, and how to upgrade. If you already upgraded to b4, these breaking changes were already handled — you can upgrade to b6 with just `pip install --upgrade getdango` and `dango start`.
 
 ---
 
@@ -49,7 +49,7 @@ The `events` and `conversions` queries now include the `landingPage` dimension.
 
 ```bash
 # 1. Upgrade the package
-pip install --upgrade --pre getdango
+pip install --upgrade getdango
 
 # 2. Start Dango (auto-runs database migrations)
 dango start
@@ -93,7 +93,7 @@ dango remote ssh
 # On server:
 cd /srv/dango/project
 source venv/bin/activate
-pip install --upgrade --pre getdango
+pip install --upgrade getdango
 dango start
 
 # 3. Full refresh affected sources (if upgrading from b3)

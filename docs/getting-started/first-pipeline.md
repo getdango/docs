@@ -36,7 +36,7 @@ Create a fresh directory, set up a virtual environment, and install Dango:
 ```bash
 mkdir my-analytics && cd my-analytics
 python3.11 -m venv venv && source venv/bin/activate
-pip install --pre getdango
+pip install getdango
 ```
 
 !!! note "Python version"

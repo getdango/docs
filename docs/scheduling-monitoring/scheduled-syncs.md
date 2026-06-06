@@ -81,12 +81,12 @@ Timezone (leave blank for UTC): America/New_York
 
 | Type | What It Does | When to Use |
 |------|-------------|-------------|
-| `sync` | Syncs selected sources, then runs `dbt run` + `dbt test` | **Recommended** for most workflows. Keeps models up to date after every sync. |
+| `sync` | Syncs selected sources, then runs `dbt build` | **Recommended** for most workflows. Keeps models up to date after every sync. |
 | `sync_only` | Syncs selected sources only — skips dbt entirely | When you want to decouple ingestion from transformation, or run dbt on a separate schedule. |
-| `dbt` | Runs a dbt command only — no source sync | For dbt-only schedules (e.g., hourly `dbt run` on models that depend on external tables). |
+| `dbt` | Runs a dbt command only — no source sync | For dbt-only schedules (e.g., hourly `dbt build` on models that depend on external tables). |
 
 !!! tip "When to use `sync_only`"
-    If you have 10 sources syncing hourly, each `sync` schedule runs a full `dbt run` after every source sync — that's 10 dbt runs per hour. Use `sync_only` for individual sources and a separate `dbt` schedule to run transformations once.
+    If you have 10 sources syncing hourly, each `sync` schedule runs a full `dbt build` after every source sync — that's 10 dbt runs per hour. Use `sync_only` for individual sources and a separate `dbt` schedule to run transformations once.
 
 ### Frequency Options
 
