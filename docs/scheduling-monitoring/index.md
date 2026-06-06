@@ -150,7 +150,7 @@ Understanding the order of operations helps you configure schedules and monitors
 |-------|-------------|---------------|
 | 1. Source sync | dlt pulls data from configured sources into DuckDB | Schedule type: `sync` or `sync_only` |
 | 2. Schema drift check | Compares new schema against saved baseline | Automatic — no config needed |
-| 3. dbt transformation | Runs `dbt run` + `dbt test` on your models | Schedule type: `sync` (included) or `dbt` (standalone) |
+| 3. dbt transformation | Runs `dbt build` on your models | Schedule type: `sync` (included) or `dbt` (standalone) |
 | 4. PII scan | Analyzes string columns for personal information | Automatic — runs after sync |
 | 5. Monitoring | Evaluates configured monitors against baselines | Requires `monitors.yml` |
 | 6. Notifications | Sends webhooks for any alerts | Requires webhooks in `schedules.yml` |

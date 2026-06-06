@@ -49,7 +49,7 @@ The `events` and `conversions` queries now include the `landingPage` dimension.
 
 ```bash
 # 1. Upgrade the package
-pip install --upgrade --pre getdango
+pip install --upgrade getdango
 
 # 2. Start Dango (auto-runs database migrations)
 dango start
