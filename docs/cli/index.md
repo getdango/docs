@@ -229,7 +229,7 @@ dango source add            # Add new source (wizard)
 dango source list           # List all sources
 dango source remove name    # Remove source
 dango oauth list            # List OAuth credentials
-dango oauth refresh name    # Refresh OAuth token
+dango oauth refresh <source_type>  # Refresh OAuth token
 ```
 
 ### Platform Control

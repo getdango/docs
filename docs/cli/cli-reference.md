@@ -67,7 +67,7 @@ dango
 │   ├── check                            Validate OAuth config
 │   ├── list                             List all credentials
 │   ├── remove SOURCE_TYPE               Remove a credential
-│   ├── refresh OAUTH_NAME               Re-authenticate
+│   ├── refresh SOURCE_TYPE              Re-authenticate
 │   ├── google_sheets                    Authenticate Google Sheets
 │   ├── google_analytics                 Authenticate Google Analytics
 │   ├── google_ads                       Authenticate Google Ads
@@ -426,13 +426,13 @@ dango generate --all
 
 ### dango run
 
-Run dbt models. All dbt run arguments are passed through.
+Run dbt models. All dbt build arguments are passed through.
 
 ```bash
 dango run [DBT_ARGS]...
 ```
 
-Any `dbt run` argument works — `--select`, `--full-refresh`, `--exclude`, etc.
+Any `dbt build` argument works — `--select`, `--full-refresh`, `--exclude`, etc.
 
 ```bash
 dango run                            # Run all models
@@ -774,7 +774,7 @@ dango oauth remove SOURCE_TYPE
 ### dango oauth refresh
 
 ```bash
-dango oauth refresh OAUTH_NAME
+dango oauth refresh SOURCE_TYPE
 ```
 
 ### Provider-specific commands

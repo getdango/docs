@@ -493,7 +493,7 @@ Re-authenticate with the OAuth provider:
 dango oauth status
 
 # Option A: Refresh the token (simplest)
-dango oauth refresh <oauth_name>  # name from `dango oauth list`
+dango oauth refresh <source_type>  # e.g., google_sheets, facebook_ads
 
 # Option B: Re-authenticate with provider-specific command
 dango oauth google_sheets

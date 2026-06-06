@@ -296,7 +296,7 @@ TREE_ARGS: dict[str, str] = {
     "auth.unlock": "EMAIL",
     "oauth.setup": "{google|facebook}",
     "oauth.remove": "SOURCE_TYPE",
-    "oauth.refresh": "OAUTH_NAME",
+    "oauth.refresh": "SOURCE_TYPE",
     "remote.query": "SQL",
     "remote.resize": "[SIZE]",
     "remote.sync": "SOURCE",
@@ -664,9 +664,9 @@ COMMAND_METADATA: dict[str, dict] = {
         "link": "[:octicons-arrow-right-24: Full guide](transform-model.md)",
     },
     "run": {
-        "description": "Run dbt models. All dbt run arguments are passed through.",
+        "description": "Run dbt models. All dbt build arguments are passed through.",
         "usage": "dango run [DBT_ARGS]...",
-        "after_usage": "Any `dbt run` argument works \u2014 `--select`, `--full-refresh`, `--exclude`, etc.",
+        "after_usage": "Any `dbt build` argument works \u2014 `--select`, `--full-refresh`, `--exclude`, etc.",
         "examples": (
             "dango run                            # Run all models\n"
             "dango run --select my_model          # Run specific model\n"
@@ -858,7 +858,7 @@ COMMAND_METADATA: dict[str, dict] = {
 
     },
     "oauth.refresh": {
-        "usage_block": "dango oauth refresh OAUTH_NAME",
+        "usage_block": "dango oauth refresh SOURCE_TYPE",
 
     },
     "oauth.google_sheets": {

@@ -109,7 +109,7 @@ dango oauth facebook_ads
 3. Credentials saved to `.dlt/secrets.toml`
 
 !!! warning
-    Facebook tokens expire after 60 days and must be manually refreshed. Run `dango oauth refresh <credential_name>` before expiry.
+    Facebook tokens expire after 60 days and must be manually refreshed. Run `dango oauth refresh <source_type>` before expiry.
 
 ---
 
@@ -172,15 +172,15 @@ dango oauth remove google_ads
 Re-authenticate an OAuth credential. Use when a token is expired or about to expire.
 
 ```bash
-dango oauth refresh OAUTH_NAME
+dango oauth refresh SOURCE_TYPE
 ```
 
 | Argument | Description |
 |----------|-------------|
-| `OAUTH_NAME` | Name of OAuth credential to refresh (from `dango oauth list`) |
+| `SOURCE_TYPE` | Source type to refresh credentials for (e.g., `google_sheets`, `facebook_ads`) |
 
 ```bash
-dango oauth refresh facebook_ads_123456789
+dango oauth refresh facebook_ads
 ```
 
 ---
@@ -199,14 +199,14 @@ dango oauth refresh facebook_ads_123456789
 
     **Typical lifetime:** 60 days
 
-    Set a reminder to run `dango oauth refresh` before expiry.
+    Set a reminder to run `dango oauth refresh facebook_ads` before expiry.
 
 ---
 
 ## Troubleshooting
 
 ??? info "OAuth token expired"
-    Run `dango oauth status` to see which tokens are expired. Use `dango oauth refresh <name>` to re-authenticate. For Google, tokens auto-refresh — if expired, re-run the provider command (e.g., `dango oauth google_sheets`).
+    Run `dango oauth status` to see which tokens are expired. Use `dango oauth refresh <source_type>` to re-authenticate. For Google, tokens auto-refresh — if expired, re-run the provider command (e.g., `dango oauth google_sheets`).
 
 ??? info "OAuth check shows missing credentials"
     Ensure your `.env` file contains the OAuth client ID and secret. Run `dango oauth setup google` or `dango oauth setup facebook` to set up from scratch.
