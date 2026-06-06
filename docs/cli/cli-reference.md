@@ -426,13 +426,13 @@ dango generate --all
 
 ### dango run
 
-Run dbt models. All dbt run arguments are passed through.
+Run dbt models. All dbt build arguments are passed through.
 
 ```bash
 dango run [DBT_ARGS]...
 ```
 
-Any `dbt run` argument works — `--select`, `--full-refresh`, `--exclude`, etc.
+Any `dbt build` argument works — `--select`, `--full-refresh`, `--exclude`, etc.
 
 ```bash
 dango run                            # Run all models

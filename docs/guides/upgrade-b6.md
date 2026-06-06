@@ -85,7 +85,7 @@ No action needed for these — they just work after upgrading:
 After upgrading locally:
 
 ```bash
-# 1. Push updated code and upgrade the package on the server
+# 1. Push updated project files to the server
 dango remote push
 
 # 2. SSH in and upgrade the Dango package

@@ -128,13 +128,19 @@ dango oauth list
 dango oauth status
 ```
 
-Example output:
-```
-OAuth Credentials Status:
+If all tokens are healthy, you'll see:
 
-  google_sheets_123456789
-    Status: Valid
-    Expires: 2026-06-15 10:30:00
+```
+✓ All OAuth credentials are active
+```
+
+If any tokens need attention:
+
+```
+⚠️  OAuth Credentials Expiring Soon:
+  • user@gmail.com (google_sheets)
+    Expires: 2026-06-15 (9 days)
+    Re-authenticate: dango oauth refresh google_sheets
 ```
 
 ### Refresh Manually
