@@ -10,7 +10,8 @@ Dango provides a layered backup strategy for cloud deployments:
 
 | Layer | Location | Retention | Purpose |
 |-------|----------|-----------|---------|
-| **On-server** | `/srv/dango/backups/deploy/` | Configurable (default: 14) | Fast rollback, pre-deploy snapshots |
+| **On-server (scheduled)** | `/srv/dango/backups/` | 14 most recent | Fast rollback |
+| **On-server (pre-deploy)** | `/srv/dango/backups/deploy/` | Configurable (default: 1) | Rollback before each push |
 | **Spaces (off-server)** | DigitalOcean Spaces bucket | GFS tiers (daily/weekly/monthly) | Disaster recovery, server migration |
 | **Local** | Your machine (`dango remote backup download`) | Manual | Offline archival |
 
