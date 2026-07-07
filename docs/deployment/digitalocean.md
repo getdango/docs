@@ -317,6 +317,20 @@ Open `http://<your-server-ip>` in a browser and log in with the admin email and 
 
 ---
 
+## Backup Configuration
+
+Backups are configured during the deploy wizard (Step 7). You can:
+
+- **Enable scheduled backups** to DigitalOcean Spaces (daily at 02:00 UTC)
+- **Reuse an existing Spaces bucket** from a previous deployment
+- **Skip backup setup** and configure it later with `dango remote backup enable`
+
+If you reused an existing bucket, your retention policy will apply to all backups in that bucket (both old and new).
+
+For full backup management, restore procedures, and disaster recovery, see [Backup & Recovery](backup-and-recovery.md).
+
+---
+
 ## Remote Server Layout
 
 Once deployed, the server has this structure:

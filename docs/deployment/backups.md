@@ -57,7 +57,6 @@ Every backup includes:
 | **Auth** | `.dango/auth.db` |
 | **Configuration** | `.dango/project.yml`, `.dango/sources.yml`, `.dango/cloud.yml`, `.dango/metabase.yml` |
 | **Audit log** | `.dango/logs/audit.jsonl` |
-| **Credentials** | `.dlt/secrets.toml`, `.env` |
 | **dbt** | `dbt/profiles.yml`, `dbt/dbt_project.yml`, `dbt/packages.yml`, `dbt/models/` (all models), `dbt/macros/`, `dbt/seeds/` |
 | **Custom sources** | `custom_sources/` (entire directory) |
 | **Seed data** | `data/seeds/` |
@@ -65,7 +64,7 @@ Every backup includes:
 | **Metabase** | H2 database files (`metabase.db.mv.db`, `metabase.db.trace.db`) from Docker volume |
 
 !!! note
-    The backup includes credentials (`.dlt/secrets.toml`) and auth database. Treat backup archives as sensitive data.
+    Credentials (`.dlt/secrets.toml`, `.env`) are **excluded by default** from backup archives for security. The auth database (user accounts, sessions) is included. Treat backup archives as sensitive data.
 
 ---
 

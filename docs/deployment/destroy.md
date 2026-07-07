@@ -5,7 +5,7 @@ Safely tear down a cloud deployment.
 ---
 
 !!! danger "Irreversible Operation"
-    Destroying a deployment permanently deletes cloud resources. For DigitalOcean, this includes the droplet, firewall, SSH key, and DigitalOcean Spaces bucket. **This cannot be undone.** Download a backup before proceeding.
+    Destroying a deployment permanently deletes cloud resources. For DigitalOcean, this includes the droplet and firewall. The Spaces bucket (containing backups) is **preserved by default**. Use ``--delete-spaces`` to remove it. **This cannot be undone.** Download a backup before proceeding.
 
 ---
 
@@ -31,7 +31,7 @@ Safely tear down a cloud deployment.
 | Option | Description |
 |--------|-------------|
 | `--force` | Skip confirmation and backup download prompts |
-| `--keep-spaces` | Keep the Spaces bucket and its contents (DigitalOcean only) |
+| `--delete-spaces` | Also delete the Spaces bucket and all its contents (DigitalOcean only) |
 | `--keep-ssh-key` | Keep the SSH key on DigitalOcean (DigitalOcean only) |
 
 ---
@@ -53,7 +53,7 @@ Safely tear down a cloud deployment.
       Droplet:   143.198.xxx.xxx (s-2vcpu-4gb, nyc1)
       Firewall:  dango-fw-abc123
       SSH key:   Will be DELETED from DigitalOcean
-      Spaces:    Will be DELETED (my-dango-backups)
+      Spaces:    my-bucket — will be KEPT (use --delete-spaces to remove)
     ```
 
     ### Step 2: Backup Download Offer
@@ -79,31 +79,27 @@ Safely tear down a cloud deployment.
       ✓ Deleted droplet
       ✓ Deleted firewall
       ✓ Deleted SSH key from DigitalOcean
-      ✓ Deleted Spaces bucket
       ✓ Removed .dango/cloud.yml
 
     Deployment destroyed.
     Note: SSH key kept locally at ~/.ssh/dango_ed25519
+    Spaces bucket 'my-bucket' was preserved.
     ```
 
-    ### Preserve Resources
+    ### Delete Spaces Bucket
 
-    Keep your Spaces bucket (with all backups) for archival:
+    By default, the Spaces bucket (and all backups) is preserved. To delete it:
 
     ```bash
-    dango deploy destroy --keep-spaces
+    dango deploy destroy --delete-spaces
     ```
+
+    ### Keep SSH Key
 
     Keep the SSH key registered on DigitalOcean (useful if redeploying soon):
 
     ```bash
     dango deploy destroy --keep-ssh-key
-    ```
-
-    Both:
-
-    ```bash
-    dango deploy destroy --keep-spaces --keep-ssh-key
     ```
 
 === "BYOS"
@@ -146,7 +142,7 @@ Safely tear down a cloud deployment.
     !!! note "Server Not Deleted"
         BYOS destroy only removes the local `cloud.yml` configuration and optionally stops Dango services on the server. The server itself, its data, and any installed software remain untouched. To fully clean up the server, SSH in and remove Dango manually.
 
-    The `--keep-spaces` and `--keep-ssh-key` options are ignored for BYOS deployments (a warning is printed).
+    The `--delete-spaces` and `--keep-ssh-key` options are ignored for BYOS deployments (a warning is printed).
 
 ---
 
@@ -159,7 +155,7 @@ Safely tear down a cloud deployment.
 | Droplet (VM) | Yes | Server and all data on it |
 | Cloud firewall | Yes | |
 | SSH key (on DO) | Yes | Unless `--keep-ssh-key` |
-| Spaces bucket | Yes | Unless `--keep-spaces` |
+| Spaces bucket | **No** (kept by default) | Unless `--delete-spaces` |
 | Local `.dango/cloud.yml` | Yes | |
 | Local SSH key (`~/.ssh/dango_*`) | **No** | Kept for potential reuse |
 | Local project files | **No** | Your code, configs, dbt models are untouched |

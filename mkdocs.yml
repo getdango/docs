@@ -253,6 +253,7 @@ nav:
     - Remote Management: deployment/remote-management.md
     - Environment Variables: deployment/environment-variables.md
     - Backups: deployment/backups.md
+    - Backup & Recovery: deployment/backup-and-recovery.md
     - Server Operations: deployment/server-operations.md
     - Destroy & Cleanup: deployment/destroy.md
     - Security:
