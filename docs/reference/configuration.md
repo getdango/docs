@@ -294,6 +294,7 @@ notifications:
 | `type` | ScheduleType | No | `sync` | Schedule type: `sync`, `sync_only`, `dbt`, `script` |
 | `cron` | string | Yes | -- | Cron expression or preset name |
 | `sources` | list[string] | Yes* | -- | Source names to sync (*required for `sync`/`sync_only` types) |
+| `script_path` | string | Yes* | -- | Path to script inside `scripts/` (*required for `script` type) |
 | `enabled` | boolean | No | `true` | Enable this schedule |
 | `timezone` | string | No | server TZ | Timezone for cron evaluation |
 | `start_date` | datetime | No | -- | First execution date |

@@ -200,6 +200,7 @@ notifications:
 | `type` | string | no | `sync` | Schedule type: `sync`, `sync_only`, `dbt`, or `script`. |
 | `cron` | string | yes | — | 5-field cron expression (minute hour day month weekday). |
 | `sources` | list | no | `[]` | Source names to sync. Required for `sync` / `sync_only`. |
+| `script_path` | string | no | — | Path to script inside `scripts/`. Required for `script`. |
 | `enabled` | bool | no | `true` | Set to `false` to pause without deleting. |
 | `timezone` | string | no | UTC | IANA timezone (e.g., `America/New_York`). |
 | `start_date` | datetime | no | — | Don't run before this date. |

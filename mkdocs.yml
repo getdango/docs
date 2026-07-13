@@ -220,6 +220,8 @@ nav:
       - Templates: notebooks/templates.md
       - DuckDB Snapshots: notebooks/duckdb-snapshots.md
       - File Locking: notebooks/file-locking.md
+    - Scripts:
+      - scripts.md
     - Scheduling & Monitoring:
       - scheduling-monitoring/index.md
       - Scheduled Syncs: scheduling-monitoring/scheduled-syncs.md

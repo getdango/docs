@@ -6,14 +6,7 @@ Custom Python code that runs on a schedule or manually via "Run Now" in the Scri
 
 ## What Are Scripts?
 
-Scripts are Python files in the `scripts/` directory that execute as subprocesses. They complement Dango's built-in sync and dbt schedules by letting you run custom logic — email reports, Slack alerts, API exports, or any other Python code.
-
-Unlike notebooks (interactive, ad-hoc), scripts are:
-
-- **Scheduled** — run on a cron just like syncs and dbt runs
-- **Manual** — trigger via "Run Now" in the Scripts tab or the API
-- **Headless** — no interactive UI, just stdout/stderr captured to log files
-- **Repeatable** — each run produces a timestamped log directory
+Scripts are Python files in `scripts/` that execute as subprocesses for custom logic — email reports, Slack alerts, API exports, or any other Python code. Unlike notebooks, scripts are scheduled, manual, headless, and repeatable.
 
 ## Getting Started
 
@@ -148,8 +141,6 @@ lock = DbtLock(project_root)
 try:
     lock.acquire(timeout=30)
     conn = duckdb.connect(str(db_path))
-
-    # Create a schema for script-managed data
     conn.sql("CREATE SCHEMA IF NOT EXISTS script_data")
     conn.sql("""
         CREATE TABLE IF NOT EXISTS script_data.my_import (
@@ -175,7 +166,7 @@ finally:
 
 ### Don't Create Tables in DuckDB Directly
 
-Use **dbt models** for persistent tables whenever possible. Script-written tables are invisible to dbt, can't participate in transformations, and may conflict with future schema changes.
+Use **dbt models** for persistent tables. Script-written tables are invisible to dbt and can't participate in transformations.
 
 ```python
 # BAD: creating tables directly in scripts
@@ -189,7 +180,7 @@ conn.sql("CREATE TABLE raw.my_table AS SELECT ...")
 
 ### Don't Acquire DbtLock for the Entire Script
 
-Acquire the lock only around the write operations, not around the entire script execution. Long-held locks block other Dango operations (syncs, dbt runs).
+Acquire the lock only around write operations. Long-held locks block syncs and dbt runs.
 
 ```python
 # BAD: holding the lock during slow network I/O
@@ -206,7 +197,7 @@ lock.release()
 
 ### Don't Import Dango Internals
 
-Scripts should only use Dango's public API surface (`dango.utils.dbt_lock.DbtLock`). Importing internal modules creates coupling that breaks when internals change.
+Only use `dango.utils.dbt_lock.DbtLock`. Internal modules can change without notice.
 
 ```python
 # BAD: importing internal modules
@@ -238,7 +229,11 @@ project_root = Path(os.environ["DANGO_PROJECT_ROOT"])
 db_path = project_root / "data" / "warehouse.duckdb"
 
 smtp_host = os.environ.get("SMTP_HOST", "localhost")
-smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+smtp_port = 587
+try:
+    smtp_port = int(os.environ.get("SMTP_PORT", "587"))
+except (ValueError, TypeError):
+    pass
 smtp_user = os.environ.get("SMTP_USER", "")
 smtp_pass = os.environ.get("SMTP_PASS", "")
 recipient = os.environ.get("REPORT_RECIPIENT", "team@example.com")
@@ -280,7 +275,7 @@ else:
 
 ### Example 2: Slack Alert
 
-This script checks data freshness and sends an alert to Slack via webhook. Uses only the standard library.
+This script checks if a key model has fresh data and sends an alert to Slack if stale. Uses only the standard library.
 
 ```python
 """scripts/slack_alert.py
@@ -305,31 +300,29 @@ if not webhook_url:
 
 conn = duckdb.connect(str(db_path), read_only=True)
 result = conn.sql("""
-    SELECT source_name, MAX(loaded_at) AS last_loaded
-    FROM raw._sync_metadata
-    WHERE loaded_at < CURRENT_TIMESTAMP - INTERVAL '24' HOUR
-    GROUP BY source_name
-    ORDER BY last_loaded ASC
+    SELECT MAX(order_date) AS last_order_date
+    FROM marts.fact_orders
+    HAVING MAX(order_date) < CURRENT_DATE - INTERVAL '1' DAY
 """).fetchall()
 conn.close()
 
-if not result:
-    print("All sources are fresh.")
+if not result or result[0][0] is None:
+    print("Data is fresh — no alert needed.")
 else:
-    lines = [":warning: *Stale Data Sources Detected*", ""]
-    now = datetime.now(timezone.utc)
-    for source, last_loaded in result:
-        hours_ago = int((now - last_loaded).total_seconds() / 3600)
-        lines.append(f"  {source}  last loaded {hours_ago}h ago")
-
-    payload = json.dumps({"text": "\n".join(lines)}).encode()
+    last_date = result[0][0]
+    days_ago = (datetime.now(timezone.utc).date() - last_date).days
+    text = (
+        f":warning: *Stale Data Alert*\n"
+        f"Latest order date is {last_date} ({days_ago} days ago)."
+    )
+    payload = json.dumps({"text": text}).encode()
     req = Request(
         webhook_url,
         data=payload,
         headers={"Content-Type": "application/json"},
     )
     urlopen(req)
-    print(f"Alert sent for {len(result)} stale source(s).")
+    print(f"Alert sent: data is {days_ago} days stale.")
 ```
 
 ### Example 3: Google Sheets Export
@@ -409,12 +402,12 @@ You can attach a script to a cron schedule, just like sync and dbt schedules.
 
 | Field | Type | Required | Default | Description |
 |-------|------|:--------:|---------|-------------|
-| `name` | string | yes | — | Unique identifier. Lowercase alphanumeric + underscores. |
+| `name` | string | yes | — | Unique identifier (lowercase + underscores). |
 | `type` | string | yes | — | Must be `script`. |
 | `cron` | string | yes | — | 5-field cron expression or preset name. |
-| `script_path` | string | yes | — | Relative path to script inside `scripts/`. |
-| `enabled` | bool | no | `true` | Set to `false` to pause without deleting. |
-| `timeout_minutes` | int | no | `30` | Maximum execution time before the job is killed. |
+| `script_path` | string | yes | — | Relative path inside `scripts/`. |
+| `enabled` | bool | no | `true` | Set to `false` to pause. |
+| `timeout_minutes` | int | no | `30` | Maximum execution time in minutes. |
 | `timezone` | string | no | UTC | IANA timezone (e.g., `America/New_York`). |
 | `start_date` | datetime | no | — | Don't run before this date. |
 
@@ -435,34 +428,25 @@ If validation fails, the schedule is skipped with a warning logged to `.dango/lo
 
 ### Log Storage
 
-Each script run creates a timestamped directory:
+Each script run creates a timestamped directory (or run UUID for manual runs):
 
 ```
 .dango/logs/scripts/
 ├── my_report_20260713T070000/
-│   ├── stdout.txt          # Captured stdout
-│   ├── stderr.txt          # Captured stderr
+│   ├── stdout.txt          # Captured stdout (truncated at 1 MB)
+│   ├── stderr.txt          # Captured stderr (truncated at 1 MB)
 │   └── meta.json           # Run metadata (status, duration, exit code)
 └── ...
 ```
 
-For manual "Run Now" executions, the directory is named by run UUID instead of timestamp. Both stdout and stderr are truncated at 1 MB each.
-
 ### Viewing Logs
 
-**Web UI:** Click the script name or the status badge in the Scripts table to open the log viewer.
+**Web UI:** Click the script name or status badge in the Scripts table.
 
 **Filesystem:**
-
 ```bash
-# Most recent run
 ls -lt .dango/logs/scripts/ | head -5
-
-# View stdout
 cat .dango/logs/scripts/my_report_20260713T070000/stdout.txt
-
-# View stderr
-cat .dango/logs/scripts/my_report_20260713T070000/stderr.txt
 ```
 
 ## Troubleshooting
@@ -492,27 +476,22 @@ script_path: ../../malicious.py
 
 ### Script times out
 
-- **Manual runs** timeout after 5 minutes by default. Long-running scripts should be scheduled instead.
-- **Scheduled runs** timeout after 30 minutes by default. Increase via `timeout_minutes` in the schedule config.
-- Break long-running scripts into smaller tasks or optimize the logic.
+- **Manual runs** timeout after 5 minutes. Long-running scripts should be scheduled instead.
+- **Scheduled runs** timeout after 30 minutes. Increase via `timeout_minutes` in the schedule config.
 
 ### Requirements install failure
 
-Dango tries to install `scripts/requirements.txt` at startup. If it fails:
-
-1. Check `.dango/logs/activity.jsonl` for the error message
-2. Install manually: `pip install -r scripts/requirements.txt`
-3. Verify package names and versions are correct
+Check `.dango/logs/activity.jsonl` for the error. Install manually: `pip install -r scripts/requirements.txt`. Verify package names and versions.
 
 ### Script succeeds but result is missing
 
 - Check `stderr.txt` — exceptions may have been printed there
-- If writing to DuckDB, verify the write lock was acquired (`DbtLock`)
-- Check that the connection is in read-write mode (not `read_only=True`)
+- If writing to DuckDB, verify the write lock was acquired
+- Check the connection is in read-write mode (not `read_only=True`)
 
 ### Cancel doesn't stop the script
 
-Dango sends `SIGTERM` first, waits 5 seconds, then sends `SIGKILL`. If the script ignores signals (e.g., traps `SIGTERM`), only `SIGKILL` terminates it. Stuck subprocesses are cleaned up when `dango stop` is run.
+Dango sends `SIGTERM` first, waits 5 seconds, then `SIGKILL`. If the script traps `SIGTERM`, only `SIGKILL` terminates it.
 
 ## Further Reading
 
