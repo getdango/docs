@@ -299,6 +299,7 @@ if not webhook_url:
     raise SystemExit(0)
 
 conn = duckdb.connect(str(db_path), read_only=True)
+# Replace marts.fact_orders with your own model or table
 result = conn.sql("""
     SELECT MAX(order_date) AS last_order_date
     FROM marts.fact_orders
@@ -458,7 +459,7 @@ cat .dango/logs/scripts/my_report_20260713T070000/stdout.txt
 - Ensure the file has a `.py` extension
 - Restart or refresh the browser page
 
-### Path traversal error on schedule activation
+### Path traversal error
 
 ```
 Script path '../../etc/passwd' escapes scripts/ directory
@@ -490,7 +491,6 @@ Check `.dango/logs/activity.jsonl` for the error. Install manually: `pip install
 - Check the connection is in read-write mode (not `read_only=True`)
 
 ### Cancel doesn't stop the script
-
 Dango sends `SIGTERM` first, waits 5 seconds, then `SIGKILL`. If the script traps `SIGTERM`, only `SIGKILL` terminates it.
 
 ## Further Reading
