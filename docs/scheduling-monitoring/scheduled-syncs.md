@@ -84,6 +84,7 @@ Timezone (leave blank for UTC): America/New_York
 | `sync` | Syncs selected sources, then runs `dbt build` | **Recommended** for most workflows. Keeps models up to date after every sync. |
 | `sync_only` | Syncs selected sources only — skips dbt entirely | When you want to decouple ingestion from transformation, or run dbt on a separate schedule. |
 | `dbt` | Runs a dbt command only — no source sync | For dbt-only schedules (e.g., hourly `dbt build` on models that depend on external tables). |
+| `script` | Runs a custom Python script from `scripts/` | For custom logic: email reports, Slack alerts, API exports, or any Python code. |
 
 !!! tip "When to use `sync_only`"
     If you have 10 sources syncing hourly, each `sync` schedule runs a full `dbt build` after every source sync — that's 10 dbt runs per hour. Use `sync_only` for individual sources and a separate `dbt` schedule to run transformations once.
@@ -160,7 +161,7 @@ Schedules are stored in `.dango/schedules.yml`. The wizard writes this file auto
 
 schedules:
   - name: daily_sync
-    type: sync                  # sync | sync_only | dbt
+    type: sync                  # sync | sync_only | dbt | script
     cron: "0 6 * * *"          # 5-field cron expression
     sources:                    # Sources to sync (ignored for type: dbt)
       - stripe
@@ -196,7 +197,7 @@ notifications:
 | Field | Type | Required | Default | Description |
 |-------|------|----------|---------|-------------|
 | `name` | string | yes | — | Unique identifier. Lowercase alphanumeric + underscores. |
-| `type` | string | no | `sync` | Schedule type: `sync`, `sync_only`, or `dbt`. |
+| `type` | string | no | `sync` | Schedule type: `sync`, `sync_only`, `dbt`, or `script`. |
 | `cron` | string | yes | — | 5-field cron expression (minute hour day month weekday). |
 | `sources` | list | no | `[]` | Source names to sync. Required for `sync` / `sync_only`. |
 | `enabled` | bool | no | `true` | Set to `false` to pause without deleting. |

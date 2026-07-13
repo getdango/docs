@@ -291,7 +291,7 @@ notifications:
 | Field | Type | Required | Default | Description |
 |-------|------|:--------:|---------|-------------|
 | `name` | string | Yes | -- | Schedule name (lowercase alphanumeric + underscore, starts with letter) |
-| `type` | ScheduleType | No | `sync` | Schedule type: `sync`, `sync_only`, `dbt` |
+| `type` | ScheduleType | No | `sync` | Schedule type: `sync`, `sync_only`, `dbt`, `script` |
 | `cron` | string | Yes | -- | Cron expression or preset name |
 | `sources` | list[string] | Yes* | -- | Source names to sync (*required for `sync`/`sync_only` types) |
 | `enabled` | boolean | No | `true` | Enable this schedule |
@@ -309,6 +309,7 @@ notifications:
 | `sync` | Sync selected sources, then run dbt (recommended) |
 | `sync_only` | Sync selected sources without running dbt afterward |
 | `dbt` | Run a dbt command only (no sync) |
+| `script` | Run a custom Python script from `scripts/` |
 
 ### Cron Presets
 
