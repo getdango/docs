@@ -17,6 +17,124 @@ Dango follows [Semantic Versioning](https://semver.org/):
 
 ## Current Version
 
+### v1.0.6
+
+*Released: August 19, 2026*
+
+**Status**: Stable — quality gate round
+
+#### Added
+
+- Script scheduling — cron-based scheduling for Python scripts in `scripts/` via `dango schedule add`
+- Scripts tab in web UI — list, run, cancel, and view logs for scripts
+- `dango transform seed` — runs dbt seeds; seed tables appear in catalog with row counts and profiling
+- Python 3.13 support
+- Schedule-aware staleness detection — sources with a schedule show a yellow "Stale" badge when last sync exceeds 2× the schedule interval
+- Per-table empty-replace protection for multi-resource dlt sources
+- Source and model row counts in web UI and catalog
+- Configurable backup retention, secrets exclusion from backups
+- Activity log deduplication and sync history gap prevention
+- `dlt` upgraded from 1.24.0 to 1.28.1
+
+#### Fixed
+
+- Custom `dlt_native` sources in `custom_sources/` now auto-discovered without manual config
+- Sources page crash when a dlt_native source has a `null` incremental capability
+- `@dlt.source` decorator crash during import inspection
+- "Incremental" sync mode label now derived from actual write_disposition in DuckDB
+- Models page: "Run" button no longer overwrites Schema column
+- Models page: "Last Run" column now sortable
+- Catalog: tab navigation no longer freezes when viewing tables filtered by source
+- Catalog: dbt docs 📖 link opens in new tab
+- DbtLock scope narrowed to write phase — long-running API syncs no longer block concurrent sources
+- DbtLock unlink race condition fixed
+- Metabase kept running during sync extract phase
+- Scheduled sync lock timeout aligned with direct sync (60s → 300s)
+- Notebook startup hang fixed; admin restart now shows warning modal
+- Scheduled sync "Unknown sync completed" toast fixed
+- Column alignment and filter inputs improved across Sources, Models, Schedules pages
+- DuckDB 1.5.2 → 1.5.4, Metabase JDBC driver 1.5.1.0 → 1.5.3.0, dbt-core 1.10.20 → 1.10.22
+
+---
+
+### v1.0.5
+
+*Released: June 25, 2026*
+
+#### Added
+
+- Sync queue — concurrent syncs wait instead of failing, with queued status in the web UI
+- WebSocket sync phase events — UI shows "Processing..." during post-sync hooks
+- Structured logging to `.dango/logs/dango.log` with daily rotation and gzip compression
+- `dango_version` field in activity log, audit log, and sync subprocess headers
+- Schedules page: sources displayed as alphabetically sorted bullet list
+- OAuth timeout with 120s limit, retry option, and provider-specific troubleshooting
+
+#### Fixed
+
+- OAuth credentials saved only after token exchange succeeds
+- Cross-project port kill — `dango stop` scoped to current project
+- Staging models generate explicit column lists instead of `SELECT *`
+- Sync log filenames include source name and timestamp
+- Notebook startup waits indefinitely for marimo to respond
+
+---
+
+### v1.0.4
+
+*Released: June 15, 2026*
+
+#### Added
+
+- Global sync status indicator in UI header
+- Activity log entries for CSV uploads, deletes, and manual schedule triggers
+- "View in Metabase" link in catalog table detail
+- Empty sync protection — replace-mode syncs that return 0 rows preserve existing data
+- `--allow-empty-replace` CLI flag to override empty sync protection
+
+#### Fixed
+
+- OAuth wizard shows success only after actual tokens obtained
+- Duplicate `sync_started` event emission removed
+
+---
+
+### v1.0.3
+
+*Released: June 2026*
+
+#### Fixed
+
+- Metabase session bridging stability improvements
+- Schedule execution reliability fixes
+- OAuth refresh handling for long-running deployments
+
+---
+
+### v1.0.2
+
+*Released: June 2026*
+
+#### Fixed
+
+- Cloud deployment stability fixes
+- Remote backup and restore improvements
+- Firewall and domain management fixes
+
+---
+
+### v1.0.1
+
+*Released: June 2026*
+
+#### Fixed
+
+- Background Metabase schema sync on startup
+- Port conflict detection improvements
+- Initial sync reliability fixes
+
+---
+
 ### v1.0.0b4
 
 *Released: June 2026*
