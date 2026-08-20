@@ -166,12 +166,15 @@ dango schedule add hubspot "10 6 * * *"   # 6:10 AM
 dango schedule add salesforce "20 6 * * *" # 6:20 AM
 ```
 
-**Add buffer time after syncs for dbt runs.** Schedule dbt model execution (or the next downstream sync) at least 15–30 minutes after the longest sync completes. This prevents lock timeouts when syncs overlap with dbt processing.
+**Add buffer time after syncs for dbt runs.** Schedule dbt model execution (or the next downstream sync) at least 15–30 minutes **after the final scheduled sync completes**. Calculate the finish time by adding actual sync duration to the last sync's start time, then add buffer.
+
+In this example: Salesforce (6:20 AM start) + ~10 min = 6:30 AM finish, so schedule dbt for 6:45–7:00 AM minimum.
 
 ```bash
 dango schedule add stripe "0 6 * * *"        # Sync: 6:00 AM, ~5 min
 dango schedule add hubspot "10 6 * * *"      # Sync: 6:10 AM, ~3 min
-dango schedule add transform "30 6 * * *"    # dbt: 6:30 AM (buffer applied)
+dango schedule add salesforce "20 6 * * *"   # Sync: 6:20 AM, ~10 min (finishes 6:30 AM)
+dango schedule add transform "45 6 * * *"    # dbt: 6:45 AM (15 min buffer)
 ```
 
 ---
