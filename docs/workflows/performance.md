@@ -150,6 +150,67 @@ dango sync
 dango sync --full-refresh  # Run on weekends
 ```
 
+### Schedule Timing
+
+**Avoid scheduling multiple sources at the same minute.** Each source waits for the DuckDB write lock, and staggered schedules prevent lock contention.
+
+Use `dango schedule add` to create schedules interactively. When prompted for frequency, use cron expressions:
+
+```
+# BAD: All syncs at 6:00 AM (cron: 0 6 * * *)
+stripe: 0 6 * * *
+hubspot: 0 6 * * *
+salesforce: 0 6 * * *
+
+# GOOD: Stagger syncs 5-10 minutes apart
+stripe: 0 6 * * *     # 6:00 AM
+hubspot: 10 6 * * *   # 6:10 AM
+salesforce: 20 6 * * * # 6:20 AM
+```
+
+**Add buffer time after syncs for dbt runs.** Schedule dbt model execution (or the next downstream sync) at least 15–30 minutes **after the final scheduled sync completes**. Calculate the finish time by adding actual sync duration to the last sync's start time, then add buffer.
+
+⚠️ **Sync duration varies** — Data volume, API throttling, and network latency cause sync times to fluctuate. Use your **longest observed sync duration** (not average) + 50% buffer to account for variance. Monitor actual sync times in the web UI and adjust schedules if timeouts occur.
+
+In this example: Salesforce (6:20 AM start) + ~10 min typical = 6:30 AM finish, plus 15 min buffer = 6:45 AM dbt start. If Salesforce occasionally takes 15 minutes (finishes 6:35 AM), add 30 min buffer → 7:05 AM dbt start. With variance accounted for:
+
+```
+stripe:   0 6 * * *      # Sync: 6:00 AM, ~5 min (worst case: 7 min)
+hubspot:  10 6 * * *     # Sync: 6:10 AM, ~3 min (worst case: 5 min)
+salesforce: 20 6 * * *   # Sync: 6:20 AM, ~10 min (worst case: 15 min → finishes 6:35 AM)
+transform: 5 7 * * *     # dbt: 7:05 AM (30 min buffer after worst case finish)
+```
+
+---
+
+## Metabase Query Cache
+
+Metabase caches dashboard query results to reduce load on DuckDB and improve dashboard response times.
+
+### Enabling Cache
+
+1. Open **Metabase Admin** → **Settings** → **Caching**
+2. Enable **Query Caching**
+3. Set cache backend (default: in-memory)
+
+### Recommended TTLs
+
+| Use Case | TTL | Rationale |
+|----------|-----|-----------|
+| **Dashboards** | 3600 seconds (1 hour) | Most dashboards show daily trends; hourly refresh is typical |
+| **Near-real-time views** | 300 seconds (5 minutes) | For dashboards tracking hourly metrics or live events |
+| **Operational dashboards** | 60 seconds (1 minute) | For dashboards users refresh manually |
+
+### Cache Behavior
+
+Metabase cache uses **TTL-based expiration**, not event-driven invalidation on sync. This means cached results expire after the configured TTL, regardless of when data changes.
+
+**Important:** If you set cache TTL to 1 hour but sync every 30 minutes, cached queries may return stale results for up to 1 hour after a sync completes. Plan your cache TTL around your actual sync frequency — don't assume cache invalidates on sync.
+
+### Cache Hit Rate
+
+View cache statistics in Metabase Admin → **Settings** → **Caching**. A high hit rate (> 80%) indicates the cache is effectively reducing DuckDB load during peak dashboard usage.
+
 ---
 
 ## Large Dataset Handling
