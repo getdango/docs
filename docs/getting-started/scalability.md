@@ -83,8 +83,7 @@ ORDER BY 1 DESC;
 ```
 
 **Action:** 
-- Increase DuckDB `memory_limit` in `dbt/profiles.yml` under `outputs: > dev: > settings: > memory_limit:` (see [Performance Optimization](../workflows/performance.md#memory-configuration) for values)
-- Increase `threads` in `dbt/profiles.yml` at two places: `outputs: > dev: > threads:` and `outputs: > dev: > settings: > threads:` to parallelize model execution
+- Increase DuckDB `memory_limit` and `threads` in `dbt/profiles.yml` under `outputs: > dev: > config:` section (see [Performance Optimization](../workflows/performance.md#memory-configuration) for example)
 - Review query plans with `EXPLAIN ANALYZE` — DuckDB auto-indexes join/filter columns; if queries are slow despite adequate memory and threads, consider materialized intermediate tables instead
 
 ### Sync Timeouts
