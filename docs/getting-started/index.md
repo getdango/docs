@@ -16,6 +16,12 @@ Dango is an open-source data platform that integrates dlt, dbt, DuckDB, and Meta
 
     Learn about Dango's architecture, features, and the problems it solves
 
+- :material-scale-balance:{ .lg .middle } **[Is Dango Right for You?](scalability.md)**
+
+    ---
+
+    Evaluate capacity, limits, and when to scale up or move on
+
 - :material-download:{ .lg .middle } **[Installation](installation.md)**
 
     ---
