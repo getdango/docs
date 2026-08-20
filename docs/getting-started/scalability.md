@@ -154,7 +154,7 @@ You get:
 - ✅ Built-in dashboards (Metabase)
 - ✅ 33 data sources (dlt)
 - ✅ Local development + cloud deployment in one CLI
-- ✅ Sub-second query response for < 50 GB datasets
+- ✅ Typically sub-second query response for < 50 GB datasets (estimate)
 
 You accept:
 - ⚠️ Single-server architecture (no failover)
