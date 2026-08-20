@@ -194,19 +194,15 @@ Metabase caches dashboard query results to reduce load on DuckDB and improve das
 | **Near-real-time views** | 300 seconds (5 minutes) | For dashboards tracking hourly metrics or live events |
 | **Operational dashboards** | 60 seconds (1 minute) | For dashboards users refresh manually |
 
-### Cache Invalidation
+### Cache Behavior
 
-Cache invalidates automatically on the next sync. When a sync writes new data to DuckDB, Metabase invalidates all cache entries for affected tables — users see fresh data on the next query.
+Metabase cache uses **TTL-based expiration**, not event-driven invalidation on sync. This means cached results expire after the configured TTL, regardless of when data changes.
 
-```
-Sync starts → Writes to DuckDB → Sync completes → Cache invalidated → Next dashboard load queries fresh data
-```
+**Important:** If you set cache TTL to 1 hour but sync every 30 minutes, cached queries may return stale results for up to 1 hour after a sync completes. Plan your cache TTL around your actual sync frequency — don't assume cache invalidates on sync.
 
-This means **cache TTL is independent of sync frequency**. Even with hourly syncs, cache still provides a performance win during peak dashboard usage.
+### Cache Hit Rate
 
-### Monitoring Cache Hit Rate
-
-View cache statistics in Metabase Admin → **Settings** → **Admin** → **Performance** (if available in your Metabase version). A high hit rate (> 80%) indicates the cache is effectively reducing DuckDB load.
+View cache statistics in Metabase Admin → **Settings** → **Caching**. A high hit rate (> 80%) indicates the cache is effectively reducing DuckDB load during peak dashboard usage.
 
 ---
 

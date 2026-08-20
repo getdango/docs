@@ -10,7 +10,7 @@ Dango is built for small teams and growing analytics teams. This page helps you 
 
 - **Small data teams** (1–10 people) — Dango reduces infrastructure overhead dramatically
 - **Growing usage** — Start locally, deploy to the cloud when you're ready
-- **50+ GB datasets** — DuckDB handles multi-gigabyte workloads efficiently
+- **Up to 100 GB datasets** — DuckDB handles multi-gigabyte workloads efficiently (Standard tier: up to 20 GB, Performance tier: 20–100 GB)
 - **Frequent schema changes** — dlt auto-evolves tables; zero manual DDL
 - **SQL-first workflows** — dbt integration makes transformations version-controlled and testable
 - **Real-time dashboards** — Metabase queries run fast against DuckDB's columnar storage
