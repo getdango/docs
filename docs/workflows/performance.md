@@ -150,6 +150,64 @@ dango sync
 dango sync --full-refresh  # Run on weekends
 ```
 
+### Schedule Timing
+
+**Avoid scheduling multiple sources at the same minute.** Each source waits for the DuckDB write lock, and staggered schedules prevent lock contention.
+
+```bash
+# BAD: All syncs compete for the lock at 6 AM
+dango schedule add stripe "0 6 * * *"
+dango schedule add hubspot "0 6 * * *"
+dango schedule add salesforce "0 6 * * *"
+
+# GOOD: Stagger syncs 5-10 minutes apart
+dango schedule add stripe "0 6 * * *"     # 6:00 AM
+dango schedule add hubspot "10 6 * * *"   # 6:10 AM
+dango schedule add salesforce "20 6 * * *" # 6:20 AM
+```
+
+**Add buffer time after syncs for dbt runs.** Schedule dbt model execution (or the next downstream sync) at least 15–30 minutes after the longest sync completes. This prevents lock timeouts when syncs overlap with dbt processing.
+
+```bash
+dango schedule add stripe "0 6 * * *"        # Sync: 6:00 AM, ~5 min
+dango schedule add hubspot "10 6 * * *"      # Sync: 6:10 AM, ~3 min
+dango schedule add transform "30 6 * * *"    # dbt: 6:30 AM (buffer applied)
+```
+
+---
+
+## Metabase Query Cache
+
+Metabase caches dashboard query results to reduce load on DuckDB and improve dashboard response times.
+
+### Enabling Cache
+
+1. Open **Metabase Admin** → **Settings** → **Caching**
+2. Enable **Query Caching**
+3. Set cache backend (default: in-memory)
+
+### Recommended TTLs
+
+| Use Case | TTL | Rationale |
+|----------|-----|-----------|
+| **Dashboards** | 3600 seconds (1 hour) | Most dashboards show daily trends; hourly refresh is typical |
+| **Near-real-time views** | 300 seconds (5 minutes) | For dashboards tracking hourly metrics or live events |
+| **Operational dashboards** | 60 seconds (1 minute) | For dashboards users refresh manually |
+
+### Cache Invalidation
+
+Cache invalidates automatically on the next sync. When a sync writes new data to DuckDB, Metabase invalidates all cache entries for affected tables — users see fresh data on the next query.
+
+```
+Sync starts → Writes to DuckDB → Sync completes → Cache invalidated → Next dashboard load queries fresh data
+```
+
+This means **cache TTL is independent of sync frequency**. Even with hourly syncs, cache still provides a performance win during peak dashboard usage.
+
+### Monitoring Cache Hit Rate
+
+View cache statistics in Metabase Admin → **Settings** → **Admin** → **Performance** (if available in your Metabase version). A high hit rate (> 80%) indicates the cache is effectively reducing DuckDB load.
+
 ---
 
 ## Large Dataset Handling

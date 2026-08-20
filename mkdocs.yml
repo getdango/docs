@@ -159,6 +159,7 @@ nav:
   - Getting Started:
     - getting-started/index.md
     - What is Dango?: getting-started/what-is-dango.md
+    - Is Dango Right for You?: getting-started/scalability.md
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quick-start.md
     - Your First Pipeline: getting-started/first-pipeline.md
