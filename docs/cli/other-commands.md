@@ -83,6 +83,52 @@ dango db clean --yes
 
 ---
 
+## Local Backup
+
+### dango backup
+
+List local backup archives stored in `.dango/backups/`.
+
+```bash
+dango backup
+```
+
+Displays all archived backups newest-first with file size and modification time. Archives are created automatically by `dango backup restore` as safety backups before restoring from an archive.
+
+```
+.dango/backups/pre-restore-20260820_143022.tar.gz     (245 MB, 2026-08-20 14:30:22)
+.dango/backups/pre-restore-20260819_091500.tar.gz     (243 MB, 2026-08-19 09:15:00)
+```
+
+---
+
+### dango backup restore
+
+Restore a project from a backup archive. Overwrites local project data and creates a safety backup first.
+
+```bash
+dango backup restore /path/to/archive.tar.gz
+```
+
+**Workflow:**
+
+1. Specify the path to a `.tar.gz` archive in `.dango/backups/` or elsewhere.
+2. A `pre-restore-{TIMESTAMP}.tar.gz` safety backup is created automatically.
+3. The archive is extracted, restoring all project files and database state.
+4. Restart services manually with `dango start`.
+
+```bash
+dango backup restore .dango/backups/pre-restore-20260819_091500.tar.gz
+```
+
+!!! warning "Destructive Operation"
+    Restore overwrites your current project data. The safety backup created before restore can be used to undo if needed.
+
+!!! note "Local vs. Cloud Backups"
+    `dango backup` manages local archives in `.dango/backups/`. For cloud backups to DigitalOcean Spaces, use `dango remote backup` — see [Cloud Backup & Recovery](../deployment/backup-and-recovery.md).
+
+---
+
 ## Validation
 
 ### dango validate

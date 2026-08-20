@@ -31,6 +31,7 @@ Click the **refresh icon** in the table header to reload the sources list.
 Status badges reflect the source's freshness state:
 
 - **Synced** (green) — last sync completed successfully
+- **Stale** (yellow) — last sync succeeded, but data is older than 2× the source's schedule interval. Only shown for scheduled sources. Unscheduled sources always show Synced with an age label.
 - **Syncing...** (blue, pulsing) — sync currently in progress
 - **Processing...** (purple, pulsing) — file operation in progress (upload or delete)
 - **Failed** (red) — last sync failed with an error
