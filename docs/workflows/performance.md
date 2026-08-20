@@ -154,16 +154,18 @@ dango sync --full-refresh  # Run on weekends
 
 **Avoid scheduling multiple sources at the same minute.** Each source waits for the DuckDB write lock, and staggered schedules prevent lock contention.
 
-```bash
-# BAD: All syncs compete for the lock at 6 AM
-dango schedule add stripe "0 6 * * *"
-dango schedule add hubspot "0 6 * * *"
-dango schedule add salesforce "0 6 * * *"
+Use `dango schedule add` to create schedules interactively. When prompted for frequency, use cron expressions:
+
+```
+# BAD: All syncs at 6:00 AM (cron: 0 6 * * *)
+stripe: 0 6 * * *
+hubspot: 0 6 * * *
+salesforce: 0 6 * * *
 
 # GOOD: Stagger syncs 5-10 minutes apart
-dango schedule add stripe "0 6 * * *"     # 6:00 AM
-dango schedule add hubspot "10 6 * * *"   # 6:10 AM
-dango schedule add salesforce "20 6 * * *" # 6:20 AM
+stripe: 0 6 * * *     # 6:00 AM
+hubspot: 10 6 * * *   # 6:10 AM
+salesforce: 20 6 * * * # 6:20 AM
 ```
 
 **Add buffer time after syncs for dbt runs.** Schedule dbt model execution (or the next downstream sync) at least 15–30 minutes **after the final scheduled sync completes**. Calculate the finish time by adding actual sync duration to the last sync's start time, then add buffer.
@@ -172,11 +174,13 @@ dango schedule add salesforce "20 6 * * *" # 6:20 AM
 
 In this example: Salesforce (6:20 AM start) + ~10 min typical = 6:30 AM finish, plus 15 min buffer = 6:45 AM dbt start. If Salesforce occasionally takes 15 minutes (finishes 6:35 AM), add 30 min buffer → 7:05 AM dbt start.
 
-```bash
-dango schedule add stripe "0 6 * * *"        # Sync: 6:00 AM, ~5 min (worst case: 7 min)
-dango schedule add hubspot "10 6 * * *"      # Sync: 6:10 AM, ~3 min (worst case: 5 min)
-dango schedule add salesforce "20 6 * * *"   # Sync: 6:20 AM, ~10 min (worst case: 15 min → finishes 6:35 AM)
-dango schedule add transform "5 7 * * *"     # dbt: 7:05 AM (30 min buffer after worst case finish)
+Use `dango schedule add` to create each schedule interactively. When prompted, enter the cron expression:
+
+```
+stripe:   0 6 * * *      # Sync: 6:00 AM, ~5 min (worst case: 7 min)
+hubspot:  10 6 * * *     # Sync: 6:10 AM, ~3 min (worst case: 5 min)
+salesforce: 20 6 * * *   # Sync: 6:20 AM, ~10 min (worst case: 15 min → finishes 6:35 AM)
+transform: 5 7 * * *     # dbt: 7:05 AM (30 min buffer after worst case finish)
 ```
 
 ---
