@@ -172,9 +172,7 @@ salesforce: 20 6 * * * # 6:20 AM
 
 ⚠️ **Sync duration varies** — Data volume, API throttling, and network latency cause sync times to fluctuate. Use your **longest observed sync duration** (not average) + 50% buffer to account for variance. Monitor actual sync times in the web UI and adjust schedules if timeouts occur.
 
-In this example: Salesforce (6:20 AM start) + ~10 min typical = 6:30 AM finish, plus 15 min buffer = 6:45 AM dbt start. If Salesforce occasionally takes 15 minutes (finishes 6:35 AM), add 30 min buffer → 7:05 AM dbt start.
-
-Use `dango schedule add` to create each schedule interactively. When prompted, enter the cron expression:
+In this example: Salesforce (6:20 AM start) + ~10 min typical = 6:30 AM finish, plus 15 min buffer = 6:45 AM dbt start. If Salesforce occasionally takes 15 minutes (finishes 6:35 AM), add 30 min buffer → 7:05 AM dbt start. With variance accounted for:
 
 ```
 stripe:   0 6 * * *      # Sync: 6:00 AM, ~5 min (worst case: 7 min)
