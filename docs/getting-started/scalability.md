@@ -44,7 +44,7 @@ Dango runs on a single server (local or cloud). There is no built-in horizontal 
 
 On cloud deployments, Metabase must stop before write operations and restart after. This prevents DuckDB lock conflicts but means dashboard queries are briefly unavailable (typically 30 seconds to 5 minutes, depending on sync duration).
 
-Local deployments have the same limitation — it's a DuckDB constraint, not a Dango implementation detail.
+Local deployments do not pause Metabase — you can run queries while syncs execute in the background.
 
 ---
 
