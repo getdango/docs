@@ -66,6 +66,15 @@ dango start
 echo "Backup complete: $BACKUP_DIR"
 ```
 
+You can also list and restore from automatic local backup archives using the CLI:
+
+```bash
+dango backup          # list archives in .dango/backups/
+dango backup restore ./path/to/archive.tar.gz
+```
+
+See [Local Backup](../cli/other-commands.md#local-backup) for full details.
+
 ### Component-Specific Backups
 
 #### DuckDB Database
