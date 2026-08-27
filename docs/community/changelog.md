@@ -17,6 +17,45 @@ Dango follows [Semantic Versioning](https://semver.org/):
 
 ## Current Version
 
+### v1.0.7
+
+*Released: August 27, 2026*
+
+**Status**: Stable
+
+#### Added
+
+- `dango doctor` — credential health check across all configured sources; shows ✓ OK / ✗ Missing / Expired / Unknown at a glance
+- Model wizard — interactive upstream table selection with CTE scaffold auto-generation; each selected table becomes a named CTE with `{{ ref(...) }}`
+- Schedule wizard — weekday preset (Mon–Fri pre-selected) in `dango schedule add`; `dango schedule reload` applies config changes without restart
+- Service account auth — `dango oauth google_sheets` and `dango oauth google_analytics` offer a choice between browser OAuth and JSON key file, useful for server deployments
+- Script UI history — scheduled script runs now appear in the Scripts page with last run timestamp, status, and View Log link (previously always showed "not run")
+- Script failure history — cancelled, timed-out, and pre-launch-failed script runs write history entries so failures are visible in the UI
+- Secrets page partial masking — env var values show the last 4 characters (`****efgh`) instead of blanket `***`
+- Metabase Collection hierarchy — nested collections preserved correctly across `dango metabase save` / `dango metabase load` roundtrips
+- Column descriptions — default descriptions for columns in 7 high-value sources (Google Ads, GA4, Google Sheets, Stripe, HubSpot, Facebook Ads, BigQuery) visible in the catalog
+- Notebook role access — editor role can open notebooks not created by them
+- Scripts cloud sync — scripts and `scripts/requirements.txt` synced to remote server on `dango remote push`; invalid script paths rejected with a clear error
+
+#### Fixed
+
+- Scripts page: scheduled runs no longer permanently show "not run" — history file written after every scheduled execution
+- Scripts page: View Log no longer 404s on scheduled runs — log files written to the correct path
+- Secrets page: duplicate `/settings/variables` page removed; env vars consolidated into `/settings/secrets`; old URL redirects (301) automatically
+- DuckDB lock conflicts on local: syncs now retry up to 5 times with 10s backoff when Metabase holds the DuckDB connection (previously failed immediately)
+- Schedule reload: source-list changes now detected and applied; previously `dango schedule reload` only compared cron triggers
+- Google Sheets: empty range now raises a clear error instead of silently bypassing empty-replace protection
+- Service account validation: no longer returns valid when `google-auth` package is not installed
+- Model wizard: duplicate CTE alias no longer generated when two upstream table names produce the same identifier
+- Sort/filter UI: broken on Schedules, Scripts, and Catalog pages after a JS refactor — now fixed
+- `InquirerPy` added to declared package dependencies — `dango oauth google_sheets` / `dango oauth google_analytics` no longer crash on fresh installs
+
+#### Security
+
+- PostCSS updated 8.5.10 → 8.5.26, resolving path traversal vulnerabilities in the CSS build toolchain (build-time only; not exploitable at runtime)
+
+---
+
 ### v1.0.6
 
 *Released: August 19, 2026*
