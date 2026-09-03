@@ -258,6 +258,11 @@ functions the CLI commands use:
   including its internal `DbtLock` acquisition around both the data load and the post-sync dbt
   step. Concurrent syncs and dbt runs are serialized the same way regardless of whether they were
   triggered from the CLI or from an agent.
+- **`run_transform`** acquires the same `DbtLock` `dango run` (CLI) uses before calling dbt, mirroring
+  the CLI command exactly. If the lock is already held by another sync or dbt run, the tool returns
+  a clean `{"status": "failed", "error": ...}` rather than corrupting the warehouse or raising a raw
+  exception — see the [dbt Workflows](../workflows/dbt-workflows.md) page for more on the
+  `DbtLock` model.
 - **`run_doctor`** calls the identical credential-health function `dango doctor` uses.
 - **`add_source`** only writes the `sources.yml` entry. It does not create credentials — for
   OAuth sources you still need to run `dango oauth <source_type>` yourself, and for API-key sources
@@ -265,15 +270,6 @@ functions the CLI commands use:
   end-to-end without you completing that step.
 - **`create_model`** writes a `.sql` file and updates `schema.yml`; it does not run anything. You
   (or the agent, via `run_transform`) still have to build the model before it materializes.
-
-!!! warning "`run_transform` does not hold `DbtLock`"
-    Unlike `dango run` (CLI) and the dbt step `run_sync` performs internally, the `run_transform`
-    MCP tool calls dbt directly without acquiring Dango's `DbtLock`. Per DuckDB's single-writer
-    constraint, calling it while another sync or dbt run is in progress is not protected the way
-    the CLI's own `dango run` is — see the [dbt Workflows](../workflows/dbt-workflows.md) page's
-    note on running `dbt` directly. Avoid asking your agent to run transforms while a sync is
-    already in flight; check `list_sources()`/`get_sync_history()` first if in doubt. This is
-    tracked as an open item for a future fix.
 
 ---
 
