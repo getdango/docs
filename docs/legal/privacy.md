@@ -6,7 +6,7 @@ description: Privacy policy for the Dango documentation site
 
 **Last updated:** February 2026
 
-This privacy policy covers the Dango documentation site at [docs.getdango.dev](https://docs.getdango.dev).
+This privacy policy covers the Dango documentation site at [docs.getdango.dev](https://docs.getdango.dev). Looking for what the Dango *product* itself sends when you run it? See [Telemetry](../security/telemetry.md) instead — a separate topic from this page.
 
 ## What We Collect
 
