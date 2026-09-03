@@ -280,6 +280,7 @@ nav:
       - dlt Workflows: workflows/dlt-workflows.md
       - dbt Workflows: workflows/dbt-workflows.md
       - Metabase Workflows: workflows/metabase-workflows.md
+      - Use Dango with Claude Code: guides/mcp-claude-code.md
       - Backup & Restore: workflows/backup-restore.md
       - Git Best Practices: workflows/git-workflows.md
       - Performance: workflows/performance.md
