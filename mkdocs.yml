@@ -316,6 +316,7 @@ nav:
     - Environment Variables: reference/environment-variables.md
     - Permissions Matrix: reference/permissions.md
     - Source Registry: reference/source-registry.md
+    - Limitations: reference/limitations.md
     - FAQ: faq.md
     - Changelog: community/changelog.md
     - Community: community/index.md
