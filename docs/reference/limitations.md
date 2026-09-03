@@ -10,7 +10,7 @@ Dango is honest about what it doesn't do yet. This page lists the real, current 
 |---|---|
 | Single-writer concurrency — Marimo cannot do concurrent read-write with the rest of the platform today | **Planned.** Fixed by the Quack migration (DuckDB's concurrent read/write storage format), targeted for when DuckDB 2.0 stabilizes (~September 2026). Waiting on DuckDB upstream, not on Dango. |
 | Cloud deploy is DigitalOcean-only for managed, automated provisioning | **Not planned.** Bring-your-own-server (BYOS) works with any provider today via manual setup. Automated wizards for AWS/GCP/Hetzner are only revisited on user demand from those providers — none yet. |
-| 34 data sources, vs. Airbyte's 300+ | **Not scheduled.** Sources are added when a specific user asks for one, not on a fixed roadmap or schedule. |
+| 35 data sources, vs. Airbyte's 300+ | **Not scheduled.** Sources are added when a specific user asks for one, not on a fixed roadmap or schedule. |
 | No SSO / SAML — admin login, 2FA, and API keys only | **Not planned.** Revisited on enterprise customer signal — none yet. |
 | No streaming, CDC, or reverse ETL | **Not planned.** Out of scope for what Dango is; revisited only on user demand. |
 | Chrome-tested only — Safari and Firefox are untested, not merely unverified | **Not scheduled.** Sits in the demand-driven backlog, pulled in on user signal rather than a committed date. |
