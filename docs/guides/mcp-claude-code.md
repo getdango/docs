@@ -270,6 +270,15 @@ functions the CLI commands use:
   end-to-end without you completing that step.
 - **`create_model`** writes a `.sql` file and updates `schema.yml`; it does not run anything. You
   (or the agent, via `run_transform`) still have to build the model before it materializes.
+- **`add_source`**, **`create_model`**, and **`add_schedule`** check your project's git state before
+  returning. If your project is a git repo and you're on `main`/`master`, or the working tree has
+  uncommitted changes, the tool's response includes a `git_warning` key (a list of warning strings)
+  alongside the normal result — for example, on `main` with a clean tree you'd see something like
+  `"On branch 'main' — this change will be written directly to that branch. Consider creating a
+  feature branch first."` This is advisory only: the tool still writes the file and reports success,
+  it just gives the agent (and you) a heads-up so an LLM-driven session doesn't silently commit
+  mutations straight to your default branch. Non-git projects and clean feature branches get no
+  `git_warning` key at all.
 
 ---
 
