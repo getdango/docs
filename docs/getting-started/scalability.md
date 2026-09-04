@@ -152,7 +152,7 @@ You get:
 - ✅ Zero infrastructure setup
 - ✅ Version-controlled transformations (dbt)
 - ✅ Built-in dashboards (Metabase)
-- ✅ 33 data sources (dlt)
+- ✅ 35 data sources (dlt)
 - ✅ Local development + cloud deployment in one CLI
 - ✅ Typically sub-second query response for < 50 GB datasets (estimate)
 

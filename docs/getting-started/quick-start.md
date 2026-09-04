@@ -61,7 +61,7 @@ During `dango init`, you set an admin password for the Web UI. This configures a
 
 ## Step 2: Add a Data Source
 
-Let's add your first data source. Dango supports 33 data sources including file imports, APIs, databases, and OAuth-based services.
+Let's add your first data source. Dango supports 35 data sources including file imports, APIs, databases, and OAuth-based services.
 
 ### Option A: File Import (Simplest)
 

@@ -390,7 +390,7 @@ Your progress is not saved if the wizard exits before Step 5 (Save). Re-run `dan
 
 ## Related Pages
 
-- [Source Catalog](source-catalog.md) — all 33 sources with auth types and capabilities
+- [Source Catalog](source-catalog.md) — all 35 sources with auth types and capabilities
 - [Sync Modes](sync-modes.md) — how data is loaded (incremental, full refresh, date range)
 - [Deduplication](deduplication.md) — choose a strategy for handling duplicates
 - [Local Files](local-files/index.md) — detailed guide for CSV, JSON, and Parquet imports

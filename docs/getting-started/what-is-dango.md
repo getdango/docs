@@ -25,7 +25,7 @@ dango init
 
 You get:
 
-- **dlt** for data ingestion (33 data sources)
+- **dlt** for data ingestion (35 data sources)
 - **dbt** for SQL transformations
 - **DuckDB** as your analytics database
 - **Metabase** for dashboards and SQL queries
@@ -61,7 +61,7 @@ Learn more in [Data Layers](../core-concepts/data-layers.md).
 | Component | Purpose | Why This Tool? |
 |-----------|---------|----------------|
 | **DuckDB** | Analytics database | Embedded, fast, no server needed |
-| **dlt** | Data ingestion | 33 sources, schema evolution |
+| **dlt** | Data ingestion | 35 sources, schema evolution |
 | **dbt** | Transformations | SQL-based, version controlled |
 | **Metabase** | BI dashboards | Auto-configured, easy to use |
 | **Docker** | Service orchestration | Consistent environments |
@@ -71,7 +71,7 @@ Learn more in [Data Layers](../core-concepts/data-layers.md).
 
 ### Data Ingestion
 
-- 33 data sources (Stripe, Google Sheets, GA4, Facebook Ads, Salesforce, HubSpot, and more)
+- 35 data sources (Stripe, Google Sheets, GA4, Facebook Ads, Salesforce, HubSpot, and more)
 - File import for CSV, JSON, and Parquet files
 - Custom source development via `dlt_native` and REST API types
 - OAuth authentication for cloud sources

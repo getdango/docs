@@ -6,14 +6,14 @@ Connect to APIs, databases, and local files through Dango's unified data ingesti
 
 ## Overview
 
-Dango supports **33 data sources** through [dlt (data load tool)](https://dlthub.com/docs). Whether you're working with local CSV files, cloud APIs, or existing databases, Dango provides a unified configuration interface.
+Dango supports **35 data sources** through [dlt (data load tool)](https://dlthub.com/docs). Whether you're working with local CSV files, cloud APIs, or existing databases, Dango provides a unified configuration interface.
 
 !!! info "Wizard vs Manual Sources"
     **Wizard-enabled sources** (25 sources): Add via `dango source add` interactive wizard — handles authentication, configuration, and validation automatically.
 
     **Manual sources**: Configure directly in `sources.yml` using `dlt_native` for any [dlt verified source](https://dlthub.com/docs/dlt-ecosystem/verified-sources/).
 
-    See the [Source Catalog](source-catalog.md) for the complete list of all 33 sources.
+    See the [Source Catalog](source-catalog.md) for the complete list of all 35 sources.
 
 **Source categories at a glance:**
 
@@ -215,7 +215,7 @@ Choose your source type and follow the guide:
 
     ---
 
-    Complete catalog of all 33 supported data sources.
+    Complete catalog of all 35 supported data sources.
 
     - Source types and auth methods
     - Configuration examples
@@ -515,7 +515,7 @@ When APIs change:
 
     ---
 
-    Explore all 33 supported data source types.
+    Explore all 35 supported data source types.
 
     [:octicons-arrow-right-24: Source Catalog](source-catalog.md)
 

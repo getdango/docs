@@ -2,16 +2,16 @@
 
 # Source Catalog
 
-Complete catalog of all 33 data sources supported by Dango, grouped by category.
+Complete catalog of all 35 data sources supported by Dango, grouped by category.
 
 ---
 
 ## Overview
 
-Dango ships with **33 built-in source connectors** powered by [dlt (data load tool)](https://dlthub.com/docs):
+Dango ships with **35 built-in source connectors** powered by [dlt (data load tool)](https://dlthub.com/docs):
 
 - **25 wizard-enabled** — add via `dango source add` interactive wizard
-- **6 coming soon** — registered but disabled pending testing
+- **8 coming soon** — registered but disabled pending testing
 - **2 hidden** — legacy aliases (use the recommended alternative)
 
 Every source is defined in the [source registry](../reference/source-registry.md) with its authentication type, default resources, and configuration parameters.
@@ -39,7 +39,7 @@ Sources for local files, generic APIs, and advanced dlt integrations.
 | Source | Display Name | Auth | Incremental | Wizard | Notes |
 |--------|-------------|------|-------------|--------|-------|
 | `local_files` | File Import (CSV, JSON, Parquet) | None | Yes | Yes | [Local Files Guide](local-files/index.md) |
-| `rest_api` | REST API (Generic) | API Key | Varies | Yes | Connect to any REST API — [REST API Guide](rest-api.md) |
+| `rest_api` | REST API (Generic) | API Key | No | Yes | Connect to any REST API — [REST API Guide](rest-api.md) |
 | `dlt_native` | dlt Native (Advanced) | None | Varies | Yes | Bring any dlt source — [Custom Sources Guide](custom-sources.md) |
 | `csv` | CSV Files | None | Yes | No | **Hidden** — use `local_files` instead |
 | `filesystem` | Files & Cloud Storage | None | No | No | **Hidden** — use `local_files` for local files |
@@ -85,7 +85,7 @@ Sources for payment processors and online stores.
 
 | Source | Display Name | Auth | Incremental | Wizard | Notes |
 |--------|-------------|------|-------------|--------|-------|
-| `stripe` | Stripe | API Key | No | Yes | [Stripe Guide](stripe.md) — charges, customers, subscriptions |
+| `stripe` | Stripe | API Key | Partial | Yes | [Stripe Guide](stripe.md) — charges, customers, subscriptions |
 | `shopify` | Shopify | OAuth | — | No | **Coming Soon** — pending OAuth flow update |
 
 ---
@@ -127,8 +127,9 @@ Sources for relational and document databases.
 
 | Source | Display Name | Auth | Incremental | Wizard | Notes |
 |--------|-------------|------|-------------|--------|-------|
-| `postgres` | PostgreSQL | Basic | No | Yes | Full table loading (incremental available via dlt_native config) |
-| `mongodb` | MongoDB | Basic | No | Yes | Full collection loading (incremental available via dlt_native config) |
+| `postgres` | PostgreSQL | Basic | No | Yes | Full table or incremental loading |
+| `mongodb` | MongoDB | Basic | No | Yes | Collections with optional filtering |
+| `sql_database` | Generic SQL Database | — | — | No | Recognized as a source type, but not yet exposed as a dedicated wizard entry or registry-backed config — use `dlt_native` with dlt's `sql_database` source today |
 
 !!! note "Other databases"
     Connect to MySQL, SQL Server, and other databases via the `dlt_native` source type using dlt's [sql_database](https://dlthub.com/docs/dlt-ecosystem/verified-sources/sql_database) source. See [Database Sources](database-sources.md).
@@ -155,6 +156,7 @@ Utility and niche sources.
 | `chess` | Chess.com | None | Partial | Yes | Public API — great for testing |
 | `strapi` | Strapi | API Key | No | No | **Coming Soon** |
 | `personio` | Personio | API Key | Partial | No | **Coming Soon** |
+| `scrapy` | Scrapy (Web Scraping) | — | — | No | Reserved for a future release — not yet implemented |
 
 ---
 
@@ -169,10 +171,10 @@ Utility and niche sources.
 | Development | 1 | 1 | 0 |
 | Communication | 1 | 1 | 0 |
 | Files & Storage | 2 | 2 | 0 |
-| Databases | 2 | 2 | 0 |
+| Databases | 3 | 2 | 1 |
 | Streaming | 2 | 2 | 0 |
-| Other | 3 | 1 | 2 |
-| **Total** | **33** | **25** | **6** |
+| Other | 4 | 1 | 3 |
+| **Total** | **35** | **25** | **8** |
 
 ---
 
@@ -195,7 +197,7 @@ Each source uses one of five authentication methods:
 
 ## Coming Soon Sources
 
-These 6 sources are registered in the source catalog but disabled pending testing or API updates:
+These 8 sources are registered in the source catalog but disabled pending testing or API updates:
 
 | Source | Reason |
 |--------|--------|
@@ -205,6 +207,8 @@ These 6 sources are registered in the source catalog but disabled pending testin
 | `asana` | Awaiting testing and validation |
 | `strapi` | Awaiting testing and validation |
 | `personio` | Awaiting testing and validation |
+| `sql_database` | Recognized as a source type but not yet exposed as a dedicated wizard entry or registry config — use `dlt_native` with dlt's `sql_database` source today |
+| `scrapy` | Reserved for a future release — not yet implemented |
 
 These sources will be enabled in future releases. In the meantime, you can connect to them via [Custom Sources (dlt_native)](custom-sources.md).
 
