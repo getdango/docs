@@ -28,7 +28,7 @@ dango start
 **What you get:**
 
 - **[Web UI](web-ui/index.md)** at `http://localhost:8800` — monitor your data pipeline
-- **[33 data sources](data-sources/source-catalog.md)** via dlt (25 in the setup wizard)
+- **[35 data sources](data-sources/source-catalog.md)** via dlt (25 in the setup wizard)
 - **[dbt](transformations/index.md)** for SQL transformations and modeling
 - **[DuckDB](core-concepts/duckdb.md)** as your analytics database
 - **[Metabase](dashboards/index.md)** for dashboards and SQL queries
@@ -80,7 +80,7 @@ dango start
 
     ---
 
-    Connect to 33 sources — APIs, databases, files, and more
+    Connect to 35 sources — APIs, databases, files, and more
 
 - :material-cog:{ .lg .middle } **[Transformations](transformations/index.md)**
 

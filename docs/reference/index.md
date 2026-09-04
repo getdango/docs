@@ -36,7 +36,7 @@ Complete technical reference documentation for Dango.
 
     ---
 
-    All 33 data sources with categories, auth types, capabilities, and configuration fields.
+    All 35 data sources with categories, auth types, capabilities, and configuration fields.
 
     [:octicons-arrow-right-24: Source Registry](source-registry.md)
 
@@ -67,7 +67,7 @@ Complete technical reference documentation for Dango.
 | [Configuration Reference](configuration.md) | All 13 config file schemas |
 | [API Reference](api.md) | REST API endpoints, WebSocket events, auth |
 | [Permissions Matrix](permissions.md) | Roles, permissions, session security |
-| [Source Registry](source-registry.md) | 33 sources with config details |
+| [Source Registry](source-registry.md) | 35 sources with config details |
 | [Environment Variables](environment-variables.md) | Platform, cloud, and credential variables |
 | [CLI Reference](../cli/cli-reference.md) | All CLI commands and options |
 | [Data Sources](../data-sources/index.md) | Source configuration guides |

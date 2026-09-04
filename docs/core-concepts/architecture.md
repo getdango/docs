@@ -16,7 +16,7 @@ Dango integrates four production-grade open-source tools into a unified platform
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
 │                    dlt (Data Load Tool)                     │
-│  • 33 sources  • OAuth  • Incremental  • Deduplication     │
+│  • 35 sources  • OAuth  • Incremental  • Deduplication     │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐

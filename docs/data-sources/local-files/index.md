@@ -274,6 +274,6 @@ If you copied files but they're classified as "unchanged":
 ## Related Pages
 
 - [Adding Sources](../adding-sources.md) — wizard walkthrough for all source types
-- [Source Catalog](../source-catalog.md) — complete list of all 33 sources
+- [Source Catalog](../source-catalog.md) — complete list of all 35 sources
 - [Sync Modes](../sync-modes.md) — incremental, full refresh, and date range options
 - [Deduplication](../deduplication.md) — strategies for handling duplicate records

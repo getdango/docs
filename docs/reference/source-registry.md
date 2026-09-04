@@ -6,10 +6,12 @@ Complete reference for all data source types supported by Dango.
 
 ## Overview
 
-Dango supports **33 data sources** across **10 categories**, using **5 authentication types**. Sources are added via `dango source add` (wizard-enabled) or manual YAML configuration in `.dango/sources.yml`.
+Dango supports **35 data sources** across **10 categories**, using **5 authentication types**. Sources are added via `dango source add` (wizard-enabled) or manual YAML configuration in `.dango/sources.yml`.
 
 - **25 wizard-enabled** sources can be configured interactively
-- **8 wizard-disabled** sources require manual YAML configuration or the `dlt_native` bypass
+- **10 wizard-disabled** sources require manual YAML configuration or the `dlt_native` bypass (2 of
+  these — `sql_database` and `scrapy` — are recognized `SourceType` values with no registry entry
+  yet; see their notes below)
 - Sources without a dedicated Pydantic config model use `generic_config: dict` in YAML
 
 ---
@@ -44,6 +46,7 @@ Dango supports **33 data sources** across **10 categories**, using **5 authentic
 | Email Inbox (IMAP) | `inbox` | Files & Storage | Basic | :white_check_mark: | :white_check_mark: |
 | MongoDB | `mongodb` | Databases | Basic | :white_check_mark: | :white_check_mark: |
 | PostgreSQL | `postgres` | Databases | Basic | :white_check_mark: | :white_check_mark: |
+| Generic SQL Database | `sql_database` | Databases | — | | |
 | GitHub | `github` | Development | API Key | :white_check_mark: | :white_check_mark: |
 | Slack | `slack` | Communication | API Key | :white_check_mark: | :white_check_mark: |
 | Apache Kafka | `kafka` | Streaming | None | :white_check_mark: | :white_check_mark: |
@@ -51,6 +54,7 @@ Dango supports **33 data sources** across **10 categories**, using **5 authentic
 | Chess.com | `chess` | Other | None | :white_check_mark: | |
 | Strapi | `strapi` | Other | API Key | | |
 | Personio | `personio` | Other | API Key | | :white_check_mark: |
+| Scrapy (Web Scraping) | `scrapy` | Other | — | | |
 
 ---
 
@@ -411,6 +415,17 @@ Load tables from PostgreSQL databases with schema filtering.
 |-------|------|---------|-------------|
 | `generic_config` | dict | -- | See [generic_config](#generic_config) |
 
+#### Generic SQL Database (`sql_database`)
+
+!!! note "Not registry-backed"
+    `sql_database` is a recognized `SourceType` value (accepted by the `type:` field in
+    `sources.yml`), but it has no entry in the source registry — no wizard UI, no dedicated auth
+    type or config fields. It's excluded because dlt's generic `sql_database` source supports
+    arbitrary table selectors across many SQL dialects, which doesn't map cleanly to the
+    wizard/registry pattern. Use the `dlt_native` bypass with dlt's
+    [sql_database](https://dlthub.com/docs/dlt-ecosystem/verified-sources/sql_database) source
+    for MySQL, SQL Server, and other databases beyond the dedicated PostgreSQL entry above.
+
 ---
 
 ### Streaming
@@ -496,6 +511,13 @@ Load player profiles and games from Chess.com API. No authentication required.
 
 !!! note "Wizard disabled"
     Enterprise-only API.
+
+#### Scrapy (`scrapy`)
+
+!!! note "Not yet implemented"
+    `scrapy` is a recognized `SourceType` value, reserved for a future release. It has no source
+    registry entry and no dlt package backing it yet — there is currently no way to configure a
+    `scrapy` source.
 
 ---
 

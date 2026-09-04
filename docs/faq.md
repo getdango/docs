@@ -10,7 +10,7 @@ Common questions about Dango.
 
 Dango is an open-source data platform that combines production-grade tools into a single, pre-configured stack:
 
-- **[dlt](core-concepts/architecture.md)** for data ingestion (33 sources)
+- **[dlt](core-concepts/architecture.md)** for data ingestion (35 sources)
 - **[DuckDB](core-concepts/duckdb.md)** for analytics storage
 - **[dbt](transformations/index.md)** for SQL transformations
 - **[Metabase](dashboards/index.md)** for dashboards and visualization
@@ -77,7 +77,7 @@ See [Changelog](community/changelog.md) for what's new in each release.
 
 ### How many data sources does Dango support?
 
-Dango supports **33 data sources**, with 25 available through the interactive setup wizard (`dango source add`). Sources include Stripe, Google Sheets, GA4, Facebook Ads, HubSpot, Salesforce, GitHub, Slack, PostgreSQL, file imports (CSV, JSON, Parquet), REST API, and more.
+Dango supports **35 data sources**, with 25 available through the interactive setup wizard (`dango source add`). Sources include Stripe, Google Sheets, GA4, Facebook Ads, HubSpot, Salesforce, GitHub, Slack, PostgreSQL, file imports (CSV, JSON, Parquet), REST API, and more.
 
 See the [Source Catalog](data-sources/source-catalog.md) for the complete list.
 
