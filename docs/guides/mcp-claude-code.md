@@ -24,26 +24,65 @@ The server exposes 15 tools:
 
 ## Setup
 
-### Automatic
+`dango mcp setup` must be run from inside your Dango project (it needs to know which project to
+point your LLM client at). It configures each detected client differently, because each one has a
+genuinely different config model — not one design applied three times:
+
+### Claude Code
 
 ```bash
 dango mcp setup
 ```
 
-This detects which supported LLM clients are installed on your machine (by checking whether their
-config directory exists) and writes a `dango` entry into each one's MCP config file:
+Runs `claude mcp add --scope local`, Claude Code's own install command, instead of writing a config
+file directly. **Local scope** is private to you and keyed by this project's absolute path — it
+lives in `~/.claude.json`, not `~/.claude/settings.json`, and never touches any other Dango project
+on your machine. This requires the `claude` CLI to be on your `PATH` (a separate thing from the
+Claude Code app itself — if setup reports it can't find `claude`, make sure it's on your `PATH` and
+re-run `dango mcp setup`).
 
-| Client | Config file |
-|--------|-------------|
-| Claude Code | `~/.claude/settings.json` |
-| Cursor | `~/.cursor/mcp.json` |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` |
+To verify or remove the connection yourself:
 
-The write is atomic (temp file + rename) and preserves the file's existing contents and
-permissions — it merges a `dango` key into `mcpServers` rather than overwriting the whole file, so
-your other client settings are untouched.
+```bash
+claude mcp get dango       # shows scope, command, and connection status
+claude mcp remove dango --scope local
+```
 
-Restart your LLM client afterward to pick up the new server.
+### Cursor
+
+`dango mcp setup` writes a project-scoped `.cursor/mcp.json` in your project root. Unlike Claude
+Code, Cursor has no private per-project scope and no native CLI install command — its project
+config is designed to be **committed to git and shared with your team**. To keep that safe, the
+entry uses a bare `dango` command (resolved via each teammate's own `PATH` once they activate their
+own venv, not an absolute path baked in for one machine) and Cursor's `${workspaceFolder}`
+substitution for the project root:
+
+```json
+{
+  "mcpServers": {
+    "dango": {
+      "command": "dango",
+      "args": ["mcp", "run"],
+      "env": { "DANGO_PROJECT_ROOT": "${workspaceFolder}" }
+    }
+  }
+}
+```
+
+Commit this file if you want the whole team connected. `dango mcp setup` will warn you (without
+blocking) if your git working tree is dirty or you're on `main`/`master` when it writes this file,
+the same way `dango source add` and `dango model add` do.
+
+### Windsurf
+
+Windsurf has no project-scoped MCP config at all — this is a hard limitation of Windsurf itself, not
+something Dango can work around. `dango mcp setup` writes the global
+`~/.codeium/windsurf/mcp_config.json`, with your current project's path injected as
+`DANGO_PROJECT_ROOT` so at least that one project is unambiguous:
+
+> **Windsurf can only be connected to one Dango project at a time.** Running `dango mcp setup` again
+> from a different project overwrites this configuration. If you work across multiple Dango
+> projects, prefer Claude Code or Cursor.
 
 ### Verify
 
@@ -51,36 +90,42 @@ Restart your LLM client afterward to pick up the new server.
 dango mcp status
 ```
 
-Reports which supported clients were detected and whether each one's config file actually has the
-`dango` entry, e.g.:
+Reports which supported clients were detected and whether each one is actually configured **for
+the project you're running the command from** — Claude Code via `claude mcp get dango`, Cursor by
+reading the project's own `.cursor/mcp.json`, Windsurf by reading its global config file:
 
 ```
-✓ Claude Code: dango MCP configured
+✓ Claude Code: dango MCP configured (local scope)
 ✓ Cursor: dango MCP configured
 ```
 
-### Manual configuration
+### Remove
 
-If your client isn't auto-detected yet, or you'd rather edit the config yourself, add this to the
-client's MCP config file under `mcpServers`:
-
-```json
-{
-  "mcpServers": {
-    "dango": {
-      "command": "/path/to/your/project/venv/bin/dango",
-      "args": ["mcp", "run"]
-    }
-  }
-}
+```bash
+dango mcp remove
 ```
 
-`command` should point at the `dango` executable inside the same virtualenv you installed Dango
-into (`dango mcp setup` resolves this automatically from `sys.executable`; falls back to the bare
-`dango` command, relying on `PATH`, if it can't find a venv-local binary). MCP clients run one
-server process per project — if you work across multiple Dango projects, `dango mcp run` picks up
-whichever project you're in the same way any other `dango` command does (it walks up from the
-current directory to find `project.yml`).
+Reverses whatever `dango mcp setup` configured for this project — `claude mcp remove dango --scope
+local` for Claude Code, and deleting the `dango` key from Cursor's and Windsurf's config files.
+
+### Manual configuration
+
+If your client isn't auto-detected, or you'd rather configure it by hand: Claude Code accepts the
+same `claude mcp add` command shown above; Cursor and Windsurf both read the `{"mcpServers": {...}}`
+JSON shape shown above from `.cursor/mcp.json` (project) or `~/.codeium/windsurf/mcp_config.json`
+(global) respectively. Whichever client you're configuring, set `DANGO_PROJECT_ROOT` to your
+project's absolute path in the entry's `env` — `dango mcp run` prefers it over guessing from the
+current directory, which matters because MCP clients spawn the server once per session and keep it
+running for the whole session, so the directory the server happened to start in can drift from the
+project you actually meant.
+
+### Version safety
+
+The server checks its own version against the version recorded when the project was created (`dango
+init`), once at startup, and prints a warning to its logs (not to you directly — MCP server output
+isn't shown in the chat) if they differ. This catches the case where a stale or mismatched `dango`
+binary ends up pointed at a newer or older project than it was built for — re-run `dango mcp setup`
+from the project's own environment if you see stale results and suspect this.
 
 ---
 
