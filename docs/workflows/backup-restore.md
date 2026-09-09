@@ -36,21 +36,25 @@ BACKUP_DIR="backups/$(date +%Y%m%d_%H%M%S)"
 
 mkdir -p "$BACKUP_DIR"
 
-# 1. Stop services (optional but recommended)
+# 1. Metabase dashboards (needs Metabase running, so do this before stopping
+#    services below. `dango metabase save` always exports to the project's
+#    fixed metabase/ directory -- it has no --output/path argument -- so we
+#    copy the export to the backup location ourselves)
+dango metabase save
+cp -r metabase "$BACKUP_DIR/"
+
+# 2. Stop services (optional but recommended, for a consistent DB snapshot)
 dango stop
 
-# 2. Database
+# 3. Database
 cp data/warehouse.duckdb "$BACKUP_DIR/"
 
-# 3. Configuration
+# 4. Configuration
 cp -r .dango "$BACKUP_DIR/"
 cp -r .dlt "$BACKUP_DIR/"
 
-# 4. dbt models and snapshots
+# 5. dbt models and snapshots
 cp -r dbt "$BACKUP_DIR/"
-
-# 5. Metabase dashboards
-dango metabase save --output "$BACKUP_DIR/metabase/"
 
 # 6. Metabase data (Docker volume)
 if [ -d "metabase-data" ]; then
@@ -130,8 +134,9 @@ cp -r dbt backups/dbt_backup/
 #### Metabase Dashboards
 
 ```bash
-# Export dashboards
-dango metabase save --output backups/metabase/
+# Export dashboards (always writes to <project>/metabase/ -- no path argument)
+dango metabase save
+cp -r metabase backups/metabase/
 
 # Full Metabase data (H2 database)
 cp -r metabase-data backups/metabase_backup/
@@ -261,8 +266,11 @@ cp /path/to/backup/warehouse.duckdb data/
 # 5. Start services
 dango start
 
-# 6. Restore Metabase dashboards
-dango metabase load --input /path/to/backup/metabase/
+# 6. Restore Metabase dashboards (dango metabase load always imports from
+#    <project>/metabase/ -- no path argument -- so copy the backed-up
+#    export there first)
+cp -r /path/to/backup/metabase .
+dango metabase load
 
 # 7. Re-enter credentials (secrets.toml)
 # Edit .dlt/secrets.toml with your credentials
@@ -294,8 +302,11 @@ dango stop
 rm -rf metabase-data
 cp -r /path/to/backup/metabase_backup metabase-data
 dango start
-# Or restore from saved dashboards
-dango metabase load --input /path/to/backup/metabase/
+# Or restore from saved dashboard/question exports instead of the raw
+# Docker volume (dango metabase load always imports from <project>/metabase/
+# -- no path argument -- so copy the backed-up export there first)
+cp -r /path/to/backup/metabase .
+dango metabase load
 ```
 
 **dbt Models Only**:
