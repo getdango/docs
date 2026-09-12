@@ -69,7 +69,7 @@ sequenceDiagram
     Facebook does **not** support automatic token refresh. You must re-authenticate every 60 days by running `dango oauth facebook_ads`. Set a **45-day calendar reminder** to avoid sync failures. If you stored your App ID and App Secret during setup, Dango can extend the token without a full re-auth flow.
 
 !!! tip "Google testing-mode tokens expire in 7 days"
-    If your Google Cloud OAuth app is in **"Testing"** status (not published), refresh tokens expire after 7 days. To avoid this, publish your OAuth app or move it to **"In production"** status in the Google Cloud Console. Published apps with limited scopes (like Sheets read-only) do not require Google verification.
+    If your Google Cloud OAuth app is in **"Testing"** status (not published), refresh tokens expire after 7 days. To avoid this, publish your OAuth app or move it to **"In production"** status in the Google Cloud Console. This does **not** remove Google's "app isn't verified" warning during consent — the scopes Dango requests (Sheets/GA4/Ads read access) are Google-classified **Sensitive** scopes, so the warning appears regardless of Testing vs. Production status. That's expected and safe to click through for your own data.
 
 ---
 
@@ -230,10 +230,14 @@ Each provider requires a registered OAuth app:
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create project (or use existing)
-3. Enable API (Sheets API, GA4 API, etc.)
-4. Create OAuth 2.0 credentials
-5. Add `http://localhost:8080` to redirect URIs
-6. Download credentials JSON
+3. Enable API (Sheets API, GA4 API, etc.) — do this before configuring Google Auth Platform;
+   see the [Google Sheets guide](google-sheets.md#create-oauth-credentials) for the full,
+   current Console flow
+4. Create OAuth 2.0 credentials (**Web application** type, via Google Auth Platform's
+   **Clients** tab)
+5. Add `http://localhost:8080/callback` to redirect URIs
+6. Copy the **Client ID** and **Client Secret** directly from the Clients tab — dango does not
+   read a downloaded credentials JSON file anywhere; it prompts for these values as plain text
 
 #### Facebook (Ads, Pages)
 

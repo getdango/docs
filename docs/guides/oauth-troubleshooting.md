@@ -6,7 +6,11 @@ Common issues when setting up OAuth sources (Google Sheets, Google Analytics, Go
 
 ## Consent Screen Setup
 
-Before creating OAuth credentials, you must configure the OAuth consent screen in Google Cloud Console. This is the screen users see when authorizing your app.
+Before creating OAuth credentials, you must configure **Google Auth Platform** (Google's current
+name for what used to be called the "OAuth consent screen") in Google Cloud Console. This is the
+screen users see when authorizing your app. Google Auth Platform only appears in the Console
+navigation once at least one API is enabled on the project — enable your source's API first (see
+[Enabling APIs](#enabling-apis) below) if you haven't already.
 
 ### Testing vs Production Mode
 
@@ -14,37 +18,67 @@ Before creating OAuth credentials, you must configure the OAuth consent screen i
 |---|---|---|
 | **Who can authorize** | Only emails you add as test users | Anyone with a Google account |
 | **Token expiry** | **7 days** — tokens expire and must be re-authorized | No expiry (until revoked) |
-| **Verification** | Not required | Requires Google review |
+| **Verification** | Depends on scope sensitivity, not this setting — see below | Depends on scope sensitivity, not this setting — see below |
 | **Best for** | Personal projects, small teams | Apps serving external users |
 
 !!! warning "Testing mode tokens expire after 7 days"
     If your tokens stop working after a week, this is why. Either re-authorize (`dango oauth refresh <source_type>`) or switch to production mode.
 
+!!! info "Verification depends on the scope, not Testing vs. Production"
+    Whether Google requires app verification is determined by scope **sensitivity**, not by
+    publishing status. Every scope Dango requests (`spreadsheets.readonly`, `analytics.readonly`,
+    `adwords`) is a Google-classified **Sensitive** scope, so the "Google hasn't verified this
+    app" warning applies the same way whether your app is Testing or Production. For a
+    personal/internal app with a handful of test users, you don't need to complete Google's
+    verification review — you'll just click through the warning each time (see
+    [App not verified](#app-not-verified-warning) below), which is expected and safe for your
+    own data.
+
 ### Setting Up the Consent Screen
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** → **OAuth consent screen**
-2. Select **External** (Internal requires Google Workspace)
-3. Fill in:
-    - **App name**: anything (e.g., "My Analytics")
-    - **User support email**: your email
-    - **Developer contact**: your email
-4. **Scopes**: click **Add or Remove Scopes** and add the scopes for your source:
+1. Enable your source's API **first** — Google Auth Platform only appears in the nav once an
+   API is enabled on the project (see [Enabling APIs](#enabling-apis) below).
+2. Go to [Google Cloud Console](https://console.cloud.google.com/) → **APIs & Services** →
+   **Google Auth Platform**.
+3. **First time in this project?** Click **Get started** and walk the 4-step wizard:
+    - App Information
+    - **Audience** — select **External** here (this is where User Type now lives; there's no
+      separate "External" button anymore)
+    - Contact Information
+    - Create
+4. **Already configured from a previous Google source in this project?** You'll land directly
+   on a tabbed dashboard (Branding / Audience / Clients / Data Access) instead of the wizard —
+   nothing further needed here, skip to step 5.
+5. **Test users** (Testing-status apps only): **Audience** tab → **Test users** → **Add users**
+   → enter the Google account email you'll authorize with. If your app's Publishing status is
+   already **In production**, this section won't appear — that's expected.
 
-    | Source | Required Scope |
+    Reference — the scope each source requests (Dango requests these directly at authorization
+    time; you do not need to pre-declare them on the **Data Access** tab for a Testing-status
+    app with test users to work):
+
+    | Source | Scope Dango Requests |
     |--------|---------------|
     | Google Sheets | `https://www.googleapis.com/auth/spreadsheets.readonly` |
     | Google Analytics (GA4) | `https://www.googleapis.com/auth/analytics.readonly` |
     | Google Ads | `https://www.googleapis.com/auth/adwords` |
 
-5. **Test users**: add the Google account email you'll authorize with
-6. Click **Save**
-
 ### Switching to Production Mode
 
-To avoid 7-day token expiry:
+Publishing to Production stops the 7-day token expiry — new and existing tokens stop expiring
+automatically after a week.
 
-1. Go to **OAuth consent screen** → click **Publish App**
-2. Google may require a verification review — for apps that only access your own data (limited users, no sensitive scopes), this is usually a quick self-attestation
+**It does not, by itself, remove the "Google hasn't verified this app" warning** — all three
+scopes above are Google-classified Sensitive scopes, so the warning depends on completing
+Google's verification review, not on publishing status. Most personal/internal setups never
+complete verification and simply click through the warning each time (see
+[App not verified](#app-not-verified-warning) below); that's expected and safe for your own data.
+
+To switch to Production:
+
+1. Go to **Google Auth Platform** → **Audience** tab → click **Publish App**
+2. This does not require completing Google's verification review — you can publish while still
+   unverified; the unverified-app warning keeps appearing at authorization time regardless
 3. After publishing, existing tokens continue working and new tokens don't expire
 
 ---
@@ -65,23 +99,30 @@ To avoid 7-day token expiry:
 
 This is a one-time step per authorization. You won't see this screen again unless you revoke access and re-authorize.
 
-!!! tip "Want to remove the warning permanently?"
-    Switch your OAuth consent screen to **Production mode** (see [Switching to Production Mode](#switching-to-production-mode) above). This also prevents the 7-day token expiry that applies to testing mode apps.
+!!! tip "Switching to Production mode does not remove this warning"
+    Production mode does **not** remove the "Google hasn't verified this app" warning — Dango's
+    scopes are all Google-classified Sensitive scopes, so the warning applies regardless of
+    publishing status. Production mode is still worth doing, though: it prevents the 7-day
+    token expiry that applies to Testing-status apps (see
+    [Switching to Production Mode](#switching-to-production-mode) above).
 
 ### "Access blocked: This app's request is invalid"
 
 **Cause:** OAuth redirect URI mismatch.
 
-**Fix:** In Google Cloud Console → **Credentials** → your OAuth client → **Authorized redirect URIs**, add:
+**Fix:** In Google Cloud Console → **Google Auth Platform** → **Clients** tab → your OAuth
+client → **Authorized redirect URIs**, add:
 
 ```
 http://localhost:8080/callback
 ```
 
-If using the Web UI OAuth flow instead of the CLI, add this URI instead:
+If using the Web UI OAuth flow instead of the CLI (cloud deployments with a configured custom
+domain — this is not a local-dev path), add this URI instead, replacing `<your-domain>` and
+`<source_type>` with your actual domain and the source's type (e.g. `google_sheets`):
 
 ```
-http://localhost:8800/api/oauth/callback
+https://<your-domain>/oauth/callback/<source_type>
 ```
 
 ### "Port 8080 already in use"
