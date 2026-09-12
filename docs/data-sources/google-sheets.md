@@ -32,12 +32,24 @@ Before adding Google Sheets as a source, you need:
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a project (or select an existing one)
 3. Navigate to **APIs & Services > Library**
-4. Search for and enable **Google Sheets API**
-5. Go to **APIs & Services > Credentials**
-6. Click **Create Credentials > OAuth client ID**
-7. Select **Desktop app** as the application type
-8. Add redirect URIs (see below)
-9. Copy the **Client ID** and **Client Secret**
+4. Search for and enable **Google Sheets API** — do this first; **Google Auth Platform** (the
+   next step) only appears in the navigation once an API is enabled on the project
+5. Navigate to **APIs & Services > Google Auth Platform** (Google's current name for what used
+   to be called the "OAuth consent screen")
+    - **First time in this project?** Click **Get started** and walk the 4-step wizard — App
+      Information, then **Audience** (select **External** here — this is where User Type now
+      lives, there's no separate "External" button anymore), then Contact Information, then
+      Create
+    - **Already configured from a previous Google source in this project?** You'll land
+      directly on a tabbed dashboard (Branding / Audience / Clients / Data Access) instead —
+      nothing further needed here, skip to step 6
+6. If your app is in Testing status, add a test user: **Google Auth Platform > Audience tab >
+   Test users > Add users** > your Google account email. If your app's Publishing status is
+   already **In production**, this section won't appear — that's expected
+7. Go to **Google Auth Platform > Clients tab > Create Client**
+8. Select **Web application** as the application type
+9. Add redirect URIs (see below)
+10. Copy the **Client ID** and **Client Secret**
 
 ### Redirect URIs
 
@@ -49,16 +61,24 @@ Before adding Google Sheets as a source, you need:
     http://localhost:8080/callback
     ```
 
-=== "Web UI Setup"
+=== "Web UI Setup (cloud deployments only)"
 
-    Add this redirect URI to your Google Cloud OAuth app:
+    The Web UI OAuth flow requires a configured custom domain with HTTPS — it is **not** a
+    local-dev path (`dango start` on your laptop always uses the CLI flow above). Add this
+    redirect URI to your Google Cloud OAuth app, replacing `<your-domain>` with your actual
+    deployed domain:
 
     ```
-    http://localhost:8800/api/oauth/callback
+    https://<your-domain>/oauth/callback/google_sheets
     ```
 
 !!! tip "Google testing mode"
-    If your OAuth app is in **"Testing"** status, refresh tokens expire after **7 days**. Move your app to **"In production"** status to get permanent tokens. Apps with limited scopes (like Sheets read-only) do not require Google verification.
+    If your OAuth app is in **"Testing"** status, refresh tokens expire after **7 days**. Move
+    your app to **"In production"** status to get permanent tokens. This does **not** remove
+    Google's "Google hasn't verified this app" warning during consent — `spreadsheets.readonly`
+    is a Google-classified **Sensitive** scope, so expect that warning regardless of Testing vs.
+    Production status. It's expected and safe to click through it for your own app — see
+    [OAuth Troubleshooting](../guides/oauth-troubleshooting.md).
 
 ---
 
