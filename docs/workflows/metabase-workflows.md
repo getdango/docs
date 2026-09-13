@@ -328,7 +328,7 @@ For sharing without login:
 | Issue | Cause | Solution |
 |-------|-------|----------|
 | "Database connection failed" | Metabase can't reach DuckDB | Restart: `dango stop && dango start` |
-| Tables not showing | Schema not synced | Run `dango metabase refresh` |
+| Tables not showing | Schema not synced (rare — `dango sync` refreshes Metabase's schema automatically as of 1.0.8) | Run `dango metabase refresh` |
 | Slow queries | Large tables, missing indexes | Check DuckDB [performance](performance.md) |
 | Export fails | Metabase not running | Check `dango status` |
 | Driver version mismatch | DuckDB upgraded independently | Match Python and driver versions — see [Troubleshooting](troubleshooting.md#metabase-connection-issues) |
