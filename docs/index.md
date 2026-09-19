@@ -1,6 +1,6 @@
 # Dango Documentation
 
-Dango is an open-source data platform that integrates **dlt + dbt + DuckDB + Metabase** into a single, pre-configured stack.
+Dango is a complete, open-source data platform: ingestion, warehouse, transformation, and dashboards — plus the auth, scheduling, monitoring, and access control it takes to actually run them together.
 
 Works on your laptop today. Deploy to the cloud when you're ready.
 

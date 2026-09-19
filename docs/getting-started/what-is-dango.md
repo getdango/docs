@@ -1,23 +1,24 @@
 # What is Dango?
 
-Dango is an open-source data platform that integrates production-grade tools (dlt, dbt, DuckDB, Metabase) into a single, cohesive platform.
+Dango is a complete, open-source data platform — ingestion, transformation, a warehouse, and
+dashboards, built on production-grade tools (dlt, dbt, DuckDB, Metabase).
 
 **Develop locally. Deploy to the cloud when you're ready.**
 
 ## The Problem
 
-Building a data platform typically requires:
+dlt, dbt, DuckDB, and Metabase are each excellent on their own. The friction is running them
+together as one system:
 
-- Weeks of setup and configuration
-- Deep knowledge of multiple tools
-- Complex infrastructure decisions
-- Choosing between simple (limited) or complex (powerful) tools
-
-**Result:** Data teams spend more time on infrastructure than analysis.
+- No shared authentication, scheduling, or access control between them out of the box
+- Nobody owns credential health, backups, or catching a schema change before it breaks a dashboard
+- Getting from "four working tools" to "a platform a team can actually operate" is the part that
+  takes weeks — and most DIY setups never build the operational layer at all
 
 ## The Solution
 
-Dango gives you a complete data stack with one command:
+Dango is that operational layer, already built in — not a one-time setup, but a platform
+maintained through updates as it runs:
 
 ```bash
 dango init
@@ -30,6 +31,8 @@ You get:
 - **DuckDB** as your analytics database
 - **Metabase** for dashboards and SQL queries
 - **Web UI** for monitoring, management, and authentication
+- **Scheduling, credential health checks, and schema drift detection** running without
+  configuration
 - **50+ CLI commands** for every aspect of your data workflow
 
 ## Architecture
