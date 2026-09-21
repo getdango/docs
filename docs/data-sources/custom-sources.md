@@ -529,14 +529,29 @@ dango run --select resource_type:seed
 Custom sources can read from the DuckDB warehouse directly — useful for transformations that need existing data:
 
 ```python
+import time
 import dlt
 import duckdb
+
+def connect_with_retry(db_path, max_retries=5, retry_wait=10):
+    """Open a read-only DuckDB connection, retrying on transient lock conflicts."""
+    last_error = None
+    for attempt in range(max_retries):
+        try:
+            return duckdb.connect(str(db_path), read_only=True)
+        except Exception as exc:
+            last_error = exc
+            if "could not set lock" not in str(exc).lower():
+                raise
+            if attempt < max_retries - 1:
+                time.sleep(retry_wait)
+    raise last_error
 
 @dlt.source
 def enriched_data():
     @dlt.resource(name="enriched_orders", write_disposition="replace")
     def enrich():
-        conn = duckdb.connect("data/warehouse.duckdb", read_only=True)
+        conn = connect_with_retry("data/warehouse.duckdb")
         orders = conn.execute("""
             SELECT o.*, c.segment
             FROM raw_my_api.orders o
@@ -551,7 +566,7 @@ def enriched_data():
 ```
 
 !!! warning "Single-writer constraint"
-    Open DuckDB with `read_only=True` to avoid blocking syncs. Only one process can write to DuckDB at a time. The path `data/warehouse.duckdb` is relative to the project root — run syncs from the project directory.
+    Open DuckDB with `read_only=True` — required to avoid corrupting the warehouse, since only one process can hold a write connection at a time. But `read_only=True` alone does **not** guarantee your connection succeeds on the first try: DuckDB's cross-process locking is asymmetric — a *writer* needs fully exclusive access, so a scheduled dango sync that happens to be writing at that exact instant can transiently block even a correctly read-only connection from a different process (your custom source, a notebook, a separate script). This is intermittent and timing-dependent, not something `read_only=True` eliminates on its own. Use a retry loop like `connect_with_retry()` above for any custom source, script, or notebook that opens its own DuckDB connection — dango's own sync code uses the same pattern internally. The path `data/warehouse.duckdb` is relative to the project root — run syncs from the project directory.
 
 ### Deploying Custom Sources to Cloud
 
