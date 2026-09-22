@@ -17,6 +17,48 @@ Dango follows [Semantic Versioning](https://semver.org/):
 
 ## Current Version
 
+### v1.0.8
+
+*Released: September 22, 2026*
+
+**Status**: Stable
+
+#### Added
+
+- Opt-in telemetry controls — anonymous first-run consent, `dango telemetry` CLI controls, and a matching `/settings/telemetry` page
+- MCP server — project-aware setup for Claude Code, Cursor, and Windsurf, with 15 tools for reading project state and safely running common mutations
+- `dango init` now creates matching `CLAUDE.md` and `AGENTS.md` guidance files for coding agents
+- `dango validate` now flags missing or placeholder model and column descriptions
+- BYOS/self-hosted deploys now warn when backups are not configured
+- Data Pipeline Health dashboard now shows live sync history, dbt test results, and source counts
+- `dango status` now reports MCP server status; `dango source inspect-state` and `dango docker-audit` add diagnostics for incremental state and Dango-managed Docker resources
+
+#### Fixed
+
+- Upgraded dbt-core, dbt-duckdb, Metabase, and the Metabase DuckDB JDBC driver to their 1.0.8-supported versions
+- `dango generate` avoids unnecessary staging-model rewrites and protects manually customized models unless `--force` is supplied
+- Sync progress now reports when data loading has completed and transforms are starting
+- Metabase now consistently respects configured ports, refreshes connections/schema reliably after syncs and restarts, restores current exports, and fixes dashboard/card provisioning
+- Docker project identity is now stable across project moves; start/stop commands avoid operating on another project's processes or containers
+- CSV/local-files sources reject incompatible column types clearly, handle apostrophes in paths, and recover safely from transient DuckDB locks
+- Google Sheets OAuth token refresh and current Google Console setup guidance are corrected
+- Source-add prompts handle pasted Sheets URLs, Ctrl+C, skipped OAuth setup, and correct sync-command hints cleanly
+- Script timeouts preserve prior output; per-script timeouts are configurable
+- MCP transform operations now share the warehouse write lock, preventing concurrent-write corruption
+- Telemetry settings no longer create project git diffs and now clearly describe machine-wide versus project scope
+
+#### Security
+
+- Removed guessable fallback credentials from Metabase provisioning
+- Updated `postcss-selector-parser` to resolve Dependabot alert #7
+
+#### Changed
+
+- MCP setup is now project-scoped for Claude Code and Cursor where supported; `dango mcp remove` reverses configured integrations
+- Telemetry prompts and status output now state ongoing-heartbeat and scope behavior plainly
+
+---
+
 ### v1.0.7
 
 *Released: August 27, 2026*
