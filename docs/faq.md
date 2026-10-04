@@ -247,7 +247,7 @@ See [Authentication](security/authentication.md) for details on the SSO bridge.
 | OAuth tokens | `.dlt/secrets.toml` |
 | API keys | `.dlt/secrets.toml` |
 | Metabase credentials | Connection details in `.dango/metabase.yml`; admin password in the OS keychain (fallback `~/.dango/secrets/metabase/`) |
-| Admin password | `.dango/auth.yml` (hashed) |
+| Admin password | `.dango/auth.db` (hashed) |
 
 Always add `.dlt/secrets.toml` to `.gitignore`. See [Credential Management](security/credentials.md).
 
