@@ -214,7 +214,7 @@ dango-backup-*
 
 When Dango backs up your `.env` before changing it, the backup is created readable by you only (`0600`) and matches the `.env*.backup` entry. Dango also warns during `dango upgrade`, `dango start` and cloud serve if it finds local backup locations that may predate this protection. It only reports them: it never opens, logs or deletes the files.
 
-The Metabase admin password is stored outside the project (OS keychain, or an owner-only file under `~/.dango/secrets/metabase/`), and is left out of cloud, scheduled and local safety backups. Older archives are cleaned the same way when you restore them.
+The Metabase admin password is stored outside the project (OS keychain, or an owner-only file under `~/.dango/secrets/metabase/`), and is left out of cloud, scheduled and local safety backups. Projects created before Dango 1.0.10 are migrated automatically on their first `dango start` with Dango 1.0.11 or later. Older archives are cleaned the same way when you restore them.
 
 ## Credential Rotation
 
