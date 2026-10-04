@@ -151,7 +151,7 @@ so the agent can read it and fix the call.
 | `list_sources()` | List configured sources with `type`, `enabled`, `last_sync`, `rows` and `status`. |
 | `list_source_types()` | List the source types in the registry, with `auth_type`, `category` and `setup_supported`. `setup_supported: false` means the type can only be configured with the `dango source add` wizard. |
 | `get_source_setup_schema(source_type)` | Describe the settings a type needs: fields, defaults and how each is handled. Agents supply only fields marked `managed_by: "agent"`; `user_secret` and `oauth` fields are handled by you. `rest_api`, `dlt_native` and types with `setup_supported: false` are CLI-only. |
-| `create_source(source_type, source_name, config=None, description=None, empty_sync_policy=None, file_path=None)` | Configure a new source with validated settings. `file_path` (`local_files` only) copies a local CSV, JSON, JSONL or Parquet file into `data/uploads/<source_name>/`. Returns `credentials_required` and `next_steps` for anything you must supply. |
+| `create_source(source_type, source_name, config=None, description=None, empty_sync_policy=None, file_path=None)` | Configure a new source with validated settings. `file_path` (`local_files` only; `~` is expanded) copies a local CSV, JSON, JSONL or Parquet file into `data/uploads/<source_name>/`; leave `directory` out when you use it. The legacy `csv` type is not accepted for new sources: use `local_files`. Returns `credentials_required` and `next_steps` for anything you must supply. |
 | `update_source(source_name, config=None, description=None, empty_sync_policy=None)` | Change a source's settings with the same validation. Pass only the keys to change; a key set to `None` or empty resets to its default. |
 | `set_source_enabled(source_name, enabled)` | Enable or disable a source. Disabled sources are skipped by sync. |
 | `remove_source(source_name, dry_run=False, force=False)` | Remove a source's `sources.yml` entry, staging files, `config.toml` section and monitors. Call with `dry_run=True` first and show the result to the user (`downstream_models`, `monitors_removed`, `files_removed`). `force=True` is required when models depend on the source. Warehouse data and `.env` are not touched. |
@@ -264,8 +264,10 @@ project are shortened to `…/`.
 ### "Add my orders CSV and build a revenue model"
 
 The agent starts by asking what the source type needs, then creates the source. `file_path` points
-at the file you gave it, and Dango copies it into the project. A local file needs no credentials, so
-`credentials_required` is empty. (Schema trimmed; the file path is shortened.)
+at the file you gave it (a leading `~` is expanded), and Dango copies it into
+`data/uploads/<source_name>/`. The agent leaves `directory` out when it passes `file_path`; a
+different `directory` is rejected. A local file needs no credentials, so `credentials_required` is
+empty. (Schema trimmed; the file path is shortened.)
 
 ```
 > get_source_setup_schema("local_files")
@@ -310,7 +312,8 @@ at the file you gave it, and Dango copies it into the project. A local file need
   ],
   "resources": null,
   "setup_guide": "…",
-  "first_sync_note": null
+  "first_sync_note": null,
+  "note": "To import a local file, pass file_path to create_source and omit 'directory': the file is copied to data/uploads/<source_name>/."
 }
 ```
 
