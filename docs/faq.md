@@ -176,7 +176,7 @@ open http://localhost:8800
 
 Click **"Open Metabase"** in the Web UI sidebar. The SSO bridge logs you in automatically.
 
-You normally don't need Metabase's own credentials. If you do want direct access at `http://localhost:3000`, the admin email is in `.dango/metabase.yml`. Since Dango 1.0.10 the password is no longer stored in that file: it is kept outside the project, in your operating system's keychain (or, where no keychain is available, in an owner-only file under `~/.dango/secrets/metabase/`).
+You normally don't need Metabase's own credentials. If you do want direct access at `http://localhost:3000`, the admin email is in `.dango/metabase.yml`. The password is no longer stored in that file (new projects since Dango 1.0.10; existing projects are migrated on their first start with Dango 1.0.11 or later): it is kept outside the project, in your operating system's keychain (or, where no keychain is available, in an owner-only file under `~/.dango/secrets/metabase/`).
 
 ### My tables don't show in Metabase
 

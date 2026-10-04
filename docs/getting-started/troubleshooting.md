@@ -395,6 +395,14 @@ Recreate (data will be lost)? (y/N)
 !!! warning
     Never answer `y` to that prompt: it deletes the Metabase data volume, including your dashboards and users.
 
+### "Metabase credential migration is incomplete" (Dango 1.0.10)
+
+**Symptom:** on a project created before Dango 1.0.10, every `dango start` prints "Metabase credential migration is incomplete; existing configuration is unchanged and will retry on the next start", sometimes followed by "Could not authenticate with Metabase" and a failed dashboard import.
+
+**Cause:** Dango 1.0.10 ran the Metabase admin-password migration while Metabase was still starting, so it never completed. Nothing is lost: the migration changes nothing when it cannot finish, and your Metabase data and dashboards are untouched.
+
+**Fix:** upgrade to Dango 1.0.11 (`pip install -U getdango`) and run `dango stop && dango start`. You will see "Waiting for Metabase to be ready..." once while the password moves into protected storage, and the warning is gone afterwards.
+
 ### Metabase Not Starting
 
 **Error:**
