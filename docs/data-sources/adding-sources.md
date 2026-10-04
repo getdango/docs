@@ -251,6 +251,25 @@ Each source type has its own config section using the source type name (or `gene
 | `enabled` | No | `true` | Include in `dango sync` |
 | `description` | No | — | Human-readable description |
 | `deduplication` | No | — | Strategy: `none`, `latest_only`, `append_only`, `scd_type2` |
+| `empty_sync_policy` | No | `block` | What a sync does when it would leave a previously non-empty table empty: `block` or `allow` (see [below](#empty-sync-policy)) |
+
+### Empty-sync policy
+
+Some sources replace their whole table on every sync: local files, databases such as Postgres and MySQL, and many API sources (for example Google Sheets, HubSpot and Jira). If such a sync suddenly returns no rows, for instance because a file was moved or a sheet range was cleared, the empty result would normally wipe the table. `empty_sync_policy` decides what happens:
+
+| Value | Behavior |
+|-------|----------|
+| `block` (default) | The sync fails, the existing data is kept, and the error tells you how to override it |
+| `allow` | The sync succeeds and the table becomes empty |
+
+```yaml
+sources:
+  - name: orders
+    type: local_files
+    empty_sync_policy: block   # or: allow
+```
+
+The policy applies to syncs started from the CLI, the web UI and the scheduler. To override it for a single CLI run, use `dango sync <source> --allow-empty-replace` or `--block-empty-replace`. `dango source add` asks which behavior you want when you add a replace-mode source. Merge and append sources are not affected.
 
 ### Editing Existing Sources
 

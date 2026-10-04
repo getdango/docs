@@ -105,9 +105,16 @@ On each sync, Dango compares the current files in the directory against its meta
 | **New** | File not seen before | Load into DuckDB |
 | **Updated** | File modification time changed | Reload (replace previous data) |
 | **Unchanged** | File modification time matches | Skip (no action) |
-| **Deleted** | File was loaded but no longer on disk | Soft-delete (mark `_dango_deleted = true`) |
+| **Deleted** | File was loaded but no longer on disk | Remove that file's rows from the table (the table and its columns stay) |
 
 This classification makes incremental syncs fast — only new and updated files are processed.
+
+### Deleted, moved and renamed files
+
+- Deleting **some** of the files removes only those files' rows on the next sync.
+- If **every** file is gone, or the only remaining files are empty, the sync would empty the table. With the default [empty-sync policy](../adding-sources.md#empty-sync-policy) (`block`) the sync fails and your existing rows are kept. Run `dango sync my_files --allow-empty-replace` if you really want the table cleared.
+- A file that comes back (for example, moved back into the folder) is reloaded on the next sync.
+- Rows are tracked by file name, so two files matching your pattern must not share a name, even in different sub-folders (`2026-09/sales.csv` and `2026-10/sales.csv`). Dango refuses to sync until the names are unique, instead of letting one file overwrite the other's rows.
 
 ### Metadata Tracking
 
@@ -259,6 +266,14 @@ A file has different columns than previously loaded files. Options:
 - Verify files exist: `ls data/uploads/my_source/`
 - Check the `file_pattern` — `*.csv` won't match `.json` files
 - Ensure files have a supported extension
+
+### "All source files are missing or empty"
+
+The sync would have removed every row, so Dango stopped and kept your data. Check that the files are still in the source directory and are not empty. If you meant to clear the table, run `dango sync my_files --allow-empty-replace`.
+
+### "Multiple files share the same file name"
+
+Two files matched by `file_pattern` have the same name (for example in different monthly folders). Rename them so each name is unique (such as `2026-09-sales.csv`), or narrow `file_pattern` so each name matches once. Nothing is changed until you do.
 
 ### Files not loading on re-sync
 

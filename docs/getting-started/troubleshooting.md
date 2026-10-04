@@ -377,6 +377,24 @@ dango start
 
 ---
 
+### "Timeout starting Docker services" (Dango 1.0.8 and 1.0.9)
+
+**Symptom:** `dango start` waits about two minutes and then fails with "Timeout starting Docker services". The partial Docker output shows a question like:
+
+```
+Volume "..._metabase-data" exists but doesn't match configuration in compose file.
+Recreate (data will be lost)? (y/N)
+```
+
+**Cause:** projects whose Metabase data volume was created before Dango 1.0.8, or whose project name was edited later, have a volume that Docker Compose treats as different. In a terminal, Dango 1.0.8 and 1.0.9 left Compose waiting for an answer.
+
+**Fix:** upgrade to Dango 1.0.10 (`pip install -U getdango`). `dango start` now answers "No" automatically and keeps your Metabase data.
+
+**Workaround on 1.0.8 or 1.0.9:** start with input closed so Compose answers "No": `dango start </dev/null`.
+
+!!! warning
+    Never answer `y` to that prompt: it deletes the Metabase data volume, including your dashboards and users.
+
 ### Metabase Not Starting
 
 **Error:**

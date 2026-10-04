@@ -199,6 +199,23 @@ Remote credentials are stored in the server's `.env` file and are **not synced**
 
 ---
 
+## Files Dango Keeps Out of Git
+
+Dango adds these entries to your project's `.gitignore` during `dango init`, and `dango upgrade` and `dango start` add any that are missing in existing projects (your own `.gitignore` lines are preserved):
+
+```
+.dango/backups/
+dango-backup-*
+.dango/metabase.yml*
+.dango/credentials
+.dlt/.encryption_key
+.env*.backup
+```
+
+When Dango backs up your `.env` before changing it, the backup is created readable by you only (`0600`) and matches the `.env*.backup` entry. Dango also warns during `dango upgrade`, `dango start` and cloud serve if it finds local backup locations that may predate this protection. It only reports them: it never opens, logs or deletes the files.
+
+The Metabase admin password is stored outside the project (OS keychain, or an owner-only file under `~/.dango/secrets/metabase/`), and is left out of cloud, scheduled and local safety backups. Older archives are cleaned the same way when you restore them.
+
 ## Credential Rotation
 
 ### When to Rotate

@@ -235,7 +235,7 @@ Cloud backups are tar.gz archives containing:
 - `data/warehouse.duckdb` — full database
 - `.dango/auth.db` — authentication database
 - `.dango/project.yml`, `.dango/sources.yml`, `.dango/cloud.yml` — configuration
-- `.dango/metabase.yml` — Metabase config
+- `.dango/metabase.yml` — Metabase connection details (the Metabase admin password is not included)
 - `.dango/logs/audit.jsonl` — audit log
 - `.dlt/secrets.toml` — credentials
 - `.dlt/pipelines/` — dlt pipeline state
