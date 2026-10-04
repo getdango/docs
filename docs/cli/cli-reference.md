@@ -383,6 +383,7 @@ dango sync [SOURCE_NAME] [OPTIONS]
 | `--full-refresh` | flag | Drop existing data and reload from scratch |
 | `--dry-run` | flag | Show what would be synced without executing |
 | `--allow-schema-changes` | flag | Allow CSV schema changes (add columns, NULL for missing) |
+| `--allow-empty-replace` / `--block-empty-replace` | flag | Override the source's saved [empty-sync policy](../data-sources/adding-sources.md#empty-sync-policy) for this run only |
 | `-y`, `--yes` | flag | Skip confirmation prompts |
 
 ```bash
@@ -393,6 +394,7 @@ dango sync --backfill 30d                # Backfill last 30 days
 dango sync --limit 1000                  # Dev mode: limit rows
 dango sync --full-refresh                # Reset and reload all
 dango sync --dry-run                     # Preview only
+dango sync my_files --allow-empty-replace  # Let this run replace the table with an empty result
 ```
 
 [:octicons-arrow-right-24: Full guide](source-sync.md)
