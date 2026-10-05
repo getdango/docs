@@ -17,6 +17,25 @@ Dango follows [Semantic Versioning](https://semver.org/):
 
 ## Current Version
 
+### v1.0.12
+
+*Released: October 5, 2026*
+
+**Status**: Stable
+
+#### Fixed
+
+- Projects whose Metabase admin password in `.dango/metabase.yml` had gone stale no longer fail every start with "Metabase credential migration is incomplete". `dango start` now recognises the working credential Dango already stores for the linked admin and adopts it, without changing anything in Metabase.
+- If every stored copy of the Metabase admin password is lost, `dango start` now restores admin access automatically using Metabase's own offline reset tool. Metabase restarts briefly; dashboards, questions and all other Metabase data are kept. `dango metabase repair-admin` runs the same repair on demand.
+- The credential migration messages are now accurate: only problems that can fix themselves say "will retry on the next start", and a rejected credential is no longer retried (and failed) on every start.
+- The Metabase admin account's password now has a single owner: user sync and `dango auth metabase-repair` no longer rotate it, and no code path stores a Metabase password that was never applied.
+
+#### Removed
+
+- Dango no longer deletes the Metabase Docker volume, and no longer suggests `docker volume rm`, when it cannot sign in to an existing Metabase. Nothing is deleted automatically.
+
+---
+
 ### v1.0.11
 
 *Released: October 4, 2026*
