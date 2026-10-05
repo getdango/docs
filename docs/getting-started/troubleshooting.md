@@ -403,6 +403,17 @@ Recreate (data will be lost)? (y/N)
 
 **Fix:** upgrade to Dango 1.0.11 (`pip install -U getdango`) and run `dango stop && dango start`. You will see "Waiting for Metabase to be ready..." once while the password moves into protected storage, and the warning is gone afterwards.
 
+### "Metabase credential migration is incomplete" or Metabase admin access lost
+
+**Symptom:** on a long-lived project, `dango start` prints "Metabase credential migration is incomplete" or "Dango could not sign in to its Metabase admin account", on every start.
+
+**Cause:** Dango's own Metabase admin password (the one Dango uses behind the scenes, not your login) was changed in Metabase while one or more of the places Dango stores it kept the old value. Nothing is lost: your dashboards, questions and data in Metabase are untouched.
+
+**Fix:** upgrade to Dango 1.0.12 (`pip install -U getdango`) and run `dango stop && dango start`. Dango first adopts the working credential it already has; if none works it restores access automatically using Metabase's own offline reset tool. Metabase restarts once, for about a minute, and you will see "Metabase admin access restored." To run the repair on demand, use `dango metabase repair-admin`.
+
+!!! warning
+    You do not need to delete the Metabase data volume, and Dango never does this for you. Older versions suggested `docker volume rm`: do not follow that advice, it deletes your dashboards.
+
 ### Metabase Not Starting
 
 **Error:**
