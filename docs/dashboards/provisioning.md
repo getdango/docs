@@ -18,7 +18,7 @@ Provision a pre-built monitoring dashboard in Metabase with a single command. Th
     dango dashboard provision
     ```
 
-    Uses `http://localhost:3000` by default.
+    Uses `http://localhost:<platform.metabase_port>` by default (`3000` unless you changed it in `.dango/project.yml`).
 
 === "Cloud"
 
@@ -26,7 +26,7 @@ Provision a pre-built monitoring dashboard in Metabase with a single command. Th
     dango dashboard provision --url https://your-domain.com
     ```
 
-    Provide the public URL of your Metabase instance.
+    Provide the public URL of your Metabase instance. The stored credential lives on the machine where the command runs. From another machine (for example your laptop, against a cloud server), pass `--username` and `--password` for the Metabase admin as well.
 
 Dango signs in to Metabase with the credential it stores for the project, so you are not prompted for a password:
 
@@ -54,7 +54,7 @@ dango dashboard provision [--url URL] [--username EMAIL] [--password PASSWORD]
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--url` | `http://localhost:3000` | Metabase instance URL |
+| `--url` | `http://localhost:<platform.metabase_port>` (3000 unless changed) | Metabase instance URL |
 | `--username` | The project's Metabase admin (from `.dango/metabase.yml`) | Metabase admin email. Override only if you created your own Metabase admin |
 | `--password` | The project's stored credential (never prompted) | Metabase admin password. Override only if you created your own Metabase admin |
 
@@ -131,8 +131,13 @@ For updating an existing dashboard, edit it directly in the Metabase UI instead.
 ### Authentication Failed
 
 ```
-Error: Authentication failed. Check your credentials.
+❌ Dashboard provisioning failed
+
+Errors:
+  • Authentication failed
 ```
+
+Dango also prints troubleshooting hints, including `dango metabase repair-admin` for a changed Metabase admin password.
 
 `dango dashboard provision` uses the credential Dango stores for the Metabase admin (not the Dango admin password, and not a field in `.dango/metabase.yml`). If you changed the Metabase admin password inside Metabase, run `dango metabase repair-admin` (local projects).
 

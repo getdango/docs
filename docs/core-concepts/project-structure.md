@@ -44,7 +44,7 @@ The `.dango/` directory contains all Dango-specific configuration, runtime state
 ├── notifications.yml     # Webhook notification configs
 ├── pii-overrides.yml     # PII detection overrides
 ├── cloud.yml             # Cloud deployment details (auto-generated)
-├── metabase.yml          # Metabase admin credentials (auto-generated)
+├── metabase.yml          # Metabase admin email and database ID (auto-generated; password is in the protected credential store)
 ├── state/                # Runtime state files
 │   ├── dbt.lock          # DuckDB write lock
 │   ├── dbt.lock.json     # Lock holder metadata
