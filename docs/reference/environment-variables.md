@@ -24,14 +24,15 @@ These control Dango's runtime behavior.
 |----------|---------|-------------|
 | `DANGO_DEBUG` | `""` (disabled) | Enable full stack traces in error messages. Set to `1`, `true`, or `yes` (case-insensitive) |
 | `DANGO_LOG_LEVEL` | `INFO` | Logging level: `DEBUG`, `INFO`, `WARNING`, `ERROR` |
-| `DANGO_ADMIN_EMAIL` | `admin@localhost` | Email for the initial admin user created on first startup |
+| `DANGO_ADMIN_EMAIL` | `admin@dango.test` (`dango init --skip-wizard`); `admin@localhost` (first start of `dango serve`) | Email for the initial admin user. Must have a dotted domain for Metabase to be set up |
 | `DANGO_ADMIN_PASSWORD` | -- | Password for the initial admin user. Required for automated/CI deployments |
 | `DANGO_OAUTH_CALLBACK_URL` | `http://localhost:8080/callback` | OAuth redirect URI for authorization server callbacks |
 | `DANGO_NOTEBOOK_DB_PATH` | `data/warehouse.duckdb` | DuckDB database path used by Marimo notebook templates |
 
 ### Usage Notes
 
-- **`DANGO_ADMIN_EMAIL`** and **`DANGO_ADMIN_PASSWORD`** are used during `dango init` (if `--skip-wizard` is set) and during cloud deployment. For interactive setup, these are prompted instead.
+- **`DANGO_ADMIN_EMAIL`** and **`DANGO_ADMIN_PASSWORD`** are used during `dango init` (if `--skip-wizard` is set) and during cloud deployment. For interactive setup, these are prompted instead. A weak `DANGO_ADMIN_PASSWORD` makes `dango init --skip-wizard` skip auth setup; use at least 8 characters, avoid common passwords, and (when `DANGO_ADMIN_EMAIL` is set) avoid your email name.
+- **Replacing the default admin.** `dango init --skip-wizard` without `DANGO_ADMIN_EMAIL` creates `admin@dango.test`. To use a real address: `dango auth add-user you@yourcompany.com --role admin --password`, sign in once as that user, then `dango auth delete-user admin@dango.test`. Metabase's own admin identity remains the placeholder address; nothing breaks.
 - **`DANGO_NOTEBOOK_DB_PATH`** is read inside Marimo notebooks to connect to DuckDB. Override this if your warehouse is at a non-standard path.
 
 ---

@@ -133,7 +133,9 @@ Metabase has a REST API for automation:
 http://localhost:3000/api/
 
 # Authentication
-# First, get a session token (credentials are in .dango/metabase.yml)
+# First, get a session token. The Metabase admin password is kept in Dango's
+# protected credential store, not in .dango/metabase.yml: use your own Metabase
+# admin login (or an API key created in Metabase).
 curl -X POST http://localhost:3000/api/session \
   -H "Content-Type: application/json" \
   -d '{"username": "your-email@example.com", "password": "your-password"}'
@@ -165,7 +167,8 @@ curl http://localhost:3000/api/dashboard/1 \
 ```python
 import requests
 
-# Login (credentials are in .dango/metabase.yml)
+# Login (use your own Metabase admin login; the Dango-stored password is not in
+# .dango/metabase.yml. An API key created in Metabase also works.)
 session = requests.Session()
 response = session.post(
     "http://localhost:3000/api/session",

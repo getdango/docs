@@ -1224,8 +1224,8 @@ dango dashboard provision [OPTIONS]
 | Option | Description |
 |--------|-------------|
 | `--url TEXT` | Metabase URL |
-| `--username TEXT` | Metabase admin username (auto-detected from auth DB) |
-| `--password TEXT` | Metabase admin password |
+| `--username TEXT` | Metabase admin email (default: the project's stored Metabase admin) |
+| `--password TEXT` | Metabase admin password (default: the project's stored credential; never prompted) |
 
 Creates a pre-built dashboard with pipeline health score, source sync status, data freshness indicators, row count trends, and dbt test results.
 

@@ -22,7 +22,7 @@ The easiest way to access Metabase is through the Dango Web UI, which handles au
 The Web UI uses an SSO bridge to log you into Metabase automatically — no separate Metabase credentials needed.
 
 ??? info "Direct Metabase access (alternative)"
-    You can also access Metabase directly at `http://localhost:3000`. Dango creates a Metabase admin account during setup with a randomly generated password stored in `.dango/metabase.yml`. Check that file for the `email` and `password` fields.
+    You can also access Metabase directly at `http://localhost:3000`. Dango creates a Metabase admin account during setup. The email is in `.dango/metabase.yml`; the password is kept in Dango's protected credential store, not in that file. You normally don't need it: `dango dashboard provision` and SSO use it for you.
 
     The SSO bridge approach (via the Web UI) is recommended because it handles authentication automatically.
 
