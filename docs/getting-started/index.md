@@ -52,7 +52,7 @@ Dango is an open-source data platform that integrates dlt, dbt, DuckDB, and Meta
 
 Before installing Dango, you'll need:
 
-- **Python 3.10-3.12** (Python 3.11 or 3.12 recommended)
+- **Python 3.10-3.13** (Python 3.11 or 3.12 recommended)
 - **Docker Desktop** (required for Metabase and Web UI)
 - **10GB free disk space** (recommended)
 

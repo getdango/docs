@@ -46,7 +46,7 @@ Yes. Dango is open source under the Apache 2.0 license. You can use it for perso
 
 ### What are the system requirements?
 
-- **Python**: 3.10-3.12 (3.11 or 3.12 recommended)
+- **Python**: 3.10-3.13 (3.11 or 3.12 recommended)
 - **Docker Desktop**: Required for Metabase and Web UI
 - **Memory**: 4GB+ recommended
 - **Disk**: 10GB+ free space recommended

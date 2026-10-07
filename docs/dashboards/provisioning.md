@@ -28,11 +28,9 @@ Provision a pre-built monitoring dashboard in Metabase with a single command. Th
 
     Provide the public URL of your Metabase instance.
 
-You'll be prompted for the admin password:
+Dango signs in to Metabase with the credential it stores for the project, so you are not prompted for a password:
 
 ```
-Password: ********
-
 ✓ Dashboard provisioned successfully!
 
   Dashboard: Data Pipeline Health
@@ -57,17 +55,14 @@ dango dashboard provision [--url URL] [--username EMAIL] [--password PASSWORD]
 | Option | Default | Description |
 |--------|---------|-------------|
 | `--url` | `http://localhost:3000` | Metabase instance URL |
-| `--username` | Auto-detected | Metabase admin email |
-| `--password` | Prompted | Metabase admin password (entered interactively) |
+| `--username` | The project's Metabase admin (from `.dango/metabase.yml`) | Metabase admin email. Override only if you created your own Metabase admin |
+| `--password` | The project's stored credential (never prompted) | Metabase admin password. Override only if you created your own Metabase admin |
 
-### Username Resolution
+### Credential Resolution
 
-The admin username is resolved in this order:
-
-1. Explicit `--username` flag
-2. `DANGO_ADMIN_EMAIL` environment variable
-3. Active admin user from the auth database
-4. Fallback: `admin@example.com`
+1. With neither `--username` nor `--password`, Dango signs in with the Metabase admin email and password stored for the project.
+2. `--username` alone must match the project's Metabase admin; to use a different admin, pass `--password` as well.
+3. `--password` without `--username` uses the admin email from `.dango/metabase.yml`.
 
 ---
 
@@ -139,22 +134,23 @@ For updating an existing dashboard, edit it directly in the Metabase UI instead.
 Error: Authentication failed. Check your credentials.
 ```
 
-Verify your Metabase admin email and password. The Metabase admin password was auto-generated during `dango start` and stored in `.dango/metabase.yml`. This is separate from the Dango admin password set during `dango init`.
+`dango dashboard provision` uses the credential Dango stores for the Metabase admin (not the Dango admin password, and not a field in `.dango/metabase.yml`). If you changed the Metabase admin password inside Metabase, run `dango metabase repair-admin` (local projects).
 
-=== "Local"
+### No Stored Credential
 
-    ```bash
-    # Check which admin email is configured
-    dango auth list-users
-    ```
+```
+Error: No Metabase admin credential is stored for this project.
+```
 
-=== "Cloud"
+Run `dango start` first; it configures Metabase and stores the admin credential. If you created your own Metabase admin, pass `--username` and `--password`.
 
-    ```bash
-    dango auth list-users
-    # Or check the environment variable
-    echo $DANGO_ADMIN_EMAIL
-    ```
+### Could Not Read the Stored Credential
+
+```
+Error: Could not read the stored Metabase credential: ...
+```
+
+Run `dango metabase repair-admin` to restore Metabase admin access.
 
 ### DuckDB Database Not Found
 

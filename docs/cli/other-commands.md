@@ -408,8 +408,8 @@ dango dashboard provision [OPTIONS]
 | Option | Description |
 |--------|-------------|
 | `--url TEXT` | Metabase URL |
-| `--username TEXT` | Metabase admin username (auto-detected from auth DB) |
-| `--password TEXT` | Metabase admin password |
+| `--username TEXT` | Metabase admin email (default: the project's stored Metabase admin) |
+| `--password TEXT` | Metabase admin password (default: the project's stored credential; never prompted) |
 
 ```bash
 dango dashboard provision

@@ -322,6 +322,8 @@ dango remote sync my_source --full-refresh --wait
 dango remote sync my_source --backfill 7d --wait
 ```
 
+Without `--wait`, the command launches the sync in the background on the server and reports a failed start (for example the project directory cannot be entered, or the command exits with an error within about 2 seconds). A sync that fails after Python has started is only visible in `dango remote status`.
+
 ---
 
 ## Environment Variables

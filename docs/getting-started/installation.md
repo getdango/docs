@@ -4,7 +4,7 @@ This guide will help you install Dango on macOS, Linux, or Windows.
 
 ## Prerequisites
 
-### Python 3.10-3.12 (Required)
+### Python 3.10-3.13 (Required)
 
 !!! info "Recommended Version"
     **Python 3.11 or 3.12** are recommended for best performance and compatibility.

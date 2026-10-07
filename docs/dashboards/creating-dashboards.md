@@ -21,7 +21,7 @@ Create a revenue dashboard in 5 minutes.
 
 1. Open the Web UI at `http://localhost:8800` and click **Open Metabase** in the sidebar (SSO bridge handles login automatically)
 
-    Alternatively, access Metabase directly at `http://localhost:3000`. Check `.dango/metabase.yml` for credentials.
+    Alternatively, access Metabase directly at `http://localhost:3000`. The admin email is in `.dango/metabase.yml`; the password is kept in Dango's protected credential store.
 
 2. Click **"+ New"** → **"Question"**
 3. Select **"DuckDB"** database

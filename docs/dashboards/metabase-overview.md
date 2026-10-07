@@ -39,7 +39,7 @@ dango start
 
 Open the Web UI at **http://localhost:8800** and click **"Open Metabase"** in the sidebar. The SSO bridge logs you in automatically.
 
-For direct access, Metabase is also available at `http://localhost:3000`. Dango creates a Metabase admin account during first startup with a randomly generated password stored in `.dango/metabase.yml`.
+For direct access, Metabase is also available at `http://localhost:3000`. Dango creates a Metabase admin account during first startup. The email is in `.dango/metabase.yml`; the password is kept in Dango's protected credential store, not in that file.
 
 ### First Login
 
