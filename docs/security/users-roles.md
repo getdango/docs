@@ -80,7 +80,7 @@ An MCP client acts with the permissions of the person running `dango mcp`. Revie
 | `run_sync`, `run_transform`, `run_doctor`, `generate_docs`, `scan_pii` | API quota, load, warehouse contents | `run_sync` accepts `dry_run` |
 | `accept_schema_drift`, `set_pii_override`, `update_source_table_docs`, `add_schedule`, `update_schedule`, `set_schedule_enabled`, `remove_schedule`, `reload_schedules` | Local project configuration | None beyond your client's approval prompt |
 | `remote_sync` | Runs a real sync on your server | Needs a deployment; no dry run |
-| `remote_push` | Replaces models, scripts and sources on your server | Dry run by default; needs `confirm=True` to apply |
+| `remote_push` | Replaces models, scripts and sources on your server | Dry run by default; a real push needs `dry_run=False` and `confirm=True` |
 
 Do not auto-approve mutation tools: they can change what runs against your warehouse.
 
