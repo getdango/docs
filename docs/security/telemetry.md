@@ -55,9 +55,9 @@ dango telemetry status
 
 **Web UI:** the same four toggles are available at **`/settings/telemetry`** (admin-only).
 
-**One-time consent prompt:** the first time you run `dango init`, Dango asks a yes/no question before sending anything:
+**One-time consent prompt:** the first time you run `dango init`, Dango asks one yes/no question covering Dango, dbt, dlt, and Metabase before sending anything:
 
-> Help improve Dango by sending anonymous usage data (no source names, credentials, or data — just install count)?
+> Allow all of the above?
 
 Your answer is stored in `~/.dango/telemetry.json` and never asked again. Answering "no" (or hitting Ctrl-D / closed stdin) means nothing is ever sent — Dango's install ping only fires after an explicit "yes."
 

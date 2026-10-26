@@ -168,6 +168,8 @@ so the agent can read it and fix the call.
 | `validate_model(model_name, layer, sql)` | Static checks without writing anything: refs exist, lineage, cycles, naming, name not already taken. `dbt parse` runs on `create_model` and `update_model`. |
 | `remove_model(model_name, drop_table=True, dry_run=False, force=False)` | Remove a custom (`intermediate` or `marts`) model: SQL file, `schema.yml` entry, monitors and, by default, the warehouse table. Call with `dry_run=True` first; `force=True` is required when downstream models exist. Staging models cannot be removed (remove the source instead). |
 
+Model SQL written through `create_model` or `update_model` must be one SELECT query. Validation blocks file and URL reads, `COPY`, `ATTACH`, `INSTALL`, and `LOAD`, and allows only restricted Jinja constructs. Hand-written model files remain your code: review them in Git before running dbt. Mutation tools can change the code and configuration that run against your warehouse, so do not auto-approve them.
+
 ### Run & diagnose
 
 | Tool | Purpose |
@@ -210,7 +212,7 @@ project's own** running server. The `activation` field in the result says what h
 | `get_catalog(source_filter=None)` | All tables grouped by schema. |
 | `get_table_schema(table_name, schema=None)` | Columns, types, descriptions and data tests for a table. Descriptions come from the dbt docs; undocumented items have `description: null`. |
 | `get_lineage(model_name=None)` | dbt lineage from the manifest: the full model summary, or one model's `depends_on` and `referenced_by`. |
-| `query(sql, row_limit=500)` | Run a read-only query: a single `SELECT` or `WITH ... SELECT`, up to 102,400 characters, at most 500 rows, with a timeout of `api.query_timeout_seconds` (default 30). PII-flagged columns are masked by name; see [limits](#what-the-agent-cant-do-limits). |
+| `query(sql, row_limit=500)` | Run a read-only query: a single `SELECT` or `WITH ... SELECT`, up to 102,400 characters, at most 500 rows, with a timeout of `api.query_timeout_seconds` (default 30). File and URL access is blocked, including through a model or view. PII-flagged columns are masked by name; see [limits](#what-the-agent-cant-do-limits). |
 
 ### Governance / PII
 

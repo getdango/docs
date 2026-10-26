@@ -9,7 +9,7 @@ Deploy Dango to a DigitalOcean droplet with the guided wizard.
 Before deploying, make sure you have:
 
 - [ ] A **DigitalOcean account** ([sign up](https://cloud.digitalocean.com/registrations/new))
-- [ ] A **Personal Access Token** with Read+Write scope ([create one](https://cloud.digitalocean.com/account/api/tokens))
+- [ ] A **Personal Access Token** ([create one](https://cloud.digitalocean.com/account/api/tokens)). A scoped token needs droplet create/read/update/delete/actions; firewall create/read/update/delete; SSH key create/read/delete; tag create/read; and regions, sizes, and images read. Spaces uses separate keys.
 - [ ] A **configured Dango project** with at least one source in `sources.yml`
 - [ ] **Credentials configured** in `.dlt/secrets.toml` for your sources
 
@@ -27,6 +27,9 @@ dango deploy
 ```
 
 That's it. The wizard walks you through every decision interactively. The rest of this page explains each step in detail.
+
+!!! warning "Deploying without a domain"
+    The site serves plain HTTP, so credentials and cookies travel unencrypted. Dango's default DigitalOcean firewall opens ports 22, 80, and 443 publicly. Without a domain, restrict web access with `dango deploy --allow-ip YOUR_IPV4` (repeatable), or explicitly acknowledge public access with `--accept-http-exposure`. The wizard can also detect the IP address the server sees. `dango remote domain set DOMAIN` reopens web ports before setting up HTTPS so a certificate can be issued.
 
 ---
 

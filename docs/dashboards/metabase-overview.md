@@ -1,5 +1,8 @@
 # Metabase Overview
 
+!!! note "After a 1.0.14 upgrade"
+    Restart Dango after installing the package locally. On the first successful start, affected saved exports are repaired by archiving duplicate collection paths only when they are confirmed empty and have no children. Collections are never deleted; non-empty or uncertain duplicates stay active and are recorded in `.dango/state/metabase_collection_repair.json`. If an open Metabase page is interrupted by a sync restart, it reconnects automatically; the maintenance page also offers **Retry now**.
+
 How Dango auto-configures Metabase for your DuckDB warehouse.
 
 ---

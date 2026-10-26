@@ -856,12 +856,17 @@ Manage the remote cloud server. See the [Deploy & Remote](deploy-remote.md) page
 
 ```bash
 dango remote push [OPTIONS]           # Push files and rebuild
+dango remote upload LOCAL_PATH [REMOTE_PATH]  # Upload one data file
 dango remote rollback [OPTIONS]       # Restore from backup
 dango remote status                   # Show server status
 dango remote logs [OPTIONS]           # View service logs
 dango remote ssh                      # Interactive SSH session
 dango remote query SQL [OPTIONS]      # Read-only SQL query
 dango remote upgrade [OPTIONS]        # Upgrade remote Dango
+dango remote power-on                 # Power on an interrupted resize
+dango remote isolation status         # Inspect runner isolation
+dango remote isolation disable --yes  # Audited administrator opt-out
+dango remote isolation enable         # Restore runner isolation
 dango remote resize [SIZE]            # Resize server
 dango remote migrate [OPTIONS]        # Migrate to new server
 dango remote history [OPTIONS]        # Show deploy history

@@ -4,10 +4,10 @@ This guide will help you install Dango on macOS, Linux, or Windows.
 
 ## Prerequisites
 
-### Python 3.10-3.13 (Required)
+### Python 3.11–3.13 (Required)
 
 !!! info "Recommended Version"
-    **Python 3.11 or 3.12** are recommended for best performance and compatibility.
+    **Python 3.12** is recommended by the installers; the contributor guide recommends 3.11. Python 3.10 users must create a new environment with a supported interpreter before upgrading. Fresh and upgraded installations require Pillow 13.0.0 or newer.
 
 **Check if you have Python:**
 
@@ -17,15 +17,15 @@ This guide will help you install Dango on macOS, Linux, or Windows.
     # Try these commands in order:
     python3.12 --version  # Check for Python 3.12
     python3.11 --version  # Check for Python 3.11
-    python3.10 --version  # Check for Python 3.10
+    python3.13 --version  # Check for Python 3.13
 
-    # If any show "3.10" or higher, you're good!
+    # Use Python 3.11, 3.12, or 3.13.
     ```
 
 === "Windows"
 
     ```powershell
-    python --version     # Should show 3.10 or higher
+    python --version     # Should show 3.11, 3.12, or 3.13
     ```
 
 **Install Python if needed:**
@@ -118,7 +118,7 @@ Before installing, verify you have everything:
     # Check Python (any of these should work):
     python3.12 --version  # 3.12.x ✓
     python3.11 --version  # 3.11.x ✓
-    python3.10 --version  # 3.10.x ✓
+    python3.13 --version  # 3.13.x ✓
 
     # Check Docker (required):
     docker --version
@@ -130,7 +130,7 @@ Before installing, verify you have everything:
 === "Windows"
 
     ```powershell
-    python --version     # Should show 3.10 or higher
+    python --version     # Should show 3.11, 3.12, or 3.13
     docker --version
     ```
 
@@ -389,7 +389,7 @@ If you installed globally:
     ```bash
     # Check each Python version
     python3.11 -m pip list | grep getdango
-    python3.10 -m pip list | grep getdango
+    python3.12 -m pip list | grep getdango
     python3 -m pip list | grep getdango
 
     # Or find the command location
