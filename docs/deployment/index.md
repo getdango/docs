@@ -20,6 +20,8 @@ Dango offers two deployment paths. Both result in the same server setup &mdash; 
 
 ## Quick Start
 
+Without a domain, deployment serves plain HTTP. On DigitalOcean, use `--allow-ip YOUR_IPV4` to restrict web ports or `--accept-http-exposure` to acknowledge public access. On BYOS, manage your own firewall and use `--accept-http-exposure`; `--allow-ip` is unavailable. See the deployment guides for details.
+
 === "DigitalOcean"
 
     ```bash

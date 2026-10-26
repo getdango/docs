@@ -14,7 +14,7 @@ Your server must meet these requirements:
 | **RAM** | 4 GB | 4 GB+ |
 | **CPU** | 1 vCPU | 2+ vCPU |
 | **Disk** | 20 GB free | 50 GB+ free |
-| **Access** | SSH access (root or sudo) | Root access |
+| **Access** | Root SSH access | Root SSH access |
 | **Ports** | 22 (SSH) | 22, 80, 443 open |
 
 Additionally, you need:
@@ -34,6 +34,12 @@ dango deploy --byos
 
 The wizard connects to your server via SSH, validates the environment, and installs everything. The rest of this page explains each step.
 
+!!! warning "HTTP and host firewall"
+    Without a domain, logins and cookies travel over plain HTTP. BYOS refuses `--allow-ip` because Dango cannot manage your provider firewall; restrict ports 80/443 with your own firewall and pass `--accept-http-exposure`, or configure a domain for HTTPS. The web service binds to `127.0.0.1` behind Caddy.
+
+!!! note "Host layout for runner isolation"
+    Keep `/srv/dango/project` on a normal directory rather than a bind mount. A restore that replaces a bind-mounted project can fall back to copy and delete, so an interruption may leave a partial replacement. If you widen the host's `net.ipv4.ip_local_port_range`, the notebook runner can reach other local services listening within that range; keep sensitive services outside it or restrict them separately.
+
 ---
 
 ## Wizard Walkthrough
@@ -43,7 +49,7 @@ The wizard connects to your server via SSH, validates the environment, and insta
 Provide your server's connection details:
 
 - **IP address or hostname** &mdash; the server's public IP or DNS name
-- **SSH user** &mdash; defaults to `root`
+- **SSH user** &mdash; must be `root`; sudo-based setup is not supported
 - **SSH key** &mdash; path to your private key, or the wizard generates a new keypair
 
 ```
@@ -121,7 +127,7 @@ After the wizard validates your SSH connection, the following is installed and c
 
 1. **System packages** &mdash; `apt` update and install build dependencies
 2. **Dango user** &mdash; creates a `dango` system user
-3. **Docker** &mdash; installed via `get.docker.com`, `dango` user added to `docker` group
+3. **Docker** &mdash; installed via `get.docker.com`; Dango normally uses a root-owned Compose helper instead of adding the `dango` user to the `docker` group. A helper setup failure leaves a warned Docker-group fallback.
 4. **Caddy** &mdash; installed from the official apt repository (reverse proxy + auto-TLS)
 5. **Project directories** &mdash; creates `/srv/dango/` structure
 6. **Python venv** &mdash; creates virtual environment and installs `getdango` from PyPI

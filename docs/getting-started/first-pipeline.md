@@ -20,7 +20,7 @@ By the end of this tutorial, you'll have:
 
 ## Prerequisites
 
-- [x] Python 3.10+ installed (3.11 recommended)
+- [x] Python 3.11–3.13 installed (3.12 recommended)
 - [x] Docker Desktop running
 - [x] A Google account with a Google Sheet containing data
 
@@ -40,7 +40,7 @@ pip install getdango
 ```
 
 !!! note "Python version"
-    Dango requires Python 3.10 or higher (but below 3.13). We recommend `python3.11`. On macOS, the system `python3` may be too old — use `python3.11` or `python3.12` explicitly.
+    Dango requires Python 3.11–3.13. The installer recommends Python 3.12. On macOS, the system `python3` may be too old — select a supported interpreter explicitly.
 
 ---
 

@@ -647,7 +647,7 @@ Choose the right interface for your task:
 |------|-----|--------|
 | **Automation** | ✅ Excellent | ❌ Not scriptable |
 | **Visual monitoring** | ⚠️ Terminal only | ✅ Dashboards |
-| **File uploads** | ⚠️ Copy files | ✅ Drag-and-drop |
+| **File uploads** | ✅ `dango remote upload` for one file under `data/` | ✅ CSV upload |
 | **Quick actions** | ✅ Fast commands | ✅ One-click buttons |
 | **CI/CD pipelines** | ✅ Perfect | ❌ No integration |
 | **Debugging** | ✅ Verbose logs | ✅ Search/filter logs |

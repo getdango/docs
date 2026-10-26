@@ -149,6 +149,8 @@ dango validate
 
 Run before syncing or deploying to catch configuration issues early.
 
+`dango validate` also warns when a model or view reads a file or URL. Such a model may build under dbt, but it cannot be queried from the web query page, MCP, or Metabase. Load the file with a `local_files` source and use `ref()` in the model instead.
+
 ```
 Validating project configuration...
 

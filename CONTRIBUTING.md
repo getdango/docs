@@ -25,7 +25,7 @@ Be respectful, inclusive, and constructive in all interactions. We're building a
 
 ### Prerequisites
 
-- Python 3.10+
+- Python 3.11–3.13 (3.11 recommended for contributors)
 - Git
 - Text editor or IDE
 

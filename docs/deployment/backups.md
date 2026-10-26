@@ -53,18 +53,16 @@ Every backup includes:
 
 | Category | Files |
 |----------|-------|
-| **Database** | `data/warehouse.duckdb` |
+| **Data** | Regular files throughout `data/`, including `data/warehouse.duckdb` and uploaded files |
 | **Auth** | `.dango/auth.db` |
 | **Configuration** | `.dango/project.yml`, `.dango/sources.yml`, `.dango/cloud.yml`, `.dango/metabase.yml` |
 | **Audit log** | `.dango/logs/audit.jsonl` |
 | **dbt** | `dbt/profiles.yml`, `dbt/dbt_project.yml`, `dbt/packages.yml`, `dbt/models/` (all models), `dbt/macros/`, `dbt/seeds/` |
 | **Custom sources** | `custom_sources/` (entire directory) |
-| **Seed data** | `data/seeds/` |
-| **dlt pipelines** | `.dlt/pipelines/` (entire directory) |
 | **Metabase** | H2 database files (`metabase.db.mv.db`, `metabase.db.trace.db`) from Docker volume |
 
 !!! note
-    Credentials (`.dlt/secrets.toml`, `.env`) are **excluded by default** from backup archives for security. The auth database (user accounts, sessions) is included. Treat backup archives as sensitive data.
+    Credentials (`.dlt/secrets.toml`, `.env`) are **excluded by default**; set `include_secrets` for a backup that needs them. `.dlt/pipelines/`, database WAL files, temporary files and directories, links, and special files are not backed up. The auth database (user accounts, sessions) is included. Treat backup archives as sensitive data and restore only archives you made yourself.
 
 ---
 

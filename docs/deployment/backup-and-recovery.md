@@ -23,7 +23,7 @@ Scheduled backups run daily at 02:00 UTC and upload to DigitalOcean Spaces. On-d
 
 | Category | Files |
 |----------|-------|
-| **Database** | `data/warehouse.duckdb` |
+| **Data** | Regular files under `data/`, including `data/warehouse.duckdb` |
 | **Auth** | `.dango/auth.db` |
 | **Configuration** | `.dango/project.yml`, `.dango/sources.yml`, `.dango/cloud.yml`, `.dango/metabase.yml` |
 | **Audit log** | `.dango/logs/audit.jsonl` |
@@ -33,11 +33,13 @@ Scheduled backups run daily at 02:00 UTC and upload to DigitalOcean Spaces. On-d
 ### What Is NOT Backed Up
 
 !!! warning "Secrets Are Excluded"
-    For security, credentials are **never** included in backup archives:
+    By default, credentials are excluded from backup archives; set `include_secrets` to include them:
     - `.env` (environment variables)
     - `.dlt/secrets.toml` (dlt credentials and OAuth tokens)
 
-    After restore, you must reconfigure credentials. See [Post-Restore Steps](#post-restore-steps).
+    If the archive omitted credentials, reconfigure them after restore. See [Post-Restore Steps](#post-restore-steps).
+
+`.dlt/pipelines/`, WAL files, and temporary files are not backed up. Restore only archives you made yourself.
 
 ---
 

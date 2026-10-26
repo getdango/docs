@@ -7,7 +7,7 @@ Get your first data pipeline running in under 10 minutes.
 Before starting, make sure you have:
 
 - [x] Installed Dango ([Installation Guide](installation.md))
-- [x] Python 3.10+ and Docker Desktop running
+- [x] Python 3.11–3.13 and Docker Desktop running
 - [x] Virtual environment activated (if using venv)
 
 ---

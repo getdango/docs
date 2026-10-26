@@ -9,6 +9,7 @@ Upgrade, resize, and migrate your cloud server.
 | Command | Description |
 |---------|-------------|
 | `dango remote upgrade` | Upgrade Dango to a newer version |
+| `dango remote power-on` | Power on a DigitalOcean server left off by an interrupted resize, then start services |
 | `dango remote resize` | Resize the server (DigitalOcean only) |
 | `dango remote migrate` | Migrate to a new server (DigitalOcean only) |
 
@@ -39,7 +40,20 @@ dango remote upgrade --version 1.2.3
 7. **Start services** &mdash; restarts dango-web and Metabase
 8. **Health check** &mdash; verifies the server is responding
 
-If the installed version already matches the target, the upgrade is a no-op.
+If the installed version already matches the target, the upgrade still completes pending server setup, including the notebook WebSocket Caddyfile change.
+
+### Upgrading to 1.0.14
+
+- On existing servers, the Metabase DuckDB file-access restriction is applied at the next `dango start` or service restart. `dango remote upgrade` updates an existing notebook WebSocket route in the Caddyfile; if that migration cannot complete, review the upgrade warning and complete the indicated Caddyfile change. Downgrading to 1.0.13 or earlier leaves notebooks unable to connect through the protected route.
+- If an upgrade is interrupted while services are stopped, a server-side guard attempts to restart `dango-web`. Re-run `dango remote upgrade` to finish any pending steps.
+- A custom Metabase version needs an administrator-approved SHA-256 digest for the exact `MB_VERSION`. On an existing server, the first upgrade attempt installs the root-owned Compose helper and reports a missing pin before building. As root on the server, run `dango-compose pin-metabase VERSION SHA256`, using the exact version and the verified jar digest, then run `dango remote upgrade` again. It resumes setup even if the package is already at the target version. The pin is kept outside the service-account-writable project tree and must match the version being built.
+- Fresh DigitalOcean and BYOS deployments with a custom `MB_VERSION` are refused before server setup because the required administrator pin cannot be installed through that flow. Deploy the default version, pin the custom jar as root, set the custom version, then run `dango remote push`.
+- The default Metabase jar digest is pinned in Dango and matched across the publisher's download and container image; the publisher does not provide its own checksum. In Docker-group fallback mode, helper integrity controls do not cover every Metabase build path. Resolve the server's fallback warning before relying on those controls.
+- A cloud upgrade or rebuild and a restart after backup do not recheck a driver jar already on the server. Verify its origin and replace a suspect jar before using those paths.
+
+Existing local projects retain their old, unverified `Dockerfile.metabase` after a package-only upgrade. Re-initialize the project to get the digest-checked template; review local edits before doing so. A fresh or upgraded Python installation requires Python 3.11–3.13 and Pillow 13.0.0 or newer.
+
+On the first successful start after upgrading, Dango repairs affected saved Metabase exports: it archives only duplicate collection paths proven empty and without children, and never deletes collections. Duplicates with content or unknown status stay active and are reported in `.dango/state/metabase_collection_repair.json`. Local users need to restart Dango after installing the new package for this repair to run.
 
 ### Options
 
@@ -50,6 +64,8 @@ If the installed version already matches the target, the upgrade is a no-op.
 | `--skip-backup` | Skip the pre-upgrade backup |
 
 ### Failed Upgrade
+
+If the Metabase build reports a missing administrator pin, use the exact version and digest in the command above and retry the upgrade. If the Metabase DuckDB driver fails integrity verification, check the network and run `dango start` again; Dango downloads and verifies a replacement before starting Metabase. A manual jar replacement must match Dango's pinned checksum.
 
 If the health check fails after an upgrade:
 

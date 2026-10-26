@@ -10,6 +10,7 @@ Manage your cloud deployment with `dango remote` commands.
 |---------|-------------|
 | **Deploy & Sync** | |
 | `dango remote push` | Push local config and dbt files to server |
+| `dango remote upload LOCAL_PATH [REMOTE_PATH]` | Upload one file under server `data/` |
 | `dango remote rollback` | Restore from a backup |
 | `dango remote sync SOURCE` | Trigger a data sync on the remote server |
 | **Monitoring** | |
@@ -20,6 +21,8 @@ Manage your cloud deployment with `dango remote` commands.
 | `dango remote query "SQL"` | Run a read-only SQL query on the warehouse |
 | **Server Operations** | |
 | `dango remote upgrade` | Upgrade Dango on the remote server |
+| `dango remote power-on` | Power on a DigitalOcean server left off by an interrupted resize and start services |
+| `dango remote isolation status` | Inspect cloud script and notebook isolation |
 | `dango remote resize` | Resize the server (change CPU/RAM) |
 | `dango remote migrate` | Migrate to a new server (new droplet for disk/region changes) |
 | `dango remote repair` | Diagnose and fix common deployment issues |
@@ -49,7 +52,9 @@ Manage your cloud deployment with `dango remote` commands.
 | `dango remote auth remove-user` | Remove a user |
 | `dango remote auth reset-password` | Reset a user's password |
 
-All commands require an active deployment (`.dango/cloud.yml` must exist). They work the same for both DigitalOcean and BYOS deployments &mdash; all communication happens over SSH.
+Remote commands require an active deployment (`.dango/cloud.yml` must exist). Most management commands use SSH. Provider-specific operations, including DigitalOcean power control and firewall changes, use the provider API.
+
+`dango remote power-on` is DigitalOcean-only: it uses the provider API while SSH is unavailable, then starts services after the server is reachable. `dango remote resize` refuses a powered-off server, and `dango remote status` reports when the server is off. For BYOS power control, use your hosting provider.
 
 ---
 
@@ -71,6 +76,7 @@ dango remote push
 | `.dango/schedules.yml` | `/srv/dango/project/.dango/schedules.yml` |
 | `.dango/monitors.yml` | `/srv/dango/project/.dango/monitors.yml` |
 | `.dango/project.yml` | `/srv/dango/project/.dango/project.yml` |
+| `.dango/scripts.yml` | `/srv/dango/project/.dango/scripts.yml` |
 | `dbt/dbt_project.yml` | `/srv/dango/project/dbt/dbt_project.yml` |
 | `dbt/packages.yml` | `/srv/dango/project/dbt/packages.yml` |
 | `docker-compose.yml` | `/srv/dango/project/docker-compose.yml` |
@@ -82,8 +88,20 @@ dango remote push
 
 - `dbt/models/` &mdash; all model SQL files
 - `dbt/macros/` &mdash; all macro SQL files
+- `dbt/seeds/` &mdash; Git-tracked seed files, loaded by `dbt build`
 
 Files that don't exist locally are skipped.
+
+Keep seed files in `dbt/seeds/` and commit them to Git before pushing. The entire `data/` directory is Git-ignored and is never sent by `dango remote push`. Put files there with the web UI CSV upload or `dango remote upload`.
+
+### Upload one data file
+
+```bash
+dango remote upload data/uploads/orders.csv
+dango remote upload ~/Downloads/orders.csv data/uploads/orders.csv
+```
+
+`REMOTE_PATH` is relative to the project root and must be under `data/`. If omitted, the local file must already be inside the project and its relative path is used. Uploads accept single regular files up to 2 GiB; they refuse `data/warehouse.duckdb*` and `data/.tmp`.
 
 !!! note "Ports, session limits, and server-only files"
     `dango remote push` uploads the standard server ports (web 8800, Metabase 3000, dbt docs 8081, Marimo 7805) regardless of any custom ports in your local `.dango/project.yml`; your local file is not changed. For the session limits, keys your local file does not set get the cloud values (30 days, 60 minutes idle); an explicit local value is uploaded as is.
@@ -154,6 +172,9 @@ This shows which files changed, which dbt models were added/modified/removed, an
 | `--yes`, `-y` | Skip confirmation prompt |
 | `--allow-dirty` | Allow deployment with uncommitted changes |
 | `--allow-branch` | Allow deployment from any branch |
+| `--allow-empty` | Allow an empty local mirrored directory to erase its non-empty server copy |
+
+Push normally refuses to mirror an empty local directory over a non-empty server directory. Restore the local files or use `--allow-empty` if you intend to erase the server copy.
 
 ### Change Detection
 

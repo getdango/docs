@@ -6,12 +6,14 @@ Common issues and solutions for Dango installation and usage.
 
 ## Installation Issues
 
+Python 3.10 is no longer supported. Before upgrading Dango, create a new environment with Python 3.11, 3.12, or 3.13. The package now requires Pillow 13.0.0 or newer.
+
 ### Python Version Too Old
 
 **Error:**
 
 ```
-ERROR: Dango requires Python 3.10 or higher
+ERROR: Dango requires Python 3.11-3.13
 ```
 
 **Solution:**
@@ -24,7 +26,7 @@ Check your Python version and install a newer version:
     # Check your version
     python3 --version
 
-    # Install Python 3.11 (recommended)
+    # Install a supported Python interpreter
     # macOS:
     brew install python@3.11
 
@@ -120,7 +122,7 @@ pip install getdango
 **4. If still failing, check Python version:**
 
 ```bash
-python --version  # Must be 3.10 or higher
+python --version  # Must be 3.11, 3.12, or 3.13
 ```
 
 ---
