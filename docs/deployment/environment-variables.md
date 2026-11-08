@@ -117,11 +117,11 @@ This file has `0600` permissions (owner read/write only). The `env` commands con
 
 | Variable | Used For |
 |----------|----------|
-| `DIGITALOCEAN_TOKEN` | DigitalOcean API access (deploy, resize, migrate, destroy) |
+| `DIGITALOCEAN_TOKEN` | DigitalOcean API access (deploy, resize, destroy) |
 | `SPACES_ACCESS_KEY` | DigitalOcean Spaces access key (backups) |
 | `SPACES_SECRET_KEY` | DigitalOcean Spaces secret key (backups) |
-| `SPACES_REGION` | Spaces region slug, e.g., `nyc3` (backups) |
-| `SPACES_BUCKET` | Spaces bucket name (backups) |
+| `SPACES_REGION` | Spaces region slug, e.g., `nyc3` (backups; the server's scheduled backup reads it from its own `.env`, where `dango deploy` writes it) |
+| `SPACES_BUCKET` | Spaces bucket name (backups; read from the server `.env` the same way) |
 | `DANGO_ADMIN_PASSWORD` | Admin password for automated setups |
 
 ---
