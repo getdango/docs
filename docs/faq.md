@@ -274,10 +274,10 @@ See [Deployment](deployment/index.md) for details.
 
 ### What are the server requirements for BYOS?
 
-- Ubuntu 22.04 LTS
+- Ubuntu 22.04 or 24.04 LTS (24.04 recommended; 22.04 gets a Dango-installed Python 3.12)
 - 2 vCPU / 4 GB RAM minimum
-- SSH access with key-based authentication
-- A domain name (for automatic HTTPS via Caddy)
+- Root SSH access with key-based authentication
+- A domain name (recommended: automatic HTTPS via Caddy; without one the server serves plain HTTP, and the deploy asks you to acknowledge that; non-interactive deploys need `--accept-http-exposure`)
 
 See [BYOS Setup](deployment/byos.md) for the full checklist.
 

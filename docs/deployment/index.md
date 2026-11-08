@@ -11,9 +11,9 @@ Dango offers two deployment paths. Both result in the same server setup &mdash; 
 | | DigitalOcean | Bring Your Own Server |
 |---|---|---|
 | **What it does** | Provisions a droplet, configures everything | Installs Dango on your existing server |
-| **Prerequisites** | DO account + API token | Ubuntu 22.04+ server with SSH access |
+| **Prerequisites** | DO account + API token | Ubuntu 22.04 or 24.04 server with root SSH access |
 | **Cloud firewall** | Managed by Dango (`dango remote firewall`) | You manage (UFW installed automatically) |
-| **Automated backups** | DO Spaces (optional, ~$5/mo) | Not included (manual snapshots) |
+| **Automated backups** | DO Spaces (optional, ~$5/mo) | On the server only unless you configure a Spaces bucket (download copies with `dango remote backup download --from-server`) |
 | **Server destruction** | `dango deploy destroy` removes everything | Your responsibility |
 | **Cost** | $24&ndash;$48/mo (droplet) + optional backups | Your server costs |
 | **Best for** | Quick setup, no existing infrastructure | AWS, GCP, Hetzner, on-premise, etc. |
