@@ -24,7 +24,7 @@ Admins have a wildcard permission (`*`) that grants access to everything. This i
 
 - All data operations (sync, transform, query)
 - User management (create, edit, deactivate, delete users)
-- Auth settings (enable/disable 2FA policy, manage API keys for any user)
+- Auth settings (such as requiring 2FA for all users); API keys are created and revoked by each user for their own account
 - Platform configuration (start/stop services, manage settings)
 - Audit log access
 - Credential and secret management
@@ -78,7 +78,8 @@ An MCP client acts with the permissions of the person running `dango mcp`. Revie
 | `create_model`, `update_model`, `remove_model` | What dbt runs against the warehouse | Model SQL validated: no file or URL access, no `COPY`/`ATTACH`/`INSTALL`/`LOAD`, restricted Jinja |
 | `create_source`, `update_source`, `set_source_enabled`, `remove_source` | Which sources sync and where | Secrets are refused as config values and stay in `.env`; `rest_api` is edited only with `dango source edit` |
 | `run_sync`, `run_transform`, `run_doctor`, `generate_docs`, `scan_pii` | API quota, load, warehouse contents | `run_sync` accepts `dry_run` |
-| `accept_schema_drift`, `set_pii_override`, `update_source_table_docs`, `add_schedule`, `update_schedule`, `set_schedule_enabled`, `remove_schedule`, `reload_schedules` | Local project configuration | None beyond your client's approval prompt |
+| `accept_schema_drift`, `update_source_table_docs`, `add_schedule`, `update_schedule`, `set_schedule_enabled`, `remove_schedule`, `reload_schedules` | Local project configuration | None beyond your client's approval prompt |
+| `set_pii_override`, `delete_pii_override` | Which columns MCP `query` masks | Tighten-only: an agent can mark a column `pii` and delete a `not_pii` override (which re-masks it); it cannot mark a column `not_pii` or delete a `pii` override, which takes you (CLI or web UI) |
 | `remote_sync` | Runs a real sync on your server | Needs a deployment; no dry run |
 | `remote_push` | Replaces models, scripts and sources on your server | Dry run by default; a real push needs `dry_run=False` and `confirm=True` |
 

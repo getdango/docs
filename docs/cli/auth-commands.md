@@ -55,14 +55,16 @@ dango auth enable
 
 ### dango auth disable
 
-Disable authentication for this project. All endpoints become accessible without login.
+Disable authentication for this project. Requests from the same machine (same origin) no longer need to log in. User management still requires login.
 
 ```bash
 dango auth disable
 ```
 
 !!! warning
-    Disabling auth removes all access control. Anyone with network access to the platform can view and modify data.
+    Disabling auth removes access control for local requests. Run `dango auth enable` to turn it back on.
+
+`dango auth disable` is refused on a cloud server ("Authentication cannot be disabled on a cloud server."). Authentication stays on there.
 
 ---
 
