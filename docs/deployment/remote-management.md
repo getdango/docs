@@ -22,9 +22,10 @@ Manage your cloud deployment with `dango remote` commands.
 | **Server Operations** | |
 | `dango remote upgrade` | Upgrade Dango on the remote server |
 | `dango remote power-on` | Power on a DigitalOcean server left off by an interrupted resize and start services |
-| `dango remote isolation status` | Inspect cloud script and notebook isolation |
+| `dango remote isolation status` | Inspect cloud script and notebook isolation (`on`, `disabled`, `missing`, `unsupported`, `unknown`) |
+| `dango remote isolation disable` / `enable` | Audited administrator opt-out from, and restore of, script and notebook isolation |
 | `dango remote resize` | Resize the server (change CPU/RAM) |
-| `dango remote migrate` | Migrate to a new server (new droplet for disk/region changes) |
+| `dango remote migrate` | Switched off in 1.0.14: refuses and prints the manual steps ([details](server-operations.md#moving-to-a-new-server)) |
 | `dango remote repair` | Diagnose and fix common deployment issues |
 | `dango remote reset-metabase` | Reset Metabase to fresh state (SSO/H2 corruption) |
 | **Firewall** | |
@@ -264,46 +265,41 @@ dango remote status
 
 | Panel | Information |
 |-------|-------------|
-| **Server** | IP address, region, size (tier + price/mo), domain |
-| **Services** | Status of dango-web, Caddy, Metabase (running/stopped) |
+| **Server** | IP address, region, size (tier + price/mo), domain; "HTTP only (unencrypted)" when no domain is set |
+| **Services** | Status of dango-web, Caddy, Metabase |
 | **Resources** | CPU %, RAM usage/total (%), disk usage/total (%) |
 | **Data** | DuckDB database size, last sync timestamp per source |
-| **Versions** | Installed Dango version vs. latest on PyPI, upgrade available warning |
-| **Last Deployment** | Git commit (short SHA), branch, deployer, timestamp |
-| **Backup** | Last backup timestamp (or "No backups found" warning) |
+| **Backups** | The `Off-site:` line (`yes (Spaces <bucket>)`, `NO: ...` with the reason, or `unknown`), the command to keep a local copy when it is not `yes`, and whether the daily timer is enabled |
+| **Backup** | Last backup timestamp (or a "No backups found" warning) |
+| **Versions** | Installed and recorded Dango version, Docker access state (`helper` or a warned `group (fallback)`), the `Isolation:` state, latest version on PyPI |
+
+On DigitalOcean deployments, `dango remote status` also warns when DigitalOcean has droplets tagged `dango` that your `.dango/cloud.yml` does not name (see [Orphaned resources](destroy.md#orphaned-resources)), and when the server cannot be reached it says "Server is powered off. Run: dango remote power-on" if the droplet is off.
 
 ```
-Server: 143.198.xxx.xxx
-Region: nyc1 (New York 1)
-Size:   Standard (s-2vcpu-4gb) — $24/mo
-Domain: analytics.yourcompany.com
+Server
+  IP: 143.198.xxx.xxx
+  Region: nyc1
+  Size: s-2vcpu-4gb (Standard, $24/mo)
+  Domain: analytics.yourcompany.com
 
-Services:
-  ✓ Dango web server (running)
-  ✓ Metabase (running)
-  ✓ Caddy (running)
+Services
+  dango-web      active
+  caddy          active
+  metabase       running
 
-Resources:
-  CPU:  12%
-  RAM:  1.8 GB / 4.0 GB (45%)
-  Disk: 14.2 GB / 80.0 GB (18%)
+Backups
+  Off-site: yes (Spaces my-dango-backups)
+  Scheduled backups: enabled (daily at 02:00 UTC)
 
-Data:
-  DuckDB: 256 MB
-  Last sync: stripe (2 hours ago), hubspot (6 hours ago)
-
-Versions:
-  Installed: 1.0.0
-  Latest:    1.0.0
-
-Last Deployment:
-  Commit: a1b2c3d (main)
-  By: deploy@local
-  At: 2026-05-15 14:30:00
-
-Backup:
-  Last: backup-20260515-020000.tar.gz (13 hours ago)
+Versions
+  Installed: 1.0.14
+  Recorded: 1.0.14
+  Docker access: helper
+  Isolation: on (loopback restricted)
+  Latest (PyPI): 1.0.14
 ```
+
+The panels are abbreviated here; Resources and Data follow the same layout.
 
 ---
 
@@ -574,5 +570,5 @@ dango remote push --allow-dirty --allow-branch
 
 - [Environment Variables](environment-variables.md) &mdash; manage secrets on the server
 - [Backups](backups.md) &mdash; configure automated backups and restore
-- [Server Operations](server-operations.md) &mdash; upgrade, resize, and migrate
+- [Server Operations](server-operations.md): upgrade, resize, and moving to a new server
 - [Destroy & Cleanup](destroy.md) &mdash; tear down a deployment

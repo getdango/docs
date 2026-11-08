@@ -85,7 +85,7 @@ dango
 │   ├── query SQL                        Run read-only SQL
 │   ├── upgrade                          Upgrade remote Dango
 │   ├── resize [SIZE]                    Resize server
-│   ├── migrate                          Migrate to new server
+│   ├── migrate                          Switched off in 1.0.14 (prints manual steps)
 │   ├── history                          Show deploy history
 │   ├── sync SOURCE                      Trigger remote sync
 │   ├── env
@@ -104,8 +104,8 @@ dango
 │   │   ├── list                         List backups
 │   │   ├── enable                       Enable daily backups
 │   │   ├── disable                      Disable daily backups
-│   │   ├── download NAME                Download from Spaces
-│   │   └── restore SOURCE               Restore from backup
+│   │   ├── download [NAME]              Download from Spaces or --from-server
+│   │   └── restore SOURCE               Restore from backup (--from-local for a file)
 │   └── auth
 │       ├── add-user EMAIL               Create remote user
 │       ├── list-users                   List remote users
@@ -819,6 +819,8 @@ dango deploy [OPTIONS]
 | `--server-ip TEXT` | Server IP/hostname for `--byos` |
 | `--ssh-user TEXT` | SSH user for `--byos` |
 | `--ssh-key TEXT` | SSH key path for `--byos` |
+| `--allow-ip IPv4_OR_CIDR` | Without a domain: restrict ports 80/443 to this address (repeatable; DigitalOcean only, refused for `--byos`) |
+| `--accept-http-exposure` | Without a domain: deploy over plain HTTP with the web ports open to the internet |
 
 ```bash
 dango deploy                                    # Interactive wizard
@@ -838,11 +840,11 @@ dango deploy destroy [OPTIONS]
 | Option | Description |
 |--------|-------------|
 | `--force` | Skip confirmation and backup prompts |
-| `--keep-spaces` | Keep the Spaces bucket |
+| `--delete-spaces` | Also delete the Spaces bucket and all its contents (kept by default) |
 | `--keep-ssh-key` | Keep the SSH key on DigitalOcean |
 
 !!! danger
-    This deletes the Droplet, firewall, SSH key (from DO), and Spaces bucket. Local files and SSH keys are never deleted.
+    On DigitalOcean this deletes the droplet, firewall and SSH key (the Spaces bucket is kept unless `--delete-spaces`). On BYOS it removes Dango and its data from the server but not the machine. Before asking for confirmation it reminds you that `.env` and `.dlt/secrets.toml` are not in backups and lists the secret names on the server. Local files and local SSH keys are never deleted.
 
 [:octicons-arrow-right-24: Full guide](deploy-remote.md)
 
@@ -868,7 +870,7 @@ dango remote isolation status         # Inspect runner isolation
 dango remote isolation disable --yes  # Audited administrator opt-out
 dango remote isolation enable         # Restore runner isolation
 dango remote resize [SIZE]            # Resize server
-dango remote migrate [OPTIONS]        # Migrate to new server
+dango remote migrate                  # Switched off in 1.0.14 (refuses, prints manual steps)
 dango remote history [OPTIONS]        # Show deploy history
 dango remote sync SOURCE [OPTIONS]    # Trigger remote sync
 dango remote repair                   # Diagnose and fix issues
@@ -906,7 +908,8 @@ dango remote backup list
 dango remote backup enable
 dango remote backup disable
 dango remote backup download NAME [-o PATH]
-dango remote backup restore SOURCE [-y]
+dango remote backup download --from-server [-o PATH]
+dango remote backup restore SOURCE [-y] [--from-local]
 ```
 
 ### Remote user management
