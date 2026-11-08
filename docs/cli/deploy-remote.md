@@ -52,7 +52,7 @@ dango deploy [OPTIONS]
 | `--allow-ip IPv4_OR_CIDR` | Without a domain, restrict DigitalOcean web ports to this address (repeatable) |
 | `--accept-http-exposure` | Acknowledge plain HTTP with web ports open to the internet |
 
-Without a domain, a non-interactive DigitalOcean deployment requires `--allow-ip` or `--accept-http-exposure`. BYOS refuses `--allow-ip`: configure your own firewall and use `--accept-http-exposure` if deploying without a domain. The interactive DigitalOcean wizard also offers `detect`, which uses the IP address seen by the server.
+Without a domain, a non-interactive DigitalOcean deployment requires `--allow-ip` or `--accept-http-exposure`. BYOS refuses `--allow-ip`: configure your own firewall and use `--accept-http-exposure` if deploying without a domain. The interactive DigitalOcean wizard also offers `detect`, which uses the IP address seen by the server. `--allow-ip` cannot be combined with `--domain`, because Let's Encrypt must reach ports 80/443 to issue and renew the certificate.
 
 === "Interactive (DigitalOcean)"
 
