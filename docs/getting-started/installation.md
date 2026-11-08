@@ -9,6 +9,9 @@ This guide will help you install Dango on macOS, Linux, or Windows.
 !!! info "Recommended Version"
     **Python 3.12** is recommended by the installers; the contributor guide recommends 3.11. Python 3.10 users must create a new environment with a supported interpreter before upgrading. Fresh and upgraded installations require Pillow 13.0.0 or newer.
 
+!!! note "Cloud servers"
+    This applies to your own machine. A cloud server needs Python 3.11&ndash;3.13 for its own venv too, and Dango provides it: Ubuntu 24.04 uses its own Python 3.12; Ubuntu 22.04 (Python 3.10) gets a pinned, checksum-verified Python 3.12 that Dango installs under `/opt/dango/python`. See [Server Operations](../deployment/server-operations.md#upgrading-to-1014) and [BYOS](../deployment/byos.md#prerequisites).
+
 **Check if you have Python:**
 
 === "macOS / Linux"
@@ -153,6 +156,9 @@ The bootstrap installer creates a project directory, sets up a virtual environme
     ```powershell
     irm https://getdango.dev/install.ps1 | iex
     ```
+
+!!! warning "Windows installer unverified in 1.0.14"
+    The PowerShell installer (`install.ps1`) failed in a test and has not been verified for Dango 1.0.14. A fix is planned for 1.0.15. If it fails, use the [manual installation](#manual-installation) steps with Python 3.11, 3.12 or 3.13.
 
 The installer will:
 
