@@ -40,7 +40,7 @@ pip install getdango
 ```
 
 !!! note "Python version"
-    Dango requires Python 3.11–3.13. The installer recommends Python 3.12. On macOS, the system `python3` may be too old — select a supported interpreter explicitly.
+    Dango requires Python 3.11–3.13. The installer recommends Python 3.12. On macOS, the system `python3` may be too old, so select a supported interpreter explicitly.
 
 ---
 
