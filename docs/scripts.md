@@ -77,7 +77,7 @@ Scripts run as subprocesses. On cloud servers with runner isolation enabled, the
 === "Cloud"
 
     ```bash
-    dango remote env set SLACK_WEBHOOK_URL https://hooks.slack.com/services/...
+    dango remote env set SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
     ```
 
     Declare the name for the script in `.dango/scripts.yml` and push that file:
@@ -453,13 +453,15 @@ Each script run creates a timestamped directory (or run UUID for manual runs):
 
 ### Viewing Logs
 
-**Web UI:** Click the script name or status badge in the Scripts table.
+**Web UI:** Click the script name or status badge in the Scripts table. The log page, the script history and run-detail APIs, and a failed launch message redact known secret values (6 or more characters, from `.env` and `.dlt/secrets.toml`) and secret-looking patterns in stdout, stderr, run metadata and error text, for every role. Redaction is a safety net, not a guarantee: do not print secrets in a script.
 
 **Filesystem:**
 ```bash
 ls -lt .dango/logs/scripts/ | head -5
 cat .dango/logs/scripts/my_report_20260713T070000/stdout.txt
 ```
+
+The files on disk are stored as the script wrote them, without redaction.
 
 ## Troubleshooting
 

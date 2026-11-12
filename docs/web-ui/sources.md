@@ -114,7 +114,10 @@ A list of files associated with the source, showing:
 4. Click **Upload File** to upload.
 5. A progress indicator shows during upload.
 
-Files are saved to the source's configured directory. Maximum file size is **100 MB**. Duplicate filenames are rejected — delete the existing file first if you need to replace it.
+Files are saved to the source's configured directory. Maximum file size is **100 MB**: the server stops reading an upload as soon as it passes the limit and answers 413. Duplicate filenames are rejected, so delete the existing file first if you need to replace it.
+
+!!! note "Cloud servers: proxy limit"
+    On a cloud server, Caddy also refuses request bodies over **110 MB**, slightly above the 100 MB limit. A server created with 1.0.14 has this cap. An existing server gets it only when its Caddyfile is rewritten from Dango's template (`dango remote domain set` or `dango remote domain remove`; a rewrite replaces hand edits), because `dango remote upgrade` changes only the notebook WebSocket route. The 100 MB limit in the application applies either way.
 
 !!! info "Auto-sync after upload"
     After uploading, click **Sync Now** in the modal to immediately process the new files into the database.
@@ -136,13 +139,16 @@ This triggers a sync that only processes data within the specified date range, u
     - **Sync:** `POST /api/sources/{name}/sync` starts a sync subprocess. Accepts optional `full_refresh`, `start_date`, and `end_date` parameters.
     - **Upload:** `POST /api/sources/{name}/upload-csv` uploads a file to the source directory. Max 100 MB. Set `trigger_sync=true` to auto-sync after upload.
     - **File list:** `GET /api/sources/{name}/csv-files` returns files on disk merged with database load metadata.
-    - **Delete file:** `DELETE /api/sources/{name}/csv-files?file_path=...` removes the file, cleans up database rows, and triggers a background dbt refresh.
+    - **Delete file:** `DELETE /api/sources/{name}/csv-files?file_path=...` removes the file, cleans up its database rows and metadata record in one transaction, and triggers a background dbt refresh. Only files the source loads can be deleted (the source's directory, its `file_pattern`, a format the loader reads): the warehouse, its WAL and temporary files and `.dango` state answer 403. If a sync or dbt run is using the database the request answers 409; try again when it finishes. If the database cleanup fails, the file is not deleted.
     - **WebSocket events:** `sync_started`, `sync_failed`, `file_uploaded`, `csv_deleted` events provide real-time feedback via toast notifications.
 
 ## Troubleshooting
 
 **Source shows "Failed" status**
 :   Open the Source Detail Modal to see the error message from the last sync. Common causes: expired OAuth credentials, network errors, or API rate limits. Fix the underlying issue and click **Sync Now** to retry.
+
+**File delete answers "A sync or dbt run is using the database"**
+:   The delete needs the DuckDB write lock, and a sync or dbt run holds it. Try again when the run finishes.
 
 **CSV upload rejected with "file already exists"**
 :   A file with the same name already exists in the source directory. Delete the existing file from the Existing Files list in the modal, then upload again.

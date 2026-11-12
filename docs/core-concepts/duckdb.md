@@ -179,7 +179,7 @@ data = response.json()
 print(data["columns"], data["rows"])
 ```
 
-Default limits: 10,000 rows, 30-second timeout. Configurable via [`api.query_max_rows` and `api.query_timeout_seconds`](../reference/configuration.md#api-section) in `project.yml`.
+Default limits: 10,000 rows, 30-second timeout. Configurable via [`api.query_max_rows` and `api.query_timeout_seconds`](../reference/configuration.md#api-section) in `project.yml`. A query that times out or is cancelled is interrupted in DuckDB and its connection is closed. At most 4 queries run at once across all users; further requests get HTTP 429 (`DANGO-Q008`) until one finishes.
 
 ### `dango remote query` (Cloud Ad-Hoc Queries)
 
