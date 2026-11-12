@@ -161,7 +161,9 @@ Session timeouts are configured in the `auth` section of `project.yml`:
 | `max_attempts` | 5 | Failed login attempts before account is locked |
 | `lockout_minutes` | 15 | Duration of account lockout |
 
-Locked accounts can be unlocked by an admin via `POST /api/admin/users/{user_id}/unlock`.
+Failures are counted per address and email, and also per account across all addresses: the account locks after 4 times `max_attempts` failures in total. Wrong passwords at change-password, 2FA setup/disable and API-key creation count too. Failed TOTP or recovery codes have their own account lock (see [Two-Factor Auth](../security/two-factor.md#attempt-limit)).
+
+Locked accounts can be unlocked by an admin via `dango auth unlock EMAIL` or `POST /api/admin/users/{user_id}/unlock`; both clear the TOTP lock too.
 
 ### Rate Limiting
 
@@ -175,7 +177,7 @@ Rate limiting is enabled by default. Localhost requests are exempt. Configure tr
 ### Two-Factor Authentication (2FA)
 
 - Optional by default (`require_2fa: false`)
-- When enabled globally, all users must set up TOTP before accessing the platform
+- When enabled globally, all users must set up TOTP before accessing the platform: until they do, they hold an enrollment-only session that reaches TOTP setup, logout, password change and the account page only (see [Two-Factor Auth](../security/two-factor.md#when-2fa-is-required))
 - Uses TOTP (Time-based One-Time Password) with standard authenticator apps
 - Recovery codes are generated during 2FA setup
 
@@ -209,7 +211,8 @@ curl -H "Authorization: Bearer dango_ak_..." http://localhost:8800/api/sources
 |----------|---------|-------------|
 | Expiry | None (never expires) | Optional per-key expiry date |
 | Scope | Full user permissions | Key inherits all permissions of the associated user |
-| Revocation | Manual | Revoke via API or admin UI |
+| Revocation | Manual, or automatic | Revoke via API or the account page. All of a user's keys are revoked when their password is changed or reset, when an admin revokes their sessions, and when they are deactivated |
+| Creation | Current password | Creating a key asks for the account's current password (not asked for accounts without a Dango password, such as OAuth-only sign-ins) |
 
 ---
 

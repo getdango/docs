@@ -359,6 +359,7 @@ The `POST /api/query` endpoint lets external scripts run read-only SQL against y
 
 - Read-only, `SELECT`-only (enforced by sqlglot whitelist + DuckDB `read_only` mode)
 - Default limits: **10,000 rows**, **30-second timeout** (configurable via [`api.query_max_rows` and `api.query_timeout_seconds`](../reference/configuration.md#api-section) in `project.yml`)
+- At most 4 queries at once (HTTP 429 beyond that); a query that times out is interrupted
 - Requires authentication (API key or session)
 - Every query is audit-logged
 

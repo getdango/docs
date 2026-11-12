@@ -145,8 +145,11 @@ Manage API keys for programmatic access:
 Click **Create Key** to generate a new API key:
 
 1. Enter a **Key Name** in the modal.
-2. Click **Create**.
-3. **Copy the key immediately** — it is shown only once and cannot be retrieved later.
+2. Enter your **Current Password** (accounts that sign in only through Google or GitHub have no Dango password and are not asked).
+3. Click **Create**.
+4. **Copy the key immediately.** It is shown only once and cannot be retrieved later.
+
+Changing your password revokes all of your API keys, so create new ones afterwards.
 
 ### Two-Factor Authentication (2FA)
 
@@ -167,7 +170,7 @@ Set up TOTP-based two-factor authentication for enhanced security:
 #### Disabling 2FA
 
 1. Click **Disable 2FA**.
-2. Enter your current password.
+2. Enter your current password and a TOTP code (or a recovery code if you lost your authenticator).
 3. Click **Disable 2FA** to confirm.
 
 #### Regenerating Recovery Codes
@@ -188,9 +191,10 @@ The login page (`/login`) uses a two-step flow:
 1. **Credentials step** — enter email and password, then click **Sign In**.
 2. **TOTP step** (if 2FA is enabled) — enter the 6-digit code from your authenticator app, or click "Use a recovery code instead" to enter a one-time recovery code.
 
+If your administrator requires 2FA (`auth.require_2fa`) and you have not set it up, signing in takes you to the Account page with a notice to set up 2FA. Until you verify a code there, that page, password change and logout are all you can reach (see [Two-Factor Auth](../security/two-factor.md#when-2fa-is-required)).
 If OAuth providers are configured, "Continue with [Provider]" buttons appear below the login form.
 
-Account lockout occurs after 5 failed login attempts, with a countdown timer showing when you can try again.
+Account lockout occurs after 5 failed login attempts from one address (or 20 in total from any addresses), with a countdown timer showing when you can try again. Wrong passwords at change-password, 2FA setup and disable, and API-key creation count as failed attempts too. Failed authenticator or recovery codes have a separate, longer lock.
 
 ### Accept Invite
 
@@ -220,7 +224,7 @@ If an admin creates your account with a temporary password, you're redirected to
 :   Contact an admin to disable 2FA on your account and reset your password.
 
 **API key not working**
-:   Check that the key hasn't been revoked. API keys are tied to your user account — if your account is deactivated, API keys stop working.
+:   Check that the key hasn't been revoked. API keys are tied to your user account. If your account is deactivated, or its password is changed or reset, or an admin revokes its sessions, its API keys stop working. Create a new key.
 
 ## Related Pages
 

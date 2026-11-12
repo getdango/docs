@@ -248,7 +248,13 @@ dango auth change-role user@example.com admin
 dango auth change-role user@example.com viewer
 ```
 
-Role changes take effect on the user's next request (existing sessions are updated). The Metabase role is also synced automatically.
+Role changes take effect on the user's next request (existing sessions are updated). The Metabase role is also synced automatically, and the Metabase sessions Dango bridged for the user are deleted, so the user's next visit to Metabase starts a session with the new role.
+
+The change is reported as successful only when every Metabase step succeeded. If one fails (for example, Metabase is not reachable), the new role is kept in Dango but:
+
+- the admin API answers `502` with a message saying the Metabase update did not complete, and `dango auth change-role` prints a warning;
+- the user's Metabase access (the `/metabase` proxy and the Metabase sign-in that Dango performs at login) stays suspended, so a previous, higher Metabase role cannot linger;
+- re-apply the role when Metabase is reachable: run `dango auth change-role EMAIL ROLE` again with the user's current role, or send `PUT /api/admin/users/{user_id}/role` with it. When that succeeds, access resumes.
 
 ### Deactivating Users
 
@@ -262,6 +268,7 @@ Deactivated users:
 
 - Cannot log in
 - All active sessions are invalidated immediately
+- All API keys are revoked
 - Account data is preserved (can be reactivated)
 
 To reactivate:

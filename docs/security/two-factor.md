@@ -40,6 +40,18 @@ Any TOTP-compatible authenticator app works with Dango:
 !!! success "Verification Required"
     You must enter a valid TOTP code to complete setup. This confirms your authenticator app is configured correctly before 2FA takes effect.
 
+An account that signed in with Google or GitHub has no Dango password, so step 4 is skipped for it during required enrollment (see below).
+
+### When 2FA is Required
+
+With `auth.require_2fa: true` in `.dango/project.yml`, every user must set up TOTP. A user who has not done so signs in (by password or OAuth) to an **enrollment-only session** that lasts **30 minutes**:
+
+- It reaches only TOTP setup, logout, the change-password flow, and the account page (`/settings/account`). The login page sends the user there. Every other page and API request is refused or redirected.
+- No full session, no API key and no Metabase session is issued yet, and API keys cannot be created from it.
+- When the user verifies the TOTP code in step 6, Dango replaces the enrollment session with a full session and signs the user in to Metabase.
+
+Changing the password during enrollment keeps the session enrollment-only. If the 30 minutes pass, sign in again and continue the setup.
+
 ---
 
 ## Recovery Codes
@@ -83,11 +95,14 @@ When 2FA is enabled, the login process adds a second step:
 
 ### Attempt Limit
 
-You get **5 attempts** to enter a correct code. After 5 failed attempts:
+You get **5 attempts** per partial session. After 5 failed attempts the partial session is invalidated and you must enter your password again.
 
-- The partial session is invalidated
-- You must restart the login process (enter password again)
-- This is tracked per partial session, not per account
+Failed codes are also counted per account, and that count is kept in the auth database: signing in again with your password does not reset it.
+
+- After every 5 failed codes (TOTP or recovery) the account is locked for code entry: 15 minutes the first time, doubling each further time, up to 12 hours. While locked, the login answers "Too many failed verification attempts. Try again later." even if the code is right.
+- A correct code clears the count. An admin can clear it with `dango auth unlock EMAIL` (or `POST /api/admin/users/{user_id}/unlock`).
+- Each failed code is written to the [audit log](audit-logging.md) as a failed login.
+- A TOTP code can be used once: a code from a time-step that was already accepted is refused, so wait for the next code.
 
 ### Time Window
 
@@ -113,8 +128,10 @@ To turn off two-factor authentication:
 
 1. Go to **Account** (`/settings/account`)
 2. Click **Disable Two-Factor Authentication**
-3. Enter your current password to confirm
+3. Enter your current password and a code: a 6-digit TOTP code, or a recovery code if you lost your authenticator
 4. 2FA is disabled immediately — future logins require only a password
+
+The password alone does not disable 2FA. A wrong password or code counts as a failed attempt (see [Attempt Limit](#attempt-limit) and [Brute-Force Protection](authentication.md#brute-force-protection)). With `require_2fa: true` you will be asked to set 2FA up again at your next sign-in.
 
 ---
 

@@ -45,8 +45,9 @@ The standard login flow:
 2. Server checks [brute-force lockout](#brute-force-protection) status
 3. Password verified against bcrypt hash
 4. If [2FA is enabled](two-factor.md) → partial session created (5-minute timeout) → user enters TOTP code → full session
-5. If 2FA is not enabled → full session created immediately
-6. [Metabase SSO](#metabase-sso-bridge) session bridged automatically
+5. If 2FA is not enabled but `auth.require_2fa` is on → an [enrollment-only session](two-factor.md#when-2fa-is-required) is created: it reaches only TOTP setup, logout, password change and the account page until a TOTP code is verified
+6. Otherwise → full session created immediately
+7. [Metabase SSO](#metabase-sso-bridge) session bridged automatically
 
 ### OAuth Login
 
@@ -55,9 +56,10 @@ For Google and GitHub social login:
 1. User clicks "Sign in with Google" or "Sign in with GitHub" on the login page
 2. Redirected to the provider's consent screen
 3. After approval, redirected back to Dango with an authorization code
-4. Dango exchanges the code for user info (email, name)
-5. If a Dango user with that email exists → logged in automatically
-6. If no matching user exists → redirected to login page with an error
+4. Dango exchanges the code for user info (email, name) and requires a **verified** email: Google must report `verified_email` as true, and for GitHub the address is taken only from a `/user/emails` entry marked verified (the profile email is not trusted). The provider must also return an account identifier
+5. If the email is not verified, or no verified email is available, sign-in is rejected before any account lookup or linking
+6. If a Dango user with that email exists → logged in automatically
+7. If no matching user exists → redirected to login page with an error
 
 !!! important "Admin Must Pre-Create Users"
     OAuth login does not create new accounts. An admin must first create the user via `dango auth add-user` or the web UI. The OAuth provider is linked automatically when the email matches.
@@ -134,6 +136,7 @@ API keys provide stateless authentication for scripts and automation.
 | Prefix | `dango_ak_` |
 | Storage | SHA-256 hashed (plaintext never stored) |
 | Expiry | Optional (set at creation time) |
+| Revocation | Manual, and automatic when the owner's password changes (own change or admin reset), an admin revokes the user's sessions, or the user is deactivated |
 
 ### Creating API Keys
 
@@ -143,7 +146,8 @@ API keys provide stateless authentication for scripts and automation.
     2. Scroll to **API Keys**
     3. Click **Create API Key**
     4. Set a name and optional expiry date
-    5. Copy the key — it's shown only once
+    5. Enter your current password
+    6. Copy the key. It's shown only once
 
 === "API"
 
@@ -152,8 +156,12 @@ API keys provide stateless authentication for scripts and automation.
       -H "Cookie: dango_session=..." \
       -H "X-Requested-With: XMLHttpRequest" \
       -H "Content-Type: application/json" \
-      -d '{"name": "ci-deploy", "expires_at": "2026-09-01T00:00:00"}'
+      -d '{"name": "ci-deploy", "expires_at": "2026-09-01T00:00:00", "current_password": "..."}'
     ```
+
+Creating a key asks for the account's current password again, so a session alone cannot mint a long-lived credential. A wrong password counts as a failed sign-in (see [Brute-Force Protection](#brute-force-protection)). An account that signs in only through Google or GitHub has no Dango password and is not asked.
+
+After you change your password, every API key of the account stops working and you create new ones.
 
 ### Using API Keys
 
@@ -226,18 +234,22 @@ Dango protects against credential stuffing and brute-force attacks.
 
 | Parameter | Value |
 |-----------|-------|
-| Failed attempts before lockout | 5 |
-| Lockout duration | 15 minutes |
-| Tracking | Per (IP, email) pair |
+| Failed attempts before lockout | 5 (`auth.lockout.max_attempts`) |
+| Lockout duration | 15 minutes (`auth.lockout.lockout_minutes`) |
+| Tracking | Per (IP, email) pair, and per account across all addresses |
 
-After 5 failed login attempts to the same email from the same IP address, further attempts to that email from that IP are blocked for 15 minutes. Both existing and non-existing emails receive identical lockout behavior, preventing username enumeration through lockout timing.
+After 5 failed login attempts to the same email from the same IP address, further attempts to that email from that IP are blocked for 15 minutes. Failures are also counted per account regardless of address: after 4 times `max_attempts` failures (20 with the defaults) from any addresses, the account is locked for `lockout_minutes`. A successful sign-in clears the count. Both existing and non-existing emails receive identical lockout behavior, preventing username enumeration through lockout timing.
+
+A wrong password at change-password, at 2FA setup, disable and recovery-code regeneration, and at API-key creation also counts as a failed sign-in. While an account is locked these requests answer 423 and do not compare the password, so the owner cannot change the password until the lock ends or an admin unlocks the account. Failed TOTP and recovery codes are counted separately and lock longer (see [Two-Factor Auth](two-factor.md#attempt-limit)).
 
 ### Unlocking Accounts
 
 ```bash
-# Unlock a specific user (clears failed attempt counter)
+# Unlock a specific user (clears the failed-attempt counters and the TOTP code lock)
 dango auth unlock user@example.com
 ```
+
+An admin can also unlock with `POST /api/admin/users/{user_id}/unlock`, which clears the same counters.
 
 ### Timing Oracle Prevention
 
