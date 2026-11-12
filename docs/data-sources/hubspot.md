@@ -104,7 +104,7 @@ sources:
 
     Set the token on your remote server:
     ```bash
-    dango remote env set HUBSPOT_API_KEY pat-na1-your-token-here
+    dango remote env set HUBSPOT_API_KEY=pat-na1-your-token-here
     ```
 
 ### First Sync

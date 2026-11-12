@@ -24,6 +24,7 @@ Additionally, you need:
 - [ ] **SSH key** &mdash; existing key or the wizard generates one
 - [ ] A **fresh host**, or one where `/srv/dango` does not exist yet. If `/srv` or `/srv/dango` already exists it must be a root-owned directory closed to other users (see [Troubleshooting](#srvdango-already-exists))
 - [ ] **Python 3.11&ndash;3.13 for the Dango venv.** Ubuntu 24.04 has Python 3.12. Ubuntu 22.04 ships Python 3.10, so Dango downloads a pinned, checksum-verified Python 3.12 build and installs it under `/opt/dango/python`; that needs outbound HTTPS to `github.com` and `release-assets.githubusercontent.com`, or a root-owned Python 3.11&ndash;3.13 you install yourself from the operating system's packages
+- [ ] **`fs.protected_hardlinks=1`** (the Ubuntu and Debian default; check with `sysctl fs.protected_hardlinks`). Setup runs root commands over directories the `dango` user can write, which is safe only with this kernel setting, so a host with another value is refused before anything is changed
 - [ ] Basic tools on the host: `curl`, `sha256sum`, `tar`, `find`, `readlink`, `mktemp` and `flock` (from `util-linux`)
 
 !!! note "Docker Not Required"
@@ -263,6 +264,27 @@ BYOS setup failed: Server setup stopped before changing anything: /srv/dango alr
 ```
 
 Setup refuses, before any root step, a host whose `/srv` or `/srv/dango` is not a real directory owned by root, is writable by its group or others, carries an ACL, or holds a Python venv the service account can change. This includes re-running `dango deploy --byos` against an existing 1.0.13 or earlier server, where `/srv/dango` is owned by the `dango` user. To update such a server use `dango remote upgrade`. For a new server use a fresh host, or have root move the directory aside (`mv /srv/dango /srv/dango.old`) after checking it, and run `dango deploy --byos` again.
+
+### `fs.protected_hardlinks` is not 1
+
+```
+BYOS setup failed: Server setup stopped before changing anything: this host does not have fs.protected_hardlinks=1 (or it could not be read). ...
+```
+
+or, from the runner verification step on a later `dango remote upgrade`:
+
+```
+verify: fs.protected_hardlinks is not 1: root chown over service-writable directories could follow a hard link to a root file. Run: sysctl -w fs.protected_hardlinks=1
+```
+
+Set it on the server and persist it, then run the command again:
+
+```bash
+sysctl -w fs.protected_hardlinks=1
+echo 'fs.protected_hardlinks = 1' > /etc/sysctl.d/99-dango-hardlinks.conf
+```
+
+A host where the setting cannot be changed (some containers and restricted kernels) cannot run Dango's cloud setup.
 
 ### No usable Python, or `flock` missing (`DANGO-D024`)
 

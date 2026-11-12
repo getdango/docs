@@ -85,7 +85,7 @@ Every backup includes:
 | **Code** | `notebooks/`, `scripts/`, `custom_sources/` (entire directories) |
 | **Metabase** | H2 database files (`metabase.db.mv.db`, `metabase.db.trace.db`) from the Docker volume |
 
-Only regular files and directories are copied. Links and special files are skipped with a warning, and a copy that fails fails the backup.
+Only regular files and directories are copied. Links and special files are skipped with a warning, and a copy that fails fails the backup. The server copies project directories through descriptors opened without following links, so a link swapped in during the copy is not followed. The one exception is a `data/` that is itself a link (for example to a data volume): it is backed up only if its target is a directory owned by the `dango` user, and only the entries that user owns are copied; otherwise the backup refuses.
 
 ### What is not backed up
 
@@ -111,7 +111,8 @@ Backups are stored as compressed tar archives:
 
 ### Retention
 
-- `dango remote backup` and the daily timer upload the archive to Spaces, verify its size, then remove the local copy from the server. Without a Spaces destination the archive stays in `/srv/dango/backups/deploy/`.
+- `dango remote backup` and the daily timer upload the archive to Spaces, verify its size, then remove the local copy and its manifest from the server. Without a Spaces destination the archive stays in `/srv/dango/backups/deploy/`.
+- If a Spaces upload cannot be verified, the archive and its manifest stay on the server, older Spaces backups are not pruned, and the run is recorded as failed (`last_error` and `consecutive_failures` in `/srv/dango/backups/.backup_health.json` on the server). Download a copy with `dango remote backup download --from-server -o <file>` and check the Spaces credentials and bucket.
 - Backups made automatically by `dango remote push`, `upgrade`, `resize` and `backup restore` stay on the server, and only the newest archive is kept (older ones are deleted after each such backup).
 - Spaces backups follow daily/weekly/monthly tiers (default 7 daily, 4 weekly, monthly off); see [Retention and secrets settings](#retention-and-secrets-settings).
 

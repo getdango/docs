@@ -226,7 +226,7 @@ dango remote backup restore
     - **Daily**: Keep all backups from the last **7 days**
     - **Weekly**: Keep **1 backup per week** for up to **4 weeks** older than 7 days
 
-    Older backups are pruned automatically. The archive is removed from the server after a verified upload. Without a Spaces destination (always the case on BYOS unless you configure one), backups stay on the server and are lost with it: every backup command prints an `Off-site:` line, and `dango remote backup download --from-server -o <file>` saves a copy locally.
+    Older backups are pruned automatically. The archive is removed from the server after a verified upload; if the upload cannot be verified, it stays on the server, nothing is pruned and the run is recorded as failed. Without a Spaces destination (always the case on BYOS unless you configure one), backups stay on the server and are lost with it: every backup command prints an `Off-site:` line, and `dango remote backup download --from-server -o <file>` saves a copy locally.
 
 ### What Cloud Backups Include
 

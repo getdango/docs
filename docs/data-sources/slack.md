@@ -91,7 +91,7 @@ sources:
 
     Set the token on your remote server:
     ```bash
-    dango remote env set SLACK_ACCESS_TOKEN xoxb-your-bot-token-here
+    dango remote env set SLACK_ACCESS_TOKEN=xoxb-your-bot-token-here
     ```
 
 ### First Sync

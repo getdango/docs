@@ -81,7 +81,7 @@ sources:
 
     Set the connection URL on the remote server:
     ```bash
-    dango remote env set POSTGRES_CREDENTIALS "postgresql://myuser:mypassword@dbhost:5432/mydb"
+    dango remote env set POSTGRES_CREDENTIALS="postgresql://myuser:mypassword@dbhost:5432/mydb"
     ```
 
 ### First Sync
@@ -169,7 +169,7 @@ sources:
 
     Set the connection URL on the remote server:
     ```bash
-    dango remote env set MONGODB_CONNECTION_URL "mongodb+srv://myuser:mypassword@cluster.mongodb.net/mydb"
+    dango remote env set MONGODB_CONNECTION_URL="mongodb+srv://myuser:mypassword@cluster.mongodb.net/mydb"
     ```
 
 ### First Sync

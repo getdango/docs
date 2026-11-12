@@ -647,10 +647,10 @@ dango remote reset-metabase
 ## Troubleshooting
 
 ??? info "Deploy fails with SSH connection error"
-    Verify the server IP and SSH key. For BYOS, ensure the SSH user has sudo access and port 22 is open.
+    Verify the server IP and SSH key. For BYOS, the SSH user must be `root` and port 22 must be open.
 
 ??? info "Push rejected due to deploy lock"
-    Another push may be in progress. Wait for it to complete, or use `--force` to override the lock (only if you're sure no other deploy is running).
+    Another push may be in progress. Wait for it to complete, or use `--force` to override the lock (only if you're sure no other deploy is running). A lock file left by an older Dango (1.0.13 or earlier) or by a killed push also needs `--force`. See [Deploy Lock](../deployment/remote-management.md#deploy-lock).
 
 ??? info "Domain HTTPS not working"
     Ensure DNS is pointed to the server IP. Caddy automatically retries certificate issuance. Check `dango remote logs --service caddy` for details.

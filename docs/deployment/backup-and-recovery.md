@@ -206,7 +206,7 @@ This re-authenticates Google Sheets, Google Analytics, Google Ads, and Facebook 
 
 ```bash
 dango remote env list              # Check current variables
-dango remote env set KEY VALUE     # Set missing values
+dango remote env set KEY=VALUE     # Set missing values
 ```
 
 Common variables to restore:

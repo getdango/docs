@@ -145,11 +145,13 @@ Every push automatically creates a backup on the server before applying changes.
 
 ### Deploy Lock
 
-Only one push can run at a time. If another push is in progress, you'll see an error. Use `--force` to override a stale lock:
+Only one push can run at a time. The lock is a root-owned directory, `/srv/dango/deploy.lock`, created on the server when a push starts and removed when it ends. A lock that has passed its 30-minute expiry is treated as stale and replaced by the next push. If another push is in progress, or a killed push left a lock that has not expired, you'll see an error. Use `--force` to override it:
 
 ```bash
 dango remote push --force
 ```
+
+Anything at that path that is not a lock written by this Dango counts as a held lock: for example the lock *file* an older Dango (1.0.13 or earlier) left behind after a killed push, or a lock that cannot be read. The push stops with "Deploy lock ... is unreadable or was not created by this Dango" and needs `--force`, or removal of the path on the server (see [Deploy lock stuck](#deploy-lock-stuck)).
 
 !!! warning
     Only use `--force` if you are certain no other push is in progress. Forcing during an active push could leave the server in an inconsistent state.
@@ -184,6 +186,7 @@ Push uses MD5 hashing to detect changes:
 - **Model changes** &mdash; individual `*.sql` files in `dbt/models/` are compared. Changed models trigger selective `dbt run --select`
 - **Macro changes** &mdash; any change in `dbt/macros/` triggers a full `dbt run` (macros aren't individually selectable)
 - **Package changes** &mdash; if `dbt/packages.yml` changed, `dbt deps` runs before `dbt run`
+- **Retry after a failed build**: a push records a pending-build marker on the server (`/srv/dango/.deploy-build-pending`) before it copies files and clears it only after the build succeeds. If an earlier push copied files but failed before the build finished (including when `dbt deps` failed), the next push sees no file differences but still runs `dbt deps` and a full `dbt run`, and prints a warning saying so
 - **First deploy** &mdash; all local models are treated as "added" and a full `dbt run` executes
 
 ### Example Output
@@ -495,13 +498,19 @@ Prompts to select a user and enter a new password.
 ### Deploy lock stuck
 
 ```
-Error: Deploy lock is held by another process
+Deploy lock held by <deployer> (started <time>). Use --force to override.
 ```
 
-If no other push is running, the lock may be stale from a previous push that was interrupted:
+or
+
+```
+Deploy lock /srv/dango/deploy.lock is unreadable or was not created by this Dango ...
+```
+
+If no other push is running, the lock may be stale from a previous push that was interrupted, or may be a lock file left by an older Dango. The simplest fix is `dango remote push --force`. To clear it by hand:
 
 !!! warning
-    Only delete the lock file if you are certain no push is in progress.
+    Only delete the lock if you are certain no push is in progress.
 
 ```bash
 dango remote ssh
@@ -510,7 +519,7 @@ dango remote ssh
 Then on the server:
 
 ```bash
-rm /srv/dango/.dango/state/deploy.lock
+rm -rf /srv/dango/deploy.lock
 ```
 
 ### SSH connection failed
