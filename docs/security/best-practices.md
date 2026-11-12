@@ -350,6 +350,7 @@ API keys let external scripts and services authenticate with your Dango instance
 - Each key inherits the creating user's role and permissions
 - Use **one key per integration** (e.g., separate keys for a reporting script and a CI pipeline) so you can revoke individually
 - Rotate keys periodically: create a new key, update your script, then revoke the old key
+- Creating a key asks for your current password, and all of an account's keys stop working when its password is changed or reset, so plan to re-issue keys after a password change
 
 ### Query Endpoint for External Scripts
 
