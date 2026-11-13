@@ -93,7 +93,7 @@ sources:
 
     Set the key on your remote server:
     ```bash
-    dango remote env set STRIPE_API_KEY sk_live_your_key_here
+    dango remote env set STRIPE_API_KEY=sk_live_your_key_here
     ```
 
 ### First Sync

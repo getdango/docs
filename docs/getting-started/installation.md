@@ -4,10 +4,13 @@ This guide will help you install Dango on macOS, Linux, or Windows.
 
 ## Prerequisites
 
-### Python 3.10-3.13 (Required)
+### Python 3.11–3.13 (Required)
 
 !!! info "Recommended Version"
-    **Python 3.11 or 3.12** are recommended for best performance and compatibility.
+    **Python 3.12** is recommended by the installers; the contributor guide recommends 3.11. Python 3.10 users must create a new environment with a supported interpreter before upgrading. Fresh and upgraded installations require Pillow 13.0.0 or newer.
+
+!!! note "Cloud servers"
+    This applies to your own machine. A cloud server needs Python 3.11&ndash;3.13 for its own venv too, and Dango provides it: Ubuntu 24.04 uses its own Python 3.12; Ubuntu 22.04 (Python 3.10) gets a pinned, checksum-verified Python 3.12 that Dango installs under `/opt/dango/python`. See [Server Operations](../deployment/server-operations.md#upgrading-to-1014) and [BYOS](../deployment/byos.md#prerequisites).
 
 **Check if you have Python:**
 
@@ -17,15 +20,15 @@ This guide will help you install Dango on macOS, Linux, or Windows.
     # Try these commands in order:
     python3.12 --version  # Check for Python 3.12
     python3.11 --version  # Check for Python 3.11
-    python3.10 --version  # Check for Python 3.10
+    python3.13 --version  # Check for Python 3.13
 
-    # If any show "3.10" or higher, you're good!
+    # Use Python 3.11, 3.12, or 3.13.
     ```
 
 === "Windows"
 
     ```powershell
-    python --version     # Should show 3.10 or higher
+    python --version     # Should show 3.11, 3.12, or 3.13
     ```
 
 **Install Python if needed:**
@@ -118,7 +121,7 @@ Before installing, verify you have everything:
     # Check Python (any of these should work):
     python3.12 --version  # 3.12.x ✓
     python3.11 --version  # 3.11.x ✓
-    python3.10 --version  # 3.10.x ✓
+    python3.13 --version  # 3.13.x ✓
 
     # Check Docker (required):
     docker --version
@@ -130,7 +133,7 @@ Before installing, verify you have everything:
 === "Windows"
 
     ```powershell
-    python --version     # Should show 3.10 or higher
+    python --version     # Should show 3.11, 3.12, or 3.13
     docker --version
     ```
 
@@ -153,6 +156,9 @@ The bootstrap installer creates a project directory, sets up a virtual environme
     ```powershell
     irm https://getdango.dev/install.ps1 | iex
     ```
+
+!!! warning "Windows installer unverified in 1.0.14"
+    The PowerShell installer (`install.ps1`) failed in a test and has not been verified for Dango 1.0.14. A fix is planned for 1.0.15. If it fails, use the [manual installation](#manual-installation) steps with Python 3.11, 3.12 or 3.13.
 
 The installer will:
 
@@ -389,7 +395,7 @@ If you installed globally:
     ```bash
     # Check each Python version
     python3.11 -m pip list | grep getdango
-    python3.10 -m pip list | grep getdango
+    python3.12 -m pip list | grep getdango
     python3 -m pip list | grep getdango
 
     # Or find the command location

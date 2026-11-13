@@ -117,6 +117,8 @@ dango backup restore /path/to/archive.tar.gz
 3. The archive is extracted, restoring all project files and database state.
 4. Restart services manually with `dango start`.
 
+The restore refuses, before changing anything, while Dango is running for the project ("Stop Dango first (`dango stop`), then run the restore again. Nothing was restored."), while a sync or dbt run holds the project lock, and for an archive that contains links or special files. It restores only members of the archive: `.env` and `.dlt/secrets.toml` are never restored, and `.dango/cloud.yml` (your deployment ids) is never overwritten, even by an older archive that contains it. Stale database WAL files are removed, and an `auth.yml` that would switch authentication off is not restored on a server. Restore only archives you made yourself.
+
 ```bash
 dango backup restore .dango/backups/pre-restore-20260819_091500.tar.gz
 ```
@@ -148,6 +150,10 @@ dango validate
 ```
 
 Run before syncing or deploying to catch configuration issues early.
+
+`dango validate` also warns when a model or view reads a file or URL. Such a model may build under dbt, but it cannot be queried from the web query page, MCP, or Metabase. Load the file with a `local_files` source and use `ref()` in the model instead.
+
+For scripts under `scripts/`, `dango validate` also warns (without running them) when a script reads an environment variable by name that `.dango/scripts.yml` does not declare, when a declared name is missing from `.env`, or when a script appears to write the warehouse without `warehouse: write`. On a cloud server with isolation, an undeclared variable is not passed to the script and an undeclared warehouse write fails.
 
 ```
 Validating project configuration...

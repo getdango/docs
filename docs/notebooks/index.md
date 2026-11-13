@@ -46,6 +46,9 @@ dango notebook open my_analysis
 | **File Locking** | Time-limited locks with heartbeat to prevent editing conflicts | [File Locking](file-locking.md) |
 | **Idle Shutdown** | Automatic server shutdown after inactivity (2h local, 1h cloud) | [File Locking](file-locking.md#idle-auto-shutdown) |
 
+!!! note "Notebooks on a cloud server"
+    On a cloud server with isolation set up, the notebook server runs as a restricted operating-system user. It cannot read the project's `data/` directory or the server's `.env` and `.dlt` files, and it receives none of the secrets a script declares. A server without isolation refuses to start notebooks (`DANGO-ISO001`). See [Script and notebook isolation](../deployment/server-operations.md#script-and-notebook-isolation) and [Security boundaries](../security/users-roles.md#security-boundaries).
+
 ## CLI vs Web UI
 
 === "CLI"

@@ -87,8 +87,9 @@ Brute-force login protection is always enabled:
 
 | Parameter | Value |
 |-----------|-------|
-| Failed attempts before lockout | 5 |
+| Failed attempts before lockout | 5 per address and email; 20 per account from any addresses |
 | Lockout duration | 15 minutes |
+| Failed TOTP or recovery codes | Separate account lock: 15 minutes after every 5 failures, doubling up to 12 hours |
 
 See [Authentication — Brute-Force Protection](authentication.md#brute-force-protection) for details.
 

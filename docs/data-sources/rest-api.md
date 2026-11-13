@@ -100,7 +100,7 @@ sources:
 
     Set credentials on the remote server:
     ```bash
-    dango remote env set ACME_API_TOKEN your_token_here
+    dango remote env set ACME_API_TOKEN=your_token_here
     ```
 
 ### First Sync

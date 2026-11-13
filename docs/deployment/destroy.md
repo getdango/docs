@@ -5,20 +5,23 @@ Safely tear down a cloud deployment.
 ---
 
 !!! danger "Irreversible Operation"
-    Destroying a deployment permanently deletes cloud resources. For DigitalOcean, this includes the droplet and firewall. The Spaces bucket (containing backups) is **preserved by default**. Use ``--delete-spaces`` to remove it. **This cannot be undone.** Download a backup before proceeding.
+    Destroying a deployment permanently deletes cloud resources. For DigitalOcean, this includes the droplet and firewall. For BYOS, it removes Dango, its Docker volumes and all its data from your server. The Spaces bucket (containing backups) is **preserved by default**. Use ``--delete-spaces`` to remove it. **This cannot be undone.** Download a backup before proceeding.
 
 ---
 
 ## Before You Destroy
 
-1. **Download a backup** of your data:
+1. **Download a backup** of your data (works for DigitalOcean and BYOS, and needs no Spaces):
 
     ```bash
-    dango remote backup
-    dango remote backup download backup-20260515-143000.tar.gz -o ~/dango-final-backup.tar.gz
+    dango remote backup download --from-server -o ~/dango-final-backup.tar.gz
     ```
 
-2. **Check server status** to confirm which deployment you're destroying:
+    BYOS backups live only on the server and are deleted with it, so this is the only copy you will have.
+
+2. **Note your secrets.** `.env` and `.dlt/secrets.toml` are **not** in backups by default. `dango deploy destroy` reminds you of this and lists the secret names (never the values) the server holds; store the values somewhere safe before you continue.
+
+3. **Check server status** to confirm which deployment you're destroying:
 
     ```bash
     dango remote status
@@ -55,6 +58,8 @@ Safely tear down a cloud deployment.
       SSH key:   Will be DELETED from DigitalOcean
       Spaces:    my-bucket — will be KEPT (use --delete-spaces to remove)
     ```
+
+    Right after the summary, Dango reminds you that `.env` and `.dlt/secrets.toml` are NOT in backups by default and lists the names of the secrets on the server (names only).
 
     ### Step 2: Backup Download Offer
 
@@ -111,38 +116,44 @@ Safely tear down a cloud deployment.
     ### Step 1: Destruction Summary
 
     ```
-    Destruction summary:
-      Server:   203.0.113.50 (BYOS)
-      Domain:   analytics.yourcompany.com
+    BYOS Destroy Summary
+      Server: 203.0.113.50
+      Provider: BYOS
+      This will stop all Dango services and remove all data from the server.
+      Domain: analytics.yourcompany.com
     ```
 
-    ### Step 2: Backup Download Offer
+    The summary also says the server itself will not be deleted (do that through your cloud provider). Dango then reminds you that `.env` and `.dlt/secrets.toml` are not in backups, lists the secret names the server holds, and prints that backups on a server of your own are lost with the server, together with the `dango remote backup download --from-server -o <file>` command. BYOS destroy does not offer a backup download: take one first.
+
+    ### Step 2: Type-to-Confirm
+
+    Unless you pass `--force`, type the server IP to confirm:
 
     ```
-    Download latest backup before destroying? [Y/n]:
+    Type the server IP (203.0.113.50) to confirm: 203.0.113.50
     ```
 
-    ### Step 3: Type-to-Confirm
+    ### Step 3: Cleanup
+
+    Dango connects over SSH and stops `dango-web`, removes the Docker containers, volumes and images, removes the `dango-web` unit, `/srv/dango`, the `dango` user and the Caddy configuration, then removes the local `.dango/cloud.yml`:
 
     ```
-    Type the server IP to confirm destruction: 203.0.113.50
+    Stopping dango-web service...
+    Stopping Docker services...
+    Removing server files...
+    Server cleaned up.
+    Removed .dango/cloud.yml
+
+    BYOS deployment destroyed.
+    Important: Delete the server in your cloud provider's dashboard to stop billing.
     ```
 
-    ### Step 4: Cleanup
-
-    ```
-    Cleaning up...
-      ✓ Optionally stopped remote Dango services
-      ✓ Removed .dango/cloud.yml
-
-    Local cleanup complete.
-    Note: The server and its data are still intact.
-    ```
+    If the Docker teardown fails, Dango starts `dango-web` again, leaves the server files and your local `cloud.yml` in place, and stops so you can retry.
 
     !!! note "Server Not Deleted"
-        BYOS destroy only removes the local `cloud.yml` configuration and optionally stops Dango services on the server. The server itself, its data, and any installed software remain untouched. To fully clean up the server, SSH in and remove Dango manually.
+        BYOS destroy removes Dango and its data from the server, but the server itself (the machine and any other software on it) is not deleted. If the SSH key is missing or the connection fails, Dango warns that it could not clean up the server and still removes the local `cloud.yml`; clean up the server by hand.
 
-    The `--delete-spaces` and `--keep-ssh-key` options are ignored for BYOS deployments (a warning is printed).
+    The `--delete-spaces` and `--keep-ssh-key` options are ignored for BYOS deployments (a note is printed).
 
 ---
 
@@ -165,9 +176,9 @@ Safely tear down a cloud deployment.
 
 | Resource | Deleted | Notes |
 |----------|---------|-------|
-| Remote server | **No** | Server stays running |
-| Remote Dango data | **No** | Data remains at `/srv/dango/` |
-| Remote Dango services | Optional | Offered to stop during destroy |
+| Remote server | **No** | The machine stays running; delete it with your provider |
+| Remote Dango data | **Yes** | Docker volumes, `/srv/dango/`, the `dango` user and the Caddy configuration are removed |
+| Remote Dango services | **Yes** | Stopped and removed |
 | Local `.dango/cloud.yml` | Yes | |
 | Local project files | **No** | Untouched |
 
@@ -194,7 +205,7 @@ ls ~/.ssh/dango_ed25519
 2. **Droplets** &mdash; verify the droplet is no longer listed
 3. **Networking &gt; Firewalls** &mdash; verify the firewall is removed
 4. **Settings &gt; Security &gt; SSH Keys** &mdash; verify the key is removed (unless `--keep-ssh-key`)
-5. **Spaces** &mdash; verify the bucket is removed (unless `--keep-spaces`)
+5. **Spaces**: verify the bucket is removed (only deleted with `--delete-spaces`)
 
 ---
 
@@ -249,11 +260,11 @@ dango deploy destroy
 rm .dango/cloud.yml
 ```
 
-Check the DigitalOcean console for orphaned resources: droplets, firewalls, SSH keys, and Spaces buckets with "dango" in the name.
+Check the DigitalOcean console for orphaned resources: droplets, firewalls, SSH keys, and Spaces buckets with "dango" in the name. `dango deploy` and `dango remote status` also warn when DigitalOcean has droplets tagged `dango` that your `.dango/cloud.yml` does not name (see [Orphaned resources](#orphaned-resources)).
 
-### BYOS services won't stop
+### BYOS cleanup failed
 
-If the optional service stop fails during BYOS destroy:
+If the server cleanup fails during BYOS destroy (for example the SSH connection drops):
 
 ```bash
 ssh root@<server-ip>
@@ -266,7 +277,15 @@ sudo systemctl stop caddy
 
 If you suspect resources were left behind after a destroy:
 
-**DigitalOcean:** Check Droplets, Firewalls, SSH Keys, and Spaces in the web console. Resources created by Dango are tagged with "dango".
+**DigitalOcean:** Check Droplets, Firewalls, SSH Keys, and Spaces in the web console. Resources created by Dango are tagged with "dango". A deploy that is killed hard (power loss, `kill -9`) cannot clean up after itself and can leave a running, billing droplet that `.dango/cloud.yml` does not record. To catch this, `dango deploy` (before provisioning) and `dango remote status` list any droplet tagged `dango` that your `cloud.yml` does not name, with its id, name and creation time, for example:
+
+```
+Warning: DigitalOcean has 1 droplet tagged 'dango' that this project's cloud.yml does not name:
+  id 616435522  name dango-g4b  created 2026-11-06T05:06:55Z
+  If they are leftovers, delete them in the DigitalOcean console (a deploy killed hard leaves one). They may belong to another Dango project; nothing was deleted.
+```
+
+The check only warns. It never deletes anything, and it prints nothing when no DigitalOcean token is configured or the lookup fails. A droplet tagged `dango` may belong to another Dango project: check before deleting.
 
 **BYOS:** SSH into the server and check:
 

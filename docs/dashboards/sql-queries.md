@@ -8,6 +8,8 @@ DuckDB SQL patterns for querying Dango data in Metabase.
 
 Metabase's SQL editor provides direct access to your DuckDB warehouse. This guide covers Dango-specific patterns and DuckDB syntax essentials.
 
+Models and views that read files or URLs are not queryable here, from the web query page, or through MCP. `dango validate` warns about these models. Load external files through a `local_files` source and query the resulting warehouse table instead.
+
 !!! info "Full DuckDB Reference"
     For complete SQL syntax and functions, see the [DuckDB documentation](https://duckdb.org/docs/sql/introduction).
 

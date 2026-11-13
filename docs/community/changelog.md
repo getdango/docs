@@ -17,6 +17,99 @@ Dango follows [Semantic Versioning](https://semver.org/):
 
 ## Current Version
 
+### v1.0.14
+
+*Released: November 13, 2026*
+
+**Status**: Stable
+
+This release hardens access control, backups, cloud servers and the Metabase and notebook paths. Read "Before you upgrade" first.
+
+#### Upgrade
+
+| Installation | How to upgrade | Restart |
+| --- | --- | --- |
+| Local, recommended | `dango upgrade` | Not automatic: run `dango stop && dango start` afterwards |
+| Local, direct pip | `python -m pip install --upgrade getdango` | Not automatic: run `dango stop && dango start` afterwards |
+| Managed remote | `dango remote upgrade` | Automatic: the command stops, starts and health-checks the services |
+
+**Before you upgrade**: Python 3.10 is no longer supported. Move to Python 3.11, 3.12 or 3.13 first; Pillow 13.0.0 or newer is now required. If your server uses a custom `MB_VERSION`, an administrator must first pin it with `dango-compose pin-metabase VERSION SHA256` as root on the server.
+
+#### Security
+
+Security advisories for the following fixes are published with this release:
+
+- Notebook WebSocket connections on cloud servers now require a signed-in user with notebook permission (GHSA-f929-p2q2-cr9r).
+- SQL queries, monitoring queries, agent-created models and Metabase's DuckDB connection can no longer read files on the server (GHSA-wfcx-9495-46q7).
+- Agent-created sources can no longer reuse an existing credential or send it to an unvalidated host (GHSA-7fp5-4pqp-9r4r).
+- An unreadable authentication setting no longer turns authentication off (GHSA-8hhf-mrw2-f633).
+- `dango remote push` and `dango deploy` verify the server's pinned SSH host key for file transfers (GHSA-x2r8-3fx7-pgv8).
+- Deploys without a domain require restricting web access by IP or explicitly accepting HTTP exposure (GHSA-7gwh-37gx-q49m).
+- Restores remove stale write-ahead logs and fail on failed copies; backups fail when a copy fails (GHSA-w289-hqp6-m2w5).
+- The notebook proxy no longer forwards Dango session cookies or API keys to the notebook server (GHSA-4fh5-vgx3-7m8v).
+- With `auth.require_2fa`, users without TOTP get an enrollment-only session until setup is complete (GHSA-4fh5-vgx3-7m8v).
+- Cloud servers require authentication even when the authentication setting file is missing or incomplete (GHSA-4fh5-vgx3-7m8v).
+
+#### Added
+
+- Cloud script and notebook isolation: scripts and the notebook server run as restricted operating-system users, and a server without isolation set up refuses to run them. `dango remote isolation status|disable|enable` inspects and changes the state.
+- `dango remote upload LOCAL [REMOTE]` uploads one file into the server project's `data/` directory.
+- `dango remote power-on` powers on a DigitalOcean server through the API when SSH cannot connect.
+- `dango remote push --allow-empty` overrides the new refusal to mirror an empty local directory over a non-empty server copy.
+- `dango deploy --allow-ip` (repeatable) restricts web access on DigitalOcean deploys without a domain; `--accept-http-exposure` acknowledges serving over plain HTTP.
+- `dango validate` warns about models that read files or URLs, and about scripts that write to the warehouse or use undeclared environment variables.
+- `dango init` asks one telemetry question covering Dango, dbt, dlt and Metabase.
+
+#### Changed
+
+- Python 3.10 is no longer supported; Dango requires Python 3.11 to 3.13.
+- Backups now include all of `data/`, `notebooks/` and `scripts/`, plus the auth, schedule, monitor, script, PII-override and Dango state files and databases. Restores are stricter: `dango backup restore` refuses while Dango is running and never restores `.env` or `.dlt/secrets.toml`.
+- `dango upgrade` copies `.dango/` databases and settings to `.dango/backups/pre-upgrade-<timestamp>/` before installing, and keeps the newest three.
+- `dango remote migrate` is switched off; it refuses and prints the manual path.
+
+#### Fixed
+
+- Metabase imports no longer create a duplicate collection on every start. Empty duplicates left by earlier versions are archived on the first successful start after upgrading; collections are never deleted.
+- Cloud: `dango remote upgrade` and resize recover from an interruption, and a server-side guard restarts `dango-web` if one is interrupted.
+- Cloud deploy no longer creates a duplicate droplet when DigitalOcean accepts a create request but the reply is lost.
+- Cloud: scheduled backups upload to Spaces on a server deployed with backups, and backup commands state whether an off-site copy exists.
+- The SQL query endpoint interrupts a query that times out and allows at most four queries at once (HTTP 429 beyond that).
+- `dango remote env set|get|list|delete` works on servers created by `dango deploy`.
+
+#### Known issues
+
+The Windows installer (`install.ps1`) is unverified; a fix is planned for 1.0.15. See [Limitations](../reference/limitations.md).
+
+---
+
+### v1.0.13
+
+*Released: October 8, 2026*
+
+**Status**: Stable
+
+#### Fixed
+
+- Metabase renders again through Dango's `/metabase` page on new projects: the proxy no longer returns compressed JavaScript the browser could not read, which left the Dashboards tab blank.
+- `dango init --skip-wizard` now ends with a working Metabase and honours `DANGO_ADMIN_PASSWORD`.
+- `dango dashboard provision` uses the credential Dango already stores instead of asking for a Metabase password.
+- A custom `metabase_port` now works end to end, including `dango start`, `dango metabase save` / `load` and `/api/config`.
+- `.env` files Dango writes are owner-only (0600).
+- Cloud: a lost Metabase admin credential on a server is reported, and `dango remote metabase-repair-admin` runs the repair over SSH.
+- Cloud: `dango remote sync` reports a failed start, `dango remote reset-metabase` removes the credential files that exist, and `dango remote backup restore` handles file names with spaces and quotes.
+- Cloud: `dango deploy` no longer fails on the first admin account, and checks that the chosen region and size are available before creating anything.
+- Cloud: `dango remote push` no longer changes the server's ports or resets its cloud session limits.
+
+#### Security
+
+- The project id read from a server is validated before it is used in a remote command, and values written to root shell commands in the scheduled-backup job and in `remote rollback` / `remote backup restore` are shell-quoted.
+
+#### Changed
+
+- `dango init --skip-wizard` creates the admin as `admin@dango.test` when `DANGO_ADMIN_EMAIL` is not set (it was `admin@localhost`). Existing projects are unchanged.
+
+---
+
 ### v1.0.12
 
 *Released: October 5, 2026*

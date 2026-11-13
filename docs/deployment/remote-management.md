@@ -10,6 +10,7 @@ Manage your cloud deployment with `dango remote` commands.
 |---------|-------------|
 | **Deploy & Sync** | |
 | `dango remote push` | Push local config and dbt files to server |
+| `dango remote upload LOCAL_PATH [REMOTE_PATH]` | Upload one file under server `data/` |
 | `dango remote rollback` | Restore from a backup |
 | `dango remote sync SOURCE` | Trigger a data sync on the remote server |
 | **Monitoring** | |
@@ -20,8 +21,11 @@ Manage your cloud deployment with `dango remote` commands.
 | `dango remote query "SQL"` | Run a read-only SQL query on the warehouse |
 | **Server Operations** | |
 | `dango remote upgrade` | Upgrade Dango on the remote server |
+| `dango remote power-on` | Power on a DigitalOcean server left off by an interrupted resize and start services |
+| `dango remote isolation status` | Inspect cloud script and notebook isolation (`on`, `disabled`, `missing`, `unsupported`, `unknown`) |
+| `dango remote isolation disable` / `enable` | Audited administrator opt-out from, and restore of, script and notebook isolation |
 | `dango remote resize` | Resize the server (change CPU/RAM) |
-| `dango remote migrate` | Migrate to a new server (new droplet for disk/region changes) |
+| `dango remote migrate` | Switched off in 1.0.14: refuses and prints the manual steps ([details](server-operations.md#moving-to-a-new-server)) |
 | `dango remote repair` | Diagnose and fix common deployment issues |
 | `dango remote reset-metabase` | Reset Metabase to fresh state (SSO/H2 corruption) |
 | **Firewall** | |
@@ -49,7 +53,9 @@ Manage your cloud deployment with `dango remote` commands.
 | `dango remote auth remove-user` | Remove a user |
 | `dango remote auth reset-password` | Reset a user's password |
 
-All commands require an active deployment (`.dango/cloud.yml` must exist). They work the same for both DigitalOcean and BYOS deployments &mdash; all communication happens over SSH.
+Remote commands require an active deployment (`.dango/cloud.yml` must exist). Most management commands use SSH. Provider-specific operations, including DigitalOcean power control and firewall changes, use the provider API.
+
+`dango remote power-on` is DigitalOcean-only: it uses the provider API while SSH is unavailable, then starts services after the server is reachable. `dango remote resize` refuses a powered-off server, and `dango remote status` reports when the server is off. For BYOS power control, use your hosting provider.
 
 ---
 
@@ -71,6 +77,7 @@ dango remote push
 | `.dango/schedules.yml` | `/srv/dango/project/.dango/schedules.yml` |
 | `.dango/monitors.yml` | `/srv/dango/project/.dango/monitors.yml` |
 | `.dango/project.yml` | `/srv/dango/project/.dango/project.yml` |
+| `.dango/scripts.yml` | `/srv/dango/project/.dango/scripts.yml` |
 | `dbt/dbt_project.yml` | `/srv/dango/project/dbt/dbt_project.yml` |
 | `dbt/packages.yml` | `/srv/dango/project/dbt/packages.yml` |
 | `docker-compose.yml` | `/srv/dango/project/docker-compose.yml` |
@@ -82,8 +89,20 @@ dango remote push
 
 - `dbt/models/` &mdash; all model SQL files
 - `dbt/macros/` &mdash; all macro SQL files
+- `dbt/seeds/` &mdash; Git-tracked seed files, loaded by `dbt build`
 
 Files that don't exist locally are skipped.
+
+Keep seed files in `dbt/seeds/` and commit them to Git before pushing. The entire `data/` directory is Git-ignored and is never sent by `dango remote push`. Put files there with the web UI CSV upload or `dango remote upload`.
+
+### Upload one data file
+
+```bash
+dango remote upload data/uploads/orders.csv
+dango remote upload ~/Downloads/orders.csv data/uploads/orders.csv
+```
+
+`REMOTE_PATH` is relative to the project root and must be under `data/`. If omitted, the local file must already be inside the project and its relative path is used. Uploads accept single regular files up to 2 GiB; they refuse `data/warehouse.duckdb*` and `data/.tmp`.
 
 !!! note "Ports, session limits, and server-only files"
     `dango remote push` uploads the standard server ports (web 8800, Metabase 3000, dbt docs 8081, Marimo 7805) regardless of any custom ports in your local `.dango/project.yml`; your local file is not changed. For the session limits, keys your local file does not set get the cloud values (30 days, 60 minutes idle); an explicit local value is uploaded as is.
@@ -126,11 +145,13 @@ Every push automatically creates a backup on the server before applying changes.
 
 ### Deploy Lock
 
-Only one push can run at a time. If another push is in progress, you'll see an error. Use `--force` to override a stale lock:
+Only one push can run at a time. The lock is a root-owned directory, `/srv/dango/deploy.lock`, created on the server when a push starts and removed when it ends. A lock that has passed its 30-minute expiry is treated as stale and replaced by the next push. If another push is in progress, or a killed push left a lock that has not expired, you'll see an error. Use `--force` to override it:
 
 ```bash
 dango remote push --force
 ```
+
+Anything at that path that is not a lock written by this Dango counts as a held lock: for example the lock *file* an older Dango (1.0.13 or earlier) left behind after a killed push, or a lock that cannot be read. The push stops with "Deploy lock ... is unreadable or was not created by this Dango" and needs `--force`, or removal of the path on the server (see [Deploy lock stuck](#deploy-lock-stuck)).
 
 !!! warning
     Only use `--force` if you are certain no other push is in progress. Forcing during an active push could leave the server in an inconsistent state.
@@ -154,6 +175,9 @@ This shows which files changed, which dbt models were added/modified/removed, an
 | `--yes`, `-y` | Skip confirmation prompt |
 | `--allow-dirty` | Allow deployment with uncommitted changes |
 | `--allow-branch` | Allow deployment from any branch |
+| `--allow-empty` | Allow an empty local mirrored directory to erase its non-empty server copy |
+
+Push normally refuses to mirror an empty local directory over a non-empty server directory. Restore the local files or use `--allow-empty` if you intend to erase the server copy.
 
 ### Change Detection
 
@@ -162,6 +186,7 @@ Push uses MD5 hashing to detect changes:
 - **Model changes** &mdash; individual `*.sql` files in `dbt/models/` are compared. Changed models trigger selective `dbt run --select`
 - **Macro changes** &mdash; any change in `dbt/macros/` triggers a full `dbt run` (macros aren't individually selectable)
 - **Package changes** &mdash; if `dbt/packages.yml` changed, `dbt deps` runs before `dbt run`
+- **Retry after a failed build**: a push records a pending-build marker on the server (`/srv/dango/.deploy-build-pending`) before it copies files and clears it only after the build succeeds. If an earlier push copied files but failed before the build finished (including when `dbt deps` failed), the next push sees no file differences but still runs `dbt deps` and a full `dbt run`, and prints a warning saying so
 - **First deploy** &mdash; all local models are treated as "added" and a full `dbt run` executes
 
 ### Example Output
@@ -243,46 +268,41 @@ dango remote status
 
 | Panel | Information |
 |-------|-------------|
-| **Server** | IP address, region, size (tier + price/mo), domain |
-| **Services** | Status of dango-web, Caddy, Metabase (running/stopped) |
+| **Server** | IP address, region, size (tier + price/mo), domain; "HTTP only (unencrypted)" when no domain is set |
+| **Services** | Status of dango-web, Caddy, Metabase |
 | **Resources** | CPU %, RAM usage/total (%), disk usage/total (%) |
 | **Data** | DuckDB database size, last sync timestamp per source |
-| **Versions** | Installed Dango version vs. latest on PyPI, upgrade available warning |
-| **Last Deployment** | Git commit (short SHA), branch, deployer, timestamp |
-| **Backup** | Last backup timestamp (or "No backups found" warning) |
+| **Backups** | The `Off-site:` line (`yes (Spaces <bucket>)`, `NO: ...` with the reason, or `unknown`), the command to keep a local copy when it is not `yes`, and whether the daily timer is enabled |
+| **Backup** | Last backup timestamp (or a "No backups found" warning) |
+| **Versions** | Installed and recorded Dango version, Docker access state (`helper` or a warned `group (fallback)`), the `Isolation:` state, latest version on PyPI |
+
+On DigitalOcean deployments, `dango remote status` also warns when DigitalOcean has droplets tagged `dango` that your `.dango/cloud.yml` does not name (see [Orphaned resources](destroy.md#orphaned-resources)), and when the server cannot be reached it says "Server is powered off. Run: dango remote power-on" if the droplet is off.
 
 ```
-Server: 143.198.xxx.xxx
-Region: nyc1 (New York 1)
-Size:   Standard (s-2vcpu-4gb) — $24/mo
-Domain: analytics.yourcompany.com
+Server
+  IP: 143.198.xxx.xxx
+  Region: nyc1
+  Size: s-2vcpu-4gb (Standard, $24/mo)
+  Domain: analytics.yourcompany.com
 
-Services:
-  ✓ Dango web server (running)
-  ✓ Metabase (running)
-  ✓ Caddy (running)
+Services
+  dango-web      active
+  caddy          active
+  metabase       running
 
-Resources:
-  CPU:  12%
-  RAM:  1.8 GB / 4.0 GB (45%)
-  Disk: 14.2 GB / 80.0 GB (18%)
+Backups
+  Off-site: yes (Spaces my-dango-backups)
+  Scheduled backups: enabled (daily at 02:00 UTC)
 
-Data:
-  DuckDB: 256 MB
-  Last sync: stripe (2 hours ago), hubspot (6 hours ago)
-
-Versions:
-  Installed: 1.0.0
-  Latest:    1.0.0
-
-Last Deployment:
-  Commit: a1b2c3d (main)
-  By: deploy@local
-  At: 2026-05-15 14:30:00
-
-Backup:
-  Last: backup-20260515-020000.tar.gz (13 hours ago)
+Versions
+  Installed: 1.0.14
+  Recorded: 1.0.14
+  Docker access: helper
+  Isolation: on (loopback restricted)
+  Latest (PyPI): 1.0.14
 ```
+
+The panels are abbreviated here; Resources and Data follow the same layout.
 
 ---
 
@@ -478,13 +498,19 @@ Prompts to select a user and enter a new password.
 ### Deploy lock stuck
 
 ```
-Error: Deploy lock is held by another process
+Deploy lock held by <deployer> (started <time>). Use --force to override.
 ```
 
-If no other push is running, the lock may be stale from a previous push that was interrupted:
+or
+
+```
+Deploy lock /srv/dango/deploy.lock is unreadable or was not created by this Dango ...
+```
+
+If no other push is running, the lock may be stale from a previous push that was interrupted, or may be a lock file left by an older Dango. The simplest fix is `dango remote push --force`. To clear it by hand:
 
 !!! warning
-    Only delete the lock file if you are certain no push is in progress.
+    Only delete the lock if you are certain no push is in progress.
 
 ```bash
 dango remote ssh
@@ -493,7 +519,7 @@ dango remote ssh
 Then on the server:
 
 ```bash
-rm /srv/dango/.dango/state/deploy.lock
+rm -rf /srv/dango/deploy.lock
 ```
 
 ### SSH connection failed
@@ -553,5 +579,5 @@ dango remote push --allow-dirty --allow-branch
 
 - [Environment Variables](environment-variables.md) &mdash; manage secrets on the server
 - [Backups](backups.md) &mdash; configure automated backups and restore
-- [Server Operations](server-operations.md) &mdash; upgrade, resize, and migrate
+- [Server Operations](server-operations.md): upgrade, resize, and moving to a new server
 - [Destroy & Cleanup](destroy.md) &mdash; tear down a deployment

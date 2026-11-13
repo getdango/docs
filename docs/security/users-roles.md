@@ -24,7 +24,7 @@ Admins have a wildcard permission (`*`) that grants access to everything. This i
 
 - All data operations (sync, transform, query)
 - User management (create, edit, deactivate, delete users)
-- Auth settings (enable/disable 2FA policy, manage API keys for any user)
+- Auth settings (such as requiring 2FA for all users); API keys are created and revoked by each user for their own account
 - Platform configuration (start/stop services, manage settings)
 - Audit log access
 - Credential and secret management
@@ -54,6 +54,36 @@ Viewers have read-only access to data and status:
 - View schedules and governance reports
 
 ---
+
+## Security boundaries
+
+Editors can run Python scripts and notebooks and can query the whole warehouse. Dango has no table- or row-level entitlements. Web query results are not PII-masked; MCP query results are masked by output column name only. Code in the shared notebook process cannot be attributed to an individual user.
+
+### Cloud script and notebook isolation
+
+On an isolated cloud server, scripts and notebooks run as restricted operating-system users. Scripts may read warehouse data, but notebooks cannot read the project `data/` directory. Neither runner receives the server's `.env` or `.dlt` files. Declare only the environment variable names a script needs in its `.dango/scripts.yml` `env:` list; their values are taken from the server's `.env`. The notebook runner receives none of those declared values. A script defaults to `warehouse: read`; declaring `warehouse: write` runs it as the `dango` service user and is reported as unisolated. Review that choice before enabling writes.
+
+If cloud isolation is missing, script and notebook execution is refused with `DANGO-ISO001`; run `dango remote upgrade` to set it up. An administrator can inspect `dango remote isolation status`, use the audited `dango remote isolation disable --yes` opt-out, and restore isolation with `dango remote isolation enable`. With the opt-out, scripts and notebooks run as `dango` and can access server secrets, backups, the warehouse, and local services. Local projects do not use the cloud restricted-user setup.
+
+The runner network rules restrict access to the server's loopback services and Docker networks, but a notebook needs its own local port and the host's ephemeral port range. On a BYOS host with a widened range, other local services in that range can be reachable. See the [BYOS host guidance](../deployment/byos.md).
+
+### MCP tools and approval
+
+An MCP client acts with the permissions of the person running `dango mcp`. Review tool requests before approving them:
+
+| Tool group | What it can change | Guard |
+|---|---|---|
+| Read-only: `list_*`, `get_*`, `validate_*`, `docs_coverage`, `remote_status`, `remote_logs`, `remote_history` | Nothing | Log output is redacted |
+| `query`, `remote_query` | Nothing; reads the warehouse | One SELECT only; file and URL access blocked; PII masked by column name; row cap |
+| `create_model`, `update_model`, `remove_model` | What dbt runs against the warehouse | Model SQL validated: no file or URL access, no `COPY`/`ATTACH`/`INSTALL`/`LOAD`, restricted Jinja |
+| `create_source`, `update_source`, `set_source_enabled`, `remove_source` | Which sources sync and where | Secrets are refused as config values and stay in `.env`; `rest_api` is edited only with `dango source edit` |
+| `run_sync`, `run_transform`, `run_doctor`, `generate_docs`, `scan_pii` | API quota, load, warehouse contents | `run_sync` accepts `dry_run` |
+| `accept_schema_drift`, `update_source_table_docs`, `add_schedule`, `update_schedule`, `set_schedule_enabled`, `remove_schedule`, `reload_schedules` | Local project configuration | None beyond your client's approval prompt |
+| `set_pii_override`, `delete_pii_override` | Which columns MCP `query` masks | Tighten-only: an agent can mark a column `pii` and delete a `not_pii` override (which re-masks it); it cannot mark a column `not_pii` or delete a `pii` override, which takes you (CLI or web UI) |
+| `remote_sync` | Runs a real sync on your server | Needs a deployment; no dry run |
+| `remote_push` | Replaces models, scripts and sources on your server | Dry run by default; a real push needs `dry_run=False` and `confirm=True` |
+
+Do not auto-approve mutation tools: they can change what runs against your warehouse.
 
 ## Permission Matrix
 
@@ -218,7 +248,13 @@ dango auth change-role user@example.com admin
 dango auth change-role user@example.com viewer
 ```
 
-Role changes take effect on the user's next request (existing sessions are updated). The Metabase role is also synced automatically.
+Role changes take effect on the user's next request (existing sessions are updated). The Metabase role is also synced automatically, and the Metabase sessions Dango bridged for the user are deleted, so the user's next visit to Metabase starts a session with the new role.
+
+The change is reported as successful only when every Metabase step succeeded. If one fails (for example, Metabase is not reachable), the new role is kept in Dango but:
+
+- the admin API answers `502` with a message saying the Metabase update did not complete, and `dango auth change-role` prints a warning;
+- the user's Metabase access (the `/metabase` proxy and the Metabase sign-in that Dango performs at login) stays suspended, so a previous, higher Metabase role cannot linger;
+- re-apply the role when Metabase is reachable: run `dango auth change-role EMAIL ROLE` again with the user's current role, or send `PUT /api/admin/users/{user_id}/role` with it. When that succeeds, access resumes.
 
 ### Deactivating Users
 
@@ -232,6 +268,7 @@ Deactivated users:
 
 - Cannot log in
 - All active sessions are invalidated immediately
+- All API keys are revoked
 - Account data is preserved (can be reactivated)
 
 To reactivate:

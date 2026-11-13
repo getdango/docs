@@ -36,9 +36,10 @@ dango remote env set SPACES_ACCESS_KEY=DO00EXAMPLE123
 ```
 
 ```
-✓ Set SPACES_ACCESS_KEY=***
+Set SPACES_ACCESS_KEY=***
 ```
 
+The message reads `Updated` instead of `Set` when the key already existed.
 - Creates the `.env` file if it doesn't exist (with `0600` permissions &mdash; readable only by the file owner)
 - Updates the value if the key already exists
 - The key cannot be empty and the format must be `KEY=VALUE`
@@ -94,10 +95,10 @@ dango remote env delete SPACES_REGION
 ```
 
 ```
-✓ Deleted SPACES_REGION
+Deleted SPACES_REGION
 ```
 
-Returns an error if the variable doesn't exist.
+Prints `Not found: SPACES_REGION is not set in remote .env` and exits with an error if the variable doesn't exist.
 
 ---
 
@@ -109,7 +110,7 @@ Environment variables are stored at:
 /srv/dango/project/.env
 ```
 
-This file has `0600` permissions (owner read/write only). The `env` commands connect to the server as the `dango` user for project file operations, following the two-SSH-user pattern (root for system operations, dango for project files).
+This file has `0600` permissions (owner read/write only). The `env` commands connect to the server as the `dango` user for project file operations, following the two-SSH-user pattern (root for system operations, dango for project files). The file is read and written as `dango` without `runuser` (which only root may call): the new content is staged in a private temporary directory on the server and then moved into place, and an unreadable `.env` is reported as an error instead of being overwritten.
 
 ---
 
@@ -117,11 +118,11 @@ This file has `0600` permissions (owner read/write only). The `env` commands con
 
 | Variable | Used For |
 |----------|----------|
-| `DIGITALOCEAN_TOKEN` | DigitalOcean API access (deploy, resize, migrate, destroy) |
+| `DIGITALOCEAN_TOKEN` | DigitalOcean API access (deploy, resize, destroy) |
 | `SPACES_ACCESS_KEY` | DigitalOcean Spaces access key (backups) |
 | `SPACES_SECRET_KEY` | DigitalOcean Spaces secret key (backups) |
-| `SPACES_REGION` | Spaces region slug, e.g., `nyc3` (backups) |
-| `SPACES_BUCKET` | Spaces bucket name (backups) |
+| `SPACES_REGION` | Spaces region slug, e.g., `nyc3` (backups; the server's scheduled backup reads it from its own `.env`, where `dango deploy` writes it) |
+| `SPACES_BUCKET` | Spaces bucket name (backups; read from the server `.env` the same way) |
 | `DANGO_ADMIN_PASSWORD` | Admin password for automated setups |
 
 ---
@@ -177,7 +178,7 @@ sudo chmod 600 /srv/dango/project/.env
 ### Invalid format
 
 ```
-Error: Invalid format. Use KEY=VALUE
+Error: Expected KEY=VALUE format (e.g. MY_KEY=my_value)
 ```
 
 The argument must contain an `=` separator and the key cannot be empty:
@@ -189,8 +190,10 @@ dango remote env set =value
 
 # Right
 dango remote env set MYVAR=value
-dango remote env set MYVAR=value with spaces
+dango remote env set "MYVAR=value with spaces"
 ```
+
+Quote the whole `KEY=VALUE` argument when the value contains spaces. The command takes one argument; `dango remote env set KEY VALUE` is not accepted.
 
 ---
 

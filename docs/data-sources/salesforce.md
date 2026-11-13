@@ -119,9 +119,9 @@ security_token = "your_security_token"
 
     For cloud deployment, set credentials as environment variables on the remote server:
     ```bash
-    dango remote env set SALESFORCE_USERNAME your.email@company.com
-    dango remote env set SALESFORCE_PASSWORD your_password
-    dango remote env set SALESFORCE_SECURITY_TOKEN your_security_token
+    dango remote env set SALESFORCE_USERNAME=your.email@company.com
+    dango remote env set SALESFORCE_PASSWORD=your_password
+    dango remote env set SALESFORCE_SECURITY_TOKEN=your_security_token
     ```
 
 ### First Sync

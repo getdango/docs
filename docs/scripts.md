@@ -49,13 +49,13 @@ The script appears automatically in the **Scripts** tab of the Web UI:
 
 ## Execution Environment
 
-Scripts run as isolated subprocesses with the following environment:
+Scripts run as subprocesses. On cloud servers with runner isolation enabled, they use a restricted operating-system account and a clean environment:
 
 | Property | Value |
 |----------|-------|
 | **Python interpreter** | `sys.executable` — the same Python that runs Dango (your venv) |
 | **Working directory** | Your project root (`DANGO_PROJECT_ROOT`) |
-| **Environment variables** | Inherited from the Dango process + `DANGO_PROJECT_ROOT` |
+| **Environment variables** | Local: inherited from the Dango process. Isolated cloud: only Dango's base variables and names declared for that script in `.dango/scripts.yml` |
 
 ### Available Environment Variables
 
@@ -63,7 +63,7 @@ Scripts run as isolated subprocesses with the following environment:
 |----------|-------------|--------|
 | `DANGO_PROJECT_ROOT` | Absolute path to project root | Dango automatically |
 | `DANGO_SCRIPT_RUN_ID` | Unique run identifier (manual runs only) | Dango automatically |
-| Any `.env` var | All variables from your `.env` file | Inherited from Dango process |
+| Declared `.env` names | Values for names listed in the script's `env:` setting | Isolated cloud script launcher |
 
 ### Setting Environment Variables
 
@@ -77,8 +77,19 @@ Scripts run as isolated subprocesses with the following environment:
 === "Cloud"
 
     ```bash
-    dango remote env set SLACK_WEBHOOK_URL https://hooks.slack.com/services/...
+    dango remote env set SLACK_WEBHOOK_URL=https://hooks.slack.com/services/...
     ```
+
+    Declare the name for the script in `.dango/scripts.yml` and push that file:
+
+    ```yaml
+    scripts:
+      - path: scripts/report.py
+        env: [SLACK_WEBHOOK_URL]
+        warehouse: read
+    ```
+
+    Scripts default to `warehouse: read`. A script declared `warehouse: write` runs as the `dango` service user and is labeled unisolated, so use that setting only for trusted code that must write the warehouse. If cloud runner isolation is missing, execution is refused with `DANGO-ISO001`; an administrator can check `dango remote isolation status` or restore setup with `dango remote upgrade`.
 
 ## Dependencies
 
@@ -442,13 +453,15 @@ Each script run creates a timestamped directory (or run UUID for manual runs):
 
 ### Viewing Logs
 
-**Web UI:** Click the script name or status badge in the Scripts table.
+**Web UI:** Click the script name or status badge in the Scripts table. The log page, the script history and run-detail APIs, and a failed launch message redact known secret values (6 or more characters, from `.env` and `.dlt/secrets.toml`) and secret-looking patterns in stdout, stderr, run metadata and error text, for every role. Redaction is a safety net, not a guarantee: do not print secrets in a script.
 
 **Filesystem:**
 ```bash
 ls -lt .dango/logs/scripts/ | head -5
 cat .dango/logs/scripts/my_report_20260713T070000/stdout.txt
 ```
+
+The files on disk are stored as the script wrote them, without redaction.
 
 ## Troubleshooting
 

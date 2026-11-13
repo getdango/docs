@@ -15,11 +15,11 @@ The `dango deploy` command provisions cloud infrastructure and deploys your proj
 
 **Remote commands (15+ subcommands across 5 groups):**
 
-- Core: `push`, `rollback`, `status`, `logs`, `ssh`, `query`, `upgrade`, `resize`, `migrate`, `history`, `sync`
+- Core: `push`, `rollback`, `status`, `logs`, `ssh`, `query`, `upgrade`, `power-on`, `resize`, `migrate` (switched off in 1.0.14), `history`, `sync`, `upload`, `isolation`
 - Environment: `env set/get/list/delete`
 - Firewall: `firewall list/allow-ip/allow-all`
 - Domain: `domain set/remove`
-- Backup: `backup list/enable/disable/download/restore`
+- Backup: `backup list/enable/disable/download/restore/verify-metabase/config`
 - Auth: `auth add-user/list-users/remove-user/reset-password`
 
 ---
@@ -49,6 +49,10 @@ dango deploy [OPTIONS]
 | `--server-ip TEXT` | Server IP/hostname for `--byos` |
 | `--ssh-user TEXT` | SSH user for `--byos` |
 | `--ssh-key TEXT` | SSH key path for `--byos` |
+| `--allow-ip IPv4_OR_CIDR` | Without a domain, restrict DigitalOcean web ports to this address (repeatable) |
+| `--accept-http-exposure` | Acknowledge plain HTTP with web ports open to the internet |
+
+Without a domain, a non-interactive DigitalOcean deployment requires `--allow-ip` or `--accept-http-exposure`. BYOS refuses `--allow-ip`: configure your own firewall and use `--accept-http-exposure` if deploying without a domain. The interactive DigitalOcean wizard also offers `detect`, which uses the IP address seen by the server. `--allow-ip` cannot be combined with `--domain`, because Let's Encrypt must reach ports 80/443 to issue and renew the certificate.
 
 === "Interactive (DigitalOcean)"
 
@@ -96,24 +100,24 @@ dango deploy destroy [OPTIONS]
 | Option | Description |
 |--------|-------------|
 | `--force` | Skip confirmation and backup prompts |
-| `--keep-spaces` | Keep the Spaces bucket and its contents |
+| `--delete-spaces` | Also delete the Spaces bucket and its contents (kept by default) |
 | `--keep-ssh-key` | Keep the SSH key on DigitalOcean |
 
 === "DigitalOcean"
 
-    Deletes the Droplet, firewall, SSH key (from DO), and Spaces bucket. Local SSH keys and project files are never deleted.
+    Deletes the droplet, firewall and SSH key (from DO). The Spaces bucket is kept unless `--delete-spaces` is given. Local SSH keys and project files are never deleted.
 
 === "BYOS"
 
-    Optionally stops remote services and removes local `cloud.yml`.
+    Stops Dango, removes its Docker containers, volumes and images, `/srv/dango`, the `dango` user and the Caddy configuration from the server, and removes the local `cloud.yml`. The machine itself is not deleted. No backup download is offered, and BYOS backups are deleted with the server.
 
 !!! danger
-    This is a destructive operation. For DigitalOcean deployments, the server and all its data will be permanently deleted.
+    This is a destructive operation. Before asking for confirmation, Dango reminds you that `.env` and `.dlt/secrets.toml` are not in backups by default and lists the secret names (never the values) the server holds. Download a backup first with `dango remote backup download --from-server -o <file>`.
 
 ```bash
 dango deploy destroy
 dango deploy destroy --force
-dango deploy destroy --keep-spaces --keep-ssh-key
+dango deploy destroy --delete-spaces --keep-ssh-key
 ```
 
 ---
@@ -122,7 +126,7 @@ dango deploy destroy --keep-spaces --keep-ssh-key
 
 ### dango remote status
 
-Show server status, resource usage (CPU, RAM, disk), service health, DuckDB size, and version info.
+Show server status, resource usage (CPU, RAM, disk), service health, DuckDB size, the `Off-site:` backup line, version info, Docker access state and script/notebook `Isolation:` state. On DigitalOcean it also warns about droplets tagged `dango` that `cloud.yml` does not name.
 
 ```bash
 dango remote status
@@ -248,6 +252,45 @@ dango remote upgrade [OPTIONS]
 | `--version TEXT` | Specific version (defaults to latest on PyPI) |
 | `-y`, `--yes` | Skip confirmation prompt |
 | `--skip-backup` | Skip the pre-upgrade backup |
+| `--force` | Allow a downgrade to an older version |
+
+Upgrade your local `dango` first. See [Server Operations](../deployment/server-operations.md#upgrading-dango) for the workflow, the 1.0.14 notes (Python on the server, custom Metabase pin, interrupted upgrades) and what a failed upgrade leaves.
+
+---
+
+### dango remote power-on
+
+Power on a DigitalOcean droplet left off by an interrupted resize, then start services. It uses the DigitalOcean API, so it works when SSH cannot connect. Not available for BYOS.
+
+```bash
+dango remote power-on
+```
+
+---
+
+### dango remote upload
+
+Upload one file into the server project's `data/` directory.
+
+```bash
+dango remote upload LOCAL_PATH [REMOTE_PATH]
+```
+
+`REMOTE_PATH` is relative to the project root and must be under `data/` (default: the file's own path inside the project). Single regular files up to 2 GiB; `data/warehouse.duckdb*` and `data/.tmp` are refused. See [Remote Management](../deployment/remote-management.md#upload-one-data-file).
+
+---
+
+### dango remote isolation
+
+Inspect, opt out of, and restore the restricted users that run scripts and notebooks on the server.
+
+```bash
+dango remote isolation status         # on | disabled | missing | unknown | unsupported
+dango remote isolation disable --yes  # audited administrator opt-out
+dango remote isolation enable         # remove the opt-out and verify isolation
+```
+
+See [Script and notebook isolation](../deployment/server-operations.md#script-and-notebook-isolation).
 
 ---
 
@@ -268,17 +311,21 @@ dango remote resize [SIZE]
 
 ### dango remote migrate
 
-Migrate to a new server (new droplet for disk/region changes). Transfers data via Spaces.
+**Switched off in 1.0.14.** The command refuses before it contacts any server or provider, exits with status 1, and prints the manual path. It returns in a later release.
 
 ```bash
-dango remote migrate [OPTIONS]
+dango remote migrate
 ```
 
-| Option | Required | Description |
-|--------|----------|-------------|
-| `--size TEXT` | Yes | Size slug for the new server |
-| `--region TEXT` | No | Region slug (defaults to current region) |
-| `-y`, `--yes` | No | Skip confirmation prompt |
+Options (`--size`, `--region`, `--yes`) are accepted and ignored. To change the server size, use [`dango remote resize`](#dango-remote-resize). To move to another server or region:
+
+1. `dango remote backup download --from-server -o ./backup.tar.gz`
+2. `dango deploy destroy`
+3. `dango deploy`
+4. `dango remote backup restore ./backup.tar.gz --from-local`
+5. Re-enter secrets (they are not in backups by default) and update DNS.
+
+See [Moving to a New Server](../deployment/server-operations.md#moving-to-a-new-server) for details.
 
 ---
 
@@ -441,7 +488,7 @@ dango remote domain remove
 
 ### dango remote backup
 
-Trigger an on-demand backup on the server.
+Trigger an on-demand backup on the server. It ends with an `Off-site:` line: `yes (Spaces <bucket>)` or `NO: backups exist only on this server and are lost with it`.
 
 ```bash
 dango remote backup
@@ -461,7 +508,7 @@ dango remote backup list
 
 ### dango remote backup enable
 
-Enable daily scheduled backups via systemd timer. Requires Spaces to be configured.
+Enable daily scheduled backups via systemd timer. With a Spaces destination (and both Spaces keys in the server `.env`) backups are uploaded off-site; without one (always the case on BYOS unless you configure it) they stay on the server, and the command prints `Off-site: NO` with the command to keep a copy.
 
 ```bash
 dango remote backup enable
@@ -481,26 +528,31 @@ dango remote backup disable
 
 ### dango remote backup download
 
-Download a backup archive from Spaces.
+Download a backup archive from Spaces, or create one on the server and download it over SSH with `--from-server` (no Spaces needed; works on BYOS).
 
 ```bash
 dango remote backup download NAME [OPTIONS]
+dango remote backup download --from-server [OPTIONS]
 ```
 
 | Option | Description |
 |--------|-------------|
 | `-o`, `--output PATH` | Local path to save the backup (defaults to current directory) |
+| `--from-server` | Create a backup on the server and download it over SSH instead of using Spaces |
+
+The command prints `secrets are not in this backup; re-enter: <names>` when the archive has no secrets (names only, never values).
 
 ```bash
 dango remote backup download backup-20260224-143000.tar.gz
 dango remote backup download backup-20260224-143000.tar.gz -o ./my-backup.tar.gz
+dango remote backup download --from-server -o ./latest-backup.tar.gz
 ```
 
 ---
 
 ### dango remote backup restore
 
-Restore the server from a Spaces backup. Downloads the backup to the server, then restores it.
+Restore the server from a Spaces backup (the server downloads it, then restores it) or from a local file with `--from-local` (the file is uploaded first).
 
 ```bash
 dango remote backup restore SOURCE [OPTIONS]
@@ -509,12 +561,14 @@ dango remote backup restore SOURCE [OPTIONS]
 | Option | Description |
 |--------|-------------|
 | `-y`, `--yes` | Skip confirmation prompt |
+| `--from-local` | `SOURCE` is a local `.tar.gz` file to upload and restore |
 
 !!! warning
-    Current data on the server will be overwritten.
+    Current data on the server will be overwritten. Before asking, the command reminds you that `.env` and `.dlt/secrets.toml` are not in backups and lists the secret names on the server. A backup that holds Metabase data is refused, with nothing changed, if the server has no Metabase Docker volume. See [Backups](../deployment/backups.md#restoring-from-backup).
 
 ```bash
 dango remote backup restore backup-20260224-143000.tar.gz
+dango remote backup restore ./my-backup.tar.gz --from-local
 ```
 
 ---
@@ -593,10 +647,10 @@ dango remote reset-metabase
 ## Troubleshooting
 
 ??? info "Deploy fails with SSH connection error"
-    Verify the server IP and SSH key. For BYOS, ensure the SSH user has sudo access and port 22 is open.
+    Verify the server IP and SSH key. For BYOS, the SSH user must be `root` and port 22 must be open.
 
 ??? info "Push rejected due to deploy lock"
-    Another push may be in progress. Wait for it to complete, or use `--force` to override the lock (only if you're sure no other deploy is running).
+    Another push may be in progress. Wait for it to complete, or use `--force` to override the lock (only if you're sure no other deploy is running). A lock file left by an older Dango (1.0.13 or earlier) or by a killed push also needs `--force`. See [Deploy Lock](../deployment/remote-management.md#deploy-lock).
 
 ??? info "Domain HTTPS not working"
     Ensure DNS is pointed to the server IP. Caddy automatically retries certificate issuance. Check `dango remote logs --service caddy` for details.

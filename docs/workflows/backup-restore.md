@@ -217,7 +217,7 @@ dango remote backup restore
 
 === "Pre-Deploy Backups (Server Disk)"
 
-    Stored on the server's local disk. Dango keeps the **5 most recent** pre-deploy backups and deletes older ones automatically.
+    Stored on the server's local disk (`/srv/dango/backups/deploy/`). After a push, upgrade or resize backup, Dango keeps only the newest archive and deletes older ones.
 
 === "Scheduled Backups (DigitalOcean Spaces)"
 
@@ -226,20 +226,22 @@ dango remote backup restore
     - **Daily**: Keep all backups from the last **7 days**
     - **Weekly**: Keep **1 backup per week** for up to **4 weeks** older than 7 days
 
-    Older backups are pruned automatically.
+    Older backups are pruned automatically. The archive is removed from the server after a verified upload; if the upload cannot be verified, it stays on the server, nothing is pruned and the run is recorded as failed. Without a Spaces destination (always the case on BYOS unless you configure one), backups stay on the server and are lost with it: every backup command prints an `Off-site:` line, and `dango remote backup download --from-server -o <file>` saves a copy locally.
 
 ### What Cloud Backups Include
 
 Cloud backups are tar.gz archives containing:
 
-- `data/warehouse.duckdb` — full database
-- `.dango/auth.db` — authentication database
-- `.dango/project.yml`, `.dango/sources.yml`, `.dango/cloud.yml` — configuration
-- `.dango/metabase.yml` — Metabase connection details (the Metabase admin password is not included)
-- `.dango/logs/audit.jsonl` — audit log
-- `.dlt/secrets.toml` — credentials
-- `.dlt/pipelines/` — dlt pipeline state
-- `dbt/profiles.yml` — dbt connection profile
+- `data/` (regular files, including `data/warehouse.duckdb`)
+- `.dango/auth.db`, `.dango/auth.yml`, `.dango/dango.db`, `.dango/scheduler.db`
+- `.dango/project.yml`, `.dango/sources.yml`, `.dango/schedules.yml`, `.dango/monitors.yml`, `.dango/scripts.yml`, `.dango/pii-overrides.yml`
+- `.dango/metabase.yml`: Metabase connection details (the Metabase admin password is not included)
+- `.dango/logs/audit.jsonl` and `.dango/logs/activity.jsonl`
+- `dbt/profiles.yml`, `dbt/dbt_project.yml`, `dbt/packages.yml`, `dbt/models/`, `dbt/macros/`, `dbt/seeds/`
+- `notebooks/`, `scripts/`, `custom_sources/`
+- Metabase H2 database files from the Docker volume
+
+Not included: `.env` and `.dlt/secrets.toml` (unless `include_secrets` is set in the server's `cloud.yml`), `.dango/cloud.yml`, `.dlt/pipelines/`, WAL and temporary files. The manifest lists the names (never values) of the secrets the server holds, and `download` and `restore` print them so you know what to re-enter. See [Backups](../deployment/backups.md).
 
 ---
 

@@ -350,6 +350,7 @@ API keys let external scripts and services authenticate with your Dango instance
 - Each key inherits the creating user's role and permissions
 - Use **one key per integration** (e.g., separate keys for a reporting script and a CI pipeline) so you can revoke individually
 - Rotate keys periodically: create a new key, update your script, then revoke the old key
+- Creating a key asks for your current password, and all of an account's keys stop working when its password is changed or reset, so plan to re-issue keys after a password change
 
 ### Query Endpoint for External Scripts
 
@@ -359,6 +360,7 @@ The `POST /api/query` endpoint lets external scripts run read-only SQL against y
 
 - Read-only, `SELECT`-only (enforced by sqlglot whitelist + DuckDB `read_only` mode)
 - Default limits: **10,000 rows**, **30-second timeout** (configurable via [`api.query_max_rows` and `api.query_timeout_seconds`](../reference/configuration.md#api-section) in `project.yml`)
+- At most 4 queries at once (HTTP 429 beyond that); a query that times out is interrupted
 - Requires authentication (API key or session)
 - Every query is audit-logged
 

@@ -137,14 +137,14 @@ auth:
 | `idle_timeout_minutes` | integer | `1440` (24h) | Session idle timeout in minutes |
 | `session_max_days` | integer | `365` (1 year) | Maximum session lifetime in days |
 | `password_max_age_days` | integer | `0` (disabled) | Force password change after this many days. `0` disables rotation. When expired, user is redirected to the change-password page on next login. OAuth login bypasses rotation. |
-| `require_2fa` | boolean | `false` | Require all users to set up TOTP 2FA |
+| `require_2fa` | boolean | `false` | Require all users to set up TOTP 2FA. A user without TOTP gets an enrollment-only session (TOTP setup, logout, password change, account page) until a code is verified |
 | `rate_limit.enabled` | boolean | `true` | Enable rate limiting |
 | `rate_limit.login.requests` | integer | `10` | Max login attempts per window |
 | `rate_limit.login.window_seconds` | integer | `60` | Login rate limit window |
 | `rate_limit.api.requests` | integer | `200` | Max API requests per window |
 | `rate_limit.api.window_seconds` | integer | `60` | API rate limit window |
 | `rate_limit.trusted_proxies` | list[string] | `[]` | IPs of trusted reverse proxies |
-| `lockout.max_attempts` | integer | `5` | Failed attempts before lockout |
+| `lockout.max_attempts` | integer | `5` | Failed attempts before lockout, per address and email. The account locks after 4 times this many failures from any addresses |
 | `lockout.lockout_minutes` | integer | `15` | Lockout duration in minutes |
 | `oauth_providers` | dict | `{}` | OAuth login providers (keyed by `google`, `github`) with `client_id` and `client_secret` |
 
@@ -162,7 +162,7 @@ api:
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
 | `query_max_rows` | integer | `10000` | Maximum rows returned by `POST /api/query`. Increase for scheduled reporting scripts pulling large datasets. |
-| `query_timeout_seconds` | integer | `30` | Query timeout in seconds. Increase for complex analytical queries. |
+| `query_timeout_seconds` | integer | `30` | Query timeout in seconds. Increase for complex analytical queries. A query past the timeout is interrupted. At most 4 queries run at once (not configurable); more get HTTP 429. |
 
 ---
 

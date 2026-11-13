@@ -9,7 +9,7 @@ Deploy Dango to a DigitalOcean droplet with the guided wizard.
 Before deploying, make sure you have:
 
 - [ ] A **DigitalOcean account** ([sign up](https://cloud.digitalocean.com/registrations/new))
-- [ ] A **Personal Access Token** with Read+Write scope ([create one](https://cloud.digitalocean.com/account/api/tokens))
+- [ ] A **Personal Access Token** ([create one](https://cloud.digitalocean.com/account/api/tokens)). A scoped token needs droplet create/read/update/delete/actions; firewall create/read/update/delete; SSH key create/read/delete; tag create/read; and regions, sizes, and images read. Spaces uses separate keys.
 - [ ] A **configured Dango project** with at least one source in `sources.yml`
 - [ ] **Credentials configured** in `.dlt/secrets.toml` for your sources
 
@@ -17,8 +17,10 @@ Before deploying, make sure you have:
     Your DO token can be provided three ways (checked in this order):
 
     1. `DIGITALOCEAN_TOKEN` environment variable
-    2. Stored in `.dango/cloud.yml` from a previous deployment
+    2. Saved in `.dango/credentials` in the project, or in `~/.dango/credentials`
     3. Prompted during the wizard
+
+    A scoped token that lacks a permission fails with "Your DigitalOcean token is missing a permission" and lists the scopes above. Without the `ssh_key` delete permission, the SSH key Dango uploaded stays in your account when a deployment is destroyed or a failed deploy is cleaned up.
 
 ## Quick Start
 
@@ -27,6 +29,12 @@ dango deploy
 ```
 
 That's it. The wizard walks you through every decision interactively. The rest of this page explains each step in detail.
+
+!!! note "Droplets left behind by an interrupted deploy"
+    If a deploy is killed hard (for example power loss), a droplet can be left running without being recorded in `.dango/cloud.yml`. `dango deploy` and `dango remote status` warn about any droplet tagged `dango` that your `cloud.yml` does not name, with its id, so you can delete it in the DigitalOcean console. Nothing is deleted automatically. See [Destroy & Cleanup](destroy.md#orphaned-resources).
+
+!!! warning "Deploying without a domain"
+    The site serves plain HTTP, so credentials and cookies travel unencrypted. Dango's default DigitalOcean firewall opens ports 22, 80, and 443 publicly. Without a domain, restrict web access with `dango deploy --allow-ip YOUR_IPV4` (repeatable), or explicitly acknowledge public access with `--accept-http-exposure`. The wizard can also detect the IP address the server sees. `dango remote domain set DOMAIN` reopens web ports before setting up HTTPS so a certificate can be issued.
 
 ---
 
@@ -195,10 +203,10 @@ After confirmation, the wizard provisions your server automatically. This takes 
 1. **Generate SSH key pair** &mdash; creates a dedicated key for server access
 2. **Upload SSH key** to your DigitalOcean account
 3. **Create cloud firewall** &mdash; allows SSH (22), HTTP (80), HTTPS (443) inbound
-4. **Provision droplet** &mdash; creates the VM with Ubuntu 22.04
+4. **Provision droplet**: creates the VM with Ubuntu 22.04 (the image is pinned; the create request is sent only once, and a droplet whose creation answer was lost is found again by its name rather than created twice)
 5. **Wait for droplet** &mdash; polls until the droplet is active and has an IP
 6. **Verify SSH** &mdash; waits for SSH to become reachable
-7. **Server setup** &mdash; installs Docker, Caddy, Python, fail2ban, and configures the server (16 steps)
+7. **Server setup**: installs Docker, Caddy, Python, fail2ban, and configures the server (16 steps). Ubuntu 22.04 ships Python 3.10, so Dango installs a pinned, checksum-verified Python 3.12 under `/opt/dango/python` for the Dango venv
 8. **Sync project files** &mdash; pushes configuration and dbt files
 9. **Generate dbt profiles** &mdash; creates `profiles.yml` tuned for the server's hardware
 10. **Push credentials** &mdash; securely transfers `.dlt/secrets.toml` and `.env`
@@ -324,6 +332,8 @@ Backups are configured during the deploy wizard (Step 7). You can:
 - **Enable scheduled backups** to DigitalOcean Spaces (daily at 02:00 UTC)
 - **Reuse an existing Spaces bucket** from a previous deployment
 - **Skip backup setup** and configure it later with `dango remote backup enable`
+
+The wizard writes the bucket and region to the server `.env` (`SPACES_BUCKET`, `SPACES_REGION`) together with the Spaces keys, and the server's scheduled backup reads them from there. Run `dango remote status` any time: its `Backups` panel says `Off-site: yes (Spaces <bucket>)` or `Off-site: NO: ...` with the reason, so a backup that never leaves the server is not mistaken for an off-site one.
 
 If you reused an existing bucket, your retention policy will apply to all backups in that bucket (both old and new).
 

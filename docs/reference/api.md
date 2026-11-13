@@ -367,6 +367,8 @@ Authenticate with email and password. Sets a session cookie on success.
 
 If the user has 2FA enabled, a partial session is returned and `POST /api/auth/2fa/verify` must be called next.
 
+If `auth.require_2fa` is on and the user has not set up TOTP, the response is `{"requires_2fa_setup": true, "must_change_password": ...}` with an enrollment-only session cookie (30 minutes). That session may call only the 2FA setup endpoints, logout, change-password, `GET /api/auth/me` and the account page; everything else answers 403 (browsers are redirected to the account page). The full session is issued by `POST /api/auth/2fa/verify-setup` once the code is verified. A locked account answers 423.
+
 #### POST /api/auth/logout
 
 Invalidate the current session.
@@ -412,6 +414,7 @@ Create a new API key.
 |-----------|:--:|------|:--------:|-------------|
 | `name` | body | string | Yes | Key name |
 | `expires_at` | body | datetime | No | Optional expiry date |
+| `current_password` | body | string | Yes, for accounts with a Dango password | Current password. A wrong value answers 400 and counts as a failed sign-in; a locked account answers 423 |
 
 ??? example "Response"
     ```json
@@ -425,6 +428,8 @@ Create a new API key.
 
 !!! warning
     The full key is only returned once at creation time. Store it securely.
+
+All of a user's API keys are revoked when the password is changed or reset, when an admin revokes the user's sessions, and when the user is deactivated.
 
 #### GET /api/auth/api-keys
 
@@ -468,7 +473,7 @@ Handle OAuth provider callback after authorization.
 
 #### POST /api/auth/2fa/setup
 
-Begin 2FA setup. Verifies password, generates TOTP secret and recovery codes.
+Begin 2FA setup. Verifies password (an enrollment session of an account with no Dango password, such as an OAuth sign-in, is not asked for one), generates TOTP secret and recovery codes.
 
 **Permission:** Authenticated
 
@@ -497,7 +502,7 @@ Complete 2FA setup by verifying a TOTP code from the authenticator app.
 
 #### POST /api/auth/2fa/verify
 
-Verify a TOTP code or recovery code to upgrade a partial session to a full session. Called after login when 2FA is enabled.
+Verify a TOTP code or recovery code to upgrade a partial session to a full session. Called after login when 2FA is enabled. Failed codes are counted per partial session (5) and per account, with a growing lockout (423) that a password sign-in does not reset; a TOTP code of an already accepted time-step is refused.
 
 **Permission:** Partial session (public with valid partial session cookie)
 
@@ -507,14 +512,16 @@ Verify a TOTP code or recovery code to upgrade a partial session to a full sessi
 
 #### POST /api/auth/2fa/disable
 
-Disable 2FA for the current user.
+Disable 2FA for the current user. The password alone is not enough: a TOTP code or a recovery code is required too.
 
 **Permission:** Authenticated
 
 | Parameter | In | Type | Required | Description |
 |-----------|:--:|------|:--------:|-------------|
 | `password` | body | string | Yes | Current password (verification) |
+| `code` | body | string | Yes | 6-digit TOTP code, or a recovery code |
 
+Wrong passwords and codes count as failed attempts; a locked account answers 423.
 #### POST /api/auth/2fa/regenerate-recovery
 
 Regenerate recovery codes. Requires both password and TOTP verification.
@@ -552,7 +559,7 @@ Resend an invite link to a user who hasn't accepted yet.
 
 #### PUT /api/admin/users/{user_id}/role
 
-Change a user's role.
+Change a user's role. The Metabase role is synced in the same request. If any Metabase step fails, the role is still changed in Dango but the response is `502` and the user's Metabase access stays suspended; send the request again with the current role to retry.
 
 | Parameter | In | Type | Required | Description |
 |-----------|:--:|------|:--------:|-------------|
@@ -560,11 +567,11 @@ Change a user's role.
 
 #### POST /api/admin/users/{user_id}/reset-password
 
-Generate a password reset link for a user.
+Generate a temporary password for a user. The user's sessions and API keys are revoked.
 
 #### POST /api/admin/users/{user_id}/deactivate
 
-Deactivate a user (preserves account, revokes access).
+Deactivate a user (preserves account; sessions and API keys are revoked).
 
 #### POST /api/admin/users/{user_id}/reactivate
 
@@ -576,11 +583,11 @@ Permanently delete a user.
 
 #### POST /api/admin/users/{user_id}/unlock
 
-Unlock an account that was locked due to too many failed login attempts.
+Unlock an account that was locked due to too many failed login attempts. Clears the per-address, account-wide and TOTP code counters.
 
 #### POST /api/admin/users/{user_id}/revoke-sessions
 
-Revoke all active sessions for a user (forces re-login).
+Revoke all active sessions and API keys for a user (forces re-login).
 
 ---
 
@@ -683,7 +690,7 @@ Upload a CSV, JSON, or Parquet file to a source.
 | Parameter | In | Type | Required | Description |
 |-----------|:--:|------|:--------:|-------------|
 | `source_name` | path | string | Yes | Source name |
-| `file` | body (multipart) | file | Yes | File to upload |
+| `file` | body (multipart) | file | Yes | File to upload (maximum 100 MB; larger files answer 413) |
 | `trigger_sync` | query | boolean | No | Trigger sync after upload (default: false) |
 
 #### GET /api/sources/{source_name}/csv-files
@@ -694,7 +701,7 @@ List files for a source (on disk and loaded in database).
 
 #### DELETE /api/sources/{source_name}/csv-files
 
-Delete a file from the filesystem.
+Delete a file the source loads: a file in the source's directory that matches its `file_pattern` and is in a format the loader reads. The warehouse database (and its WAL and temporary files), `.dango` state files and any other file answer 403. The file's rows and metadata record are removed in one transaction while the DuckDB write lock is held; a running sync or dbt run makes the request answer 409 (try again when it finishes), and a failed cleanup answers 500 and leaves the file in place.
 
 **Permission:** `csv.delete`
 
@@ -1042,7 +1049,8 @@ Execute an ad-hoc read-only SQL query against DuckDB.
 3. DuckDB connection opened in `read_only` mode
 4. Result limited to 10,000 rows
 5. SQL input limited to 100 KB
-6. 30-second query timeout
+6. 30-second query timeout: the query is interrupted and its connection closed
+7. At most 4 queries run at once; further requests answer `429` (`DANGO-Q008`) until one finishes
 
 | Parameter | In | Type | Required | Description |
 |-----------|:--:|------|:--------:|-------------|

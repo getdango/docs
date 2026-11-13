@@ -55,14 +55,16 @@ dango auth enable
 
 ### dango auth disable
 
-Disable authentication for this project. All endpoints become accessible without login.
+Disable authentication for this project. Requests from the same machine (same origin) no longer need to log in. User management still requires login.
 
 ```bash
 dango auth disable
 ```
 
 !!! warning
-    Disabling auth removes all access control. Anyone with network access to the platform can view and modify data.
+    Disabling auth removes access control for local requests. Run `dango auth enable` to turn it back on.
+
+`dango auth disable` is refused on a cloud server ("Authentication cannot be disabled on a cloud server."). Authentication stays on there.
 
 ---
 
@@ -122,7 +124,7 @@ dango auth reset-password EMAIL
 dango auth reset-password alice@example.com
 ```
 
-The user must change the temporary password on next login.
+The user must change the temporary password on next login. The user's sessions and API keys are revoked.
 
 ---
 
@@ -139,11 +141,13 @@ dango auth change-role alice@example.com admin
 dango auth change-role bob@example.com viewer
 ```
 
+The Metabase role is synced too. If that step does not complete, the command prints a warning, the local role is already changed, and the user's Metabase access stays suspended until you run the command again (with the current role) and it succeeds. See [Users & Roles](../security/users-roles.md#changing-roles).
+
 ---
 
 ### dango auth deactivate-user
 
-Soft-disable a user account. The user cannot log in but the account is preserved.
+Soft-disable a user account. The user cannot log in, their sessions and API keys are revoked, and the account is preserved.
 
 ```bash
 dango auth deactivate-user EMAIL
@@ -190,7 +194,7 @@ dango auth delete-user old-employee@example.com
 
 ### dango auth unlock
 
-Unlock a user account that was locked out due to failed login attempts.
+Unlock a user account that was locked out due to failed login attempts. It clears the per-address and account-wide counters and the lock on failed TOTP or recovery codes.
 
 ```bash
 dango auth unlock EMAIL
@@ -199,6 +203,8 @@ dango auth unlock EMAIL
 ```bash
 dango auth unlock alice@example.com
 ```
+
+The command also clears counters when the account does not look locked, and then says so.
 
 ---
 
@@ -265,7 +271,7 @@ See [Deploy & Remote](deploy-remote.md#remote-user-management) for details.
     Run `dango auth recover` to create a recovery admin account, then use it to reset other passwords.
 
 ??? info "User locked out"
-    Run `dango auth unlock user@example.com` to unlock the account. Accounts are locked after repeated failed login attempts.
+    Run `dango auth unlock user@example.com` to unlock the account. Accounts are locked after repeated failed login attempts (from one address, or in total from many) and TOTP codes have their own lock; unlock clears all of them.
 
 ??? info "Auth enabled but can't access platform"
     Check `dango auth status` to confirm auth is enabled. If you set `DANGO_ADMIN_PASSWORD` during init, that's the admin password. For automated testing/CI, use `--skip-wizard` or set the env var.

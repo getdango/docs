@@ -10,11 +10,11 @@ Your server must meet these requirements:
 
 | Requirement | Minimum | Recommended |
 |-------------|---------|-------------|
-| **OS** | Ubuntu 22.04 LTS | Ubuntu 22.04 or 24.04 LTS |
+| **OS** | Ubuntu 22.04 LTS | Ubuntu 24.04 LTS (22.04 is also supported) |
 | **RAM** | 4 GB | 4 GB+ |
 | **CPU** | 1 vCPU | 2+ vCPU |
 | **Disk** | 20 GB free | 50 GB+ free |
-| **Access** | SSH access (root or sudo) | Root access |
+| **Access** | Root SSH access | Root SSH access |
 | **Ports** | 22 (SSH) | 22, 80, 443 open |
 
 Additionally, you need:
@@ -22,6 +22,10 @@ Additionally, you need:
 - [ ] A **configured Dango project** with at least one source in `sources.yml`
 - [ ] **Credentials configured** in `.dlt/secrets.toml` for your sources
 - [ ] **SSH key** &mdash; existing key or the wizard generates one
+- [ ] A **fresh host**, or one where `/srv/dango` does not exist yet. If `/srv` or `/srv/dango` already exists it must be a root-owned directory closed to other users (see [Troubleshooting](#srvdango-already-exists))
+- [ ] **Python 3.11&ndash;3.13 for the Dango venv.** Ubuntu 24.04 has Python 3.12. Ubuntu 22.04 ships Python 3.10, so Dango downloads a pinned, checksum-verified Python 3.12 build and installs it under `/opt/dango/python`; that needs outbound HTTPS to `github.com` and `release-assets.githubusercontent.com`, or a root-owned Python 3.11&ndash;3.13 you install yourself from the operating system's packages
+- [ ] **`fs.protected_hardlinks=1`** (the Ubuntu and Debian default; check with `sysctl fs.protected_hardlinks`). Setup runs root commands over directories the `dango` user can write, which is safe only with this kernel setting, so a host with another value is refused before anything is changed
+- [ ] Basic tools on the host: `curl`, `sha256sum`, `tar`, `find`, `readlink`, `mktemp` and `flock` (from `util-linux`)
 
 !!! note "Docker Not Required"
     You do not need Docker pre-installed. The wizard installs Docker automatically via `get.docker.com` during server setup.
@@ -34,6 +38,15 @@ dango deploy --byos
 
 The wizard connects to your server via SSH, validates the environment, and installs everything. The rest of this page explains each step.
 
+!!! warning "HTTP and host firewall"
+    Without a domain, logins and cookies travel over plain HTTP. BYOS refuses `--allow-ip` because Dango cannot manage your provider firewall; restrict ports 80/443 with your own firewall and pass `--accept-http-exposure`, or configure a domain for HTTPS. The web service binds to `127.0.0.1` behind Caddy.
+
+!!! note "Backups on BYOS"
+    The `dango deploy --byos` summary ends with "Backups: not configured. BYOS backups live only on this server and are lost with it." and prints `dango remote backup download --from-server -o ./backup.tar.gz`. Secrets (`.env`, `.dlt/secrets.toml`) are not in backups by default. See [Backups](backups.md#where-backups-are-stored).
+
+!!! note "Host layout for runner isolation"
+    Keep `/srv/dango/project` on a normal directory rather than a bind mount. A restore that replaces a bind-mounted project can fall back to copy and delete, so an interruption may leave a partial replacement. If you widen the host's `net.ipv4.ip_local_port_range`, the notebook runner can reach other local services listening within that range; keep sensitive services outside it or restrict them separately.
+
 ---
 
 ## Wizard Walkthrough
@@ -43,7 +56,7 @@ The wizard connects to your server via SSH, validates the environment, and insta
 Provide your server's connection details:
 
 - **IP address or hostname** &mdash; the server's public IP or DNS name
-- **SSH user** &mdash; defaults to `root`
+- **SSH user** &mdash; must be `root`; sudo-based setup is not supported
 - **SSH key** &mdash; path to your private key, or the wizard generates a new keypair
 
 ```
@@ -67,7 +80,7 @@ Testing SSH connection to 203.0.113.50...
     If the server is not running Ubuntu, the wizard shows a warning but allows you to proceed. Dango is tested on Ubuntu 22.04 and 24.04 &mdash; other distributions may work but are not officially supported.
 
 !!! info "Ubuntu 22.04 vs 24.04"
-    Both versions are fully supported. The SSH service name differs between versions (`sshd` on 22.04, `ssh` on 24.04) &mdash; Dango detects this automatically during setup.
+    Both versions are supported; 24.04 is recommended for a new server because it ships a supported Python (3.12). The SSH service name differs between versions (`sshd` on 22.04, `ssh` on 24.04); Dango detects this automatically during setup. On 22.04, Dango installs its own Python 3.12 under `/opt/dango/python` (see [Prerequisites](#prerequisites)).
 
 The wizard auto-detects your server's hardware using `nproc` (CPU count) and `free` (RAM) to tune dbt performance settings in `profiles.yml`.
 
@@ -107,8 +120,8 @@ The BYOS wizard installs and configures Dango on your server. It does **not** ma
 | Install Docker, Caddy, Python | Yes | Yes |
 | Configure fail2ban, unattended-upgrades | Yes | Yes |
 | Cloud firewall (DO API) | Yes | No &mdash; installs UFW instead |
-| Automated backups (DO Spaces) | Yes | No &mdash; use manual snapshots |
-| `dango deploy destroy` | Yes (destroys droplet) | No &mdash; you manage the server |
+| Automated backups (DO Spaces) | Yes | Only if you configure a Spaces bucket; otherwise backups live on the server and are lost with it (see [Backups](backups.md#where-backups-are-stored)) |
+| `dango deploy destroy` | Yes (destroys droplet) | Removes Dango and its data from the server; you delete the machine |
 | `dango remote firewall` | Yes (DO cloud firewall) | No &mdash; manage UFW directly |
 | DNS/domain setup | Yes | Yes |
 | HTTPS via Caddy | Yes | Yes |
@@ -121,10 +134,10 @@ After the wizard validates your SSH connection, the following is installed and c
 
 1. **System packages** &mdash; `apt` update and install build dependencies
 2. **Dango user** &mdash; creates a `dango` system user
-3. **Docker** &mdash; installed via `get.docker.com`, `dango` user added to `docker` group
+3. **Docker** &mdash; installed via `get.docker.com`; Dango normally uses a root-owned Compose helper instead of adding the `dango` user to the `docker` group. A helper setup failure leaves a warned Docker-group fallback.
 4. **Caddy** &mdash; installed from the official apt repository (reverse proxy + auto-TLS)
 5. **Project directories** &mdash; creates `/srv/dango/` structure
-6. **Python venv** &mdash; creates virtual environment and installs `getdango` from PyPI
+6. **Python venv**: picks a Python 3.11&ndash;3.13 (the host's root-owned one, else the pinned build under `/opt/dango/python`), creates the virtual environment and installs `getdango` from PyPI
 7. **SSH hardening** &mdash; disables root password login, enforces key-only authentication
 8. **Docker daemon** &mdash; configures logging (json-file driver, 10MB max, 3 rotated files)
 9. **journald** &mdash; caps log retention at 500 MB
@@ -161,8 +174,8 @@ Different providers have different defaults. Keep these in mind when provisionin
 !!! warning "GCP default disk is too small"
     GCP instances default to 10 GB disk, which is not enough for Dango (DuckDB + Metabase + Docker images). Increase to at least 20 GB when creating the instance.
 
-!!! note "Non-root SSH users"
-    GCP and AWS disable root login by default. Use your cloud username as the SSH user and ensure it has passwordless `sudo` access. The wizard runs setup commands via `sudo`.
+!!! note "Root SSH is required"
+    GCP and AWS disable root login by default. BYOS setup needs SSH as `root` (`--ssh-user` other than `root` is refused: "BYOS deploys need SSH as root; sudo-based setup is not supported"), so enable root SSH login with your key on such a host before you deploy.
 
 **Minimum RAM:** 4 GB. Servers with 2 GB RAM cause Metabase out-of-memory crashes and are not supported.
 
@@ -187,8 +200,9 @@ dango deploy \
 |------|-------------|---------|
 | `--byos` | Enable BYOS mode (required) | Off |
 | `--server-ip` | Server IP address or hostname | Prompted |
-| `--ssh-user` | SSH username | `root` |
+| `--ssh-user` | SSH username (must be `root`) | `root` |
 | `--ssh-key` | Path to SSH private key | Prompted |
+| `--accept-http-exposure` | Required without `--domain` in non-interactive mode: acknowledge plain HTTP (`--allow-ip` is refused on BYOS) | Off |
 
 All [common flags](digitalocean.md#cli-flags) also apply (`--non-interactive`, `--admin-email`, `--admin-password`, `--domain`).
 
@@ -242,6 +256,43 @@ Warning: Server is not running Ubuntu. Proceed anyway? [y/N]
 ```
 
 Dango is tested on Ubuntu 22.04 and 24.04 LTS. Other Debian-based distributions (Debian 11+) may work. Non-Debian distributions (CentOS, Fedora, Arch) are not supported and will likely fail during package installation.
+
+### /srv/dango already exists
+
+```
+BYOS setup failed: Server setup stopped before changing anything: /srv/dango already exists and is not a root-owned directory closed to other users and without an ACL (...). Root setup would run over a tree the dango user can change.
+```
+
+Setup refuses, before any root step, a host whose `/srv` or `/srv/dango` is not a real directory owned by root, is writable by its group or others, carries an ACL, or holds a Python venv the service account can change. This includes re-running `dango deploy --byos` against an existing 1.0.13 or earlier server, where `/srv/dango` is owned by the `dango` user. To update such a server use `dango remote upgrade`. For a new server use a fresh host, or have root move the directory aside (`mv /srv/dango /srv/dango.old`) after checking it, and run `dango deploy --byos` again.
+
+### `fs.protected_hardlinks` is not 1
+
+```
+BYOS setup failed: Server setup stopped before changing anything: this host does not have fs.protected_hardlinks=1 (or it could not be read). ...
+```
+
+or, from the runner verification step on a later `dango remote upgrade`:
+
+```
+verify: fs.protected_hardlinks is not 1: root chown over service-writable directories could follow a hard link to a root file. Run: sysctl -w fs.protected_hardlinks=1
+```
+
+Set it on the server and persist it, then run the command again:
+
+```bash
+sysctl -w fs.protected_hardlinks=1
+echo 'fs.protected_hardlinks = 1' > /etc/sysctl.d/99-dango-hardlinks.conf
+```
+
+A host where the setting cannot be changed (some containers and restricted kernels) cannot run Dango's cloud setup.
+
+### No usable Python, or `flock` missing (`DANGO-D024`)
+
+```
+The server has no usable Python 3.11, 3.12 or 3.13 for the Dango venv and Dango could not install one: <cause>.
+```
+
+The cause is named in the message: the download from `github.com` / `release-assets.githubusercontent.com` failed, the file failed the size or SHA-256 check, `/opt/dango` is not a root-owned directory, or a required tool is missing (for example `flock (util-linux) is required`). Install the missing tool (`apt install util-linux curl`), allow outbound HTTPS to those hosts, or install Python 3.11, 3.12 or 3.13 from the operating system's packages (root-owned, under `/usr`, with its `venv` module), then run `dango deploy --byos` again.
 
 ### Setup step failed
 

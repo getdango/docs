@@ -6,13 +6,17 @@ Common issues and solutions for Dango installation and usage.
 
 ## Installation Issues
 
+Python 3.10 is no longer supported. Before upgrading Dango, create a new environment with Python 3.11, 3.12, or 3.13. The package now requires Pillow 13.0.0 or newer.
+
 ### Python Version Too Old
 
 **Error:**
 
 ```
-ERROR: Dango requires Python 3.10 or higher
+Python 3.11-3.13 not found
 ```
+
+This is the installer's message. `pip` refuses to install Dango on an unsupported Python with its own "requires a different Python" error.
 
 **Solution:**
 
@@ -24,7 +28,7 @@ Check your Python version and install a newer version:
     # Check your version
     python3 --version
 
-    # Install Python 3.11 (recommended)
+    # Install a supported Python interpreter
     # macOS:
     brew install python@3.11
 
@@ -35,6 +39,20 @@ Check your Python version and install a newer version:
 === "Windows"
 
     Download from [python.org](https://www.python.org/downloads/) or install from Microsoft Store.
+
+---
+
+### Cloud Upgrade or Deploy Refused (`DANGO-D024`, `DANGO-D025`)
+
+`dango remote upgrade` raises these errors **before** it stops services or changes anything, so the installed Dango keeps running. `DANGO-D024` can also stop a `dango deploy` or `dango deploy --byos` during server setup.
+
+**`DANGO-D024`: no usable Python for the server venv.** Dango 1.0.14 needs Python 3.11, 3.12 or 3.13 on the server. A root-owned Python in that range is used if present (Ubuntu 24.04). Otherwise Dango downloads a pinned, checksum-verified Python 3.12 from `github.com` and `release-assets.githubusercontent.com` and installs it under `/opt/dango/python` (Ubuntu 22.04). The message names the cause: the download failed, the file failed the size or SHA-256 check, `/opt/dango` is not a root-owned directory, or a tool is missing (`flock` from `util-linux`, `curl`, `sha256sum`, `tar`, `find`, `readlink`, `mktemp`).
+
+**Fix:** allow outbound HTTPS to those two hosts, install the missing tool, or install Python 3.11, 3.12 or 3.13 from the operating system's packages (root-owned, under `/usr`, with its `venv` module), then run the command again.
+
+**`DANGO-D025`: custom Metabase version without an administrator pin.** The project's `Dockerfile.metabase` names a Metabase version whose jar has no SHA-256 pin on the server. **Fix:** as root on the server, run the command printed at the end of the message (it contains the exact version; fill in the SHA-256 of the jar from Metabase's own download), then run `dango remote upgrade` again. See [Server Operations](../deployment/server-operations.md#upgrading-to-1014).
+
+Also upgrade your local `dango` before running `dango remote upgrade`: an older client cannot perform every 1.0.14 step.
 
 ---
 
@@ -120,7 +138,7 @@ pip install getdango
 **4. If still failing, check Python version:**
 
 ```bash
-python --version  # Must be 3.10 or higher
+python --version  # Must be 3.11, 3.12, or 3.13
 ```
 
 ---
@@ -454,6 +472,16 @@ Make sure Docker has enough resources allocated:
 - Open Docker Desktop → Settings → Resources
 - Allocate at least 4GB RAM
 - Restart Docker Desktop
+
+---
+
+### Duplicate Metabase collections after an upgrade (1.0.14)
+
+Earlier versions could create a duplicate collection on every start. After upgrading, restart Dango (`dango stop && dango start`; a package install cannot update a running process). On the first successful start, Dango archives duplicate collection paths that are proven empty and have no children. It never deletes collections.
+
+Duplicates that contain items, or whose contents could not be checked, stay active and are listed in `.dango/state/metabase_collection_repair.json`, together with how to restore an archived collection. Review that file and merge or archive the remaining duplicates yourself in Metabase.
+
+An open Metabase page that is interrupted by a restart (for example after a sync) reconnects on its own; the maintenance page also has a **Retry now** button.
 
 ---
 
